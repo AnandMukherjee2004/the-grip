@@ -15,7 +15,7 @@ export function HeroCtas() {
         <span className="hero-cta-streak" aria-hidden="true" />
       </a>
 
-      <a href="#cta" className="hero-cta-secondary">
+      <a href="/demo" className="hero-cta-secondary">
         Book a Demo
       </a>
     </div>

@@ -8,6 +8,7 @@ export const TOOLS: Tool[] = [
     category: "crm",
     description: "Inbound marketing, sales, and service software.",
     icon: "🟧",
+    logo: "/assets/crm-logos/hubspot.svg",
     popular: true,
   },
   {
@@ -16,6 +17,7 @@ export const TOOLS: Tool[] = [
     category: "crm",
     description: "Cloud-based customer relationship management platform.",
     icon: "☁️",
+    logo: "/assets/crm-logos/salesforce.svg",
     popular: true,
   },
   {
@@ -24,6 +26,7 @@ export const TOOLS: Tool[] = [
     category: "crm",
     description: "Lead management and marketing automation platform.",
     icon: "📈",
+    logo: "/assets/crm-logos/leadsquared.png",
   },
   {
     id: "freshsales",
@@ -31,6 +34,7 @@ export const TOOLS: Tool[] = [
     category: "crm",
     description: "AI-powered CRM with email, phone, and activity tracking.",
     icon: "🍃",
+    logo: "/assets/crm-logos/freshsales.svg",
   },
   {
     id: "zoho-crm",
@@ -38,6 +42,7 @@ export const TOOLS: Tool[] = [
     category: "crm",
     description: "Global online sales suite to manage sales and contacts.",
     icon: "💼",
+    logo: "/assets/crm-logos/zoho_logo_icon_169675.svg",
   },
   {
     id: "pipedrive",
@@ -45,6 +50,7 @@ export const TOOLS: Tool[] = [
     category: "crm",
     description: "Sales pipeline and CRM tool for small-to-medium teams.",
     icon: "⚡",
+    logo: "/assets/crm-logos/pipedrive.png",
   },
   {
     id: "monday-crm",
@@ -52,6 +58,7 @@ export const TOOLS: Tool[] = [
     category: "crm",
     description: "Customizable sales CRM to manage pipelines and processes.",
     icon: "📅",
+    logo: "/assets/crm-logos/monday-crm.jpeg",
   },
   {
     id: "close-crm",
@@ -68,6 +75,7 @@ export const TOOLS: Tool[] = [
     category: "payments",
     description: "Popular payment gateway for businesses in India.",
     icon: "💳",
+    logo: "/assets/crm-logos/razorpay.svg",
     popular: true,
   },
   {
@@ -76,6 +84,7 @@ export const TOOLS: Tool[] = [
     category: "payments",
     description: "Financial infrastructure and payments platform for the internet.",
     icon: "🟪",
+    logo: "/assets/crm-logos/stripe.svg",
     popular: true,
   },
   {
@@ -84,6 +93,7 @@ export const TOOLS: Tool[] = [
     category: "payments",
     description: "Local payment processing solutions for emerging markets.",
     icon: "💸",
+    logo: "/assets/crm-logos/payu.png",
   },
   {
     id: "cashfree",
@@ -91,6 +101,7 @@ export const TOOLS: Tool[] = [
     category: "payments",
     description: "Bulk payouts, payment gateways, and banking APIs.",
     icon: "🏦",
+    logo: "/assets/crm-logos/Cashfree.svg",
   },
   {
     id: "paytm-business",
@@ -98,6 +109,7 @@ export const TOOLS: Tool[] = [
     category: "payments",
     description: "Merchant payments and business financial operations.",
     icon: "📱",
+    logo: "/assets/crm-logos/paytm.svg",
   },
 
   // E-commerce
@@ -107,6 +119,7 @@ export const TOOLS: Tool[] = [
     category: "ecommerce",
     description: "All-in-one commerce platform to start, run, and grow a store.",
     icon: "🛍️",
+    logo: "/assets/crm-logos/shopify.svg",
     popular: true,
   },
   {
@@ -115,6 +128,7 @@ export const TOOLS: Tool[] = [
     category: "ecommerce",
     description: "Open-source e-commerce plugin built for WordPress.",
     icon: "🛒",
+    logo: "/assets/crm-logos/WooCommerce_Logo.svg"
   },
   {
     id: "magento",
@@ -129,6 +143,7 @@ export const TOOLS: Tool[] = [
     category: "ecommerce",
     description: "SaaS-based e-commerce supply chain management technology.",
     icon: "📦",
+    logo: "/assets/crm-logos/unicommerce.jpeg",
   },
 
   // Communication
@@ -146,6 +161,7 @@ export const TOOLS: Tool[] = [
     category: "communication",
     description: "Customer service platform with live chat, AI, and helpdesk.",
     icon: "💬",
+    logo: "/assets/crm-logos/intercom.svg",
     popular: true,
   },
   {
@@ -154,6 +170,7 @@ export const TOOLS: Tool[] = [
     category: "communication",
     description: "Web service APIs for sending SMS, calls, and emails.",
     icon: "📞",
+    logo: "/assets/crm-logos/twilio.svg",
   },
   {
     id: "freshdesk",

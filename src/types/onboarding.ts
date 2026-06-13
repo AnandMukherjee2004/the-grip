@@ -6,6 +6,7 @@ export interface Tool {
   category: ToolCategory;
   description: string;
   icon: string; // emoji or icon name
+  logo?: string; // image logo URL
   popular?: boolean;
 }
 

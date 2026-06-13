@@ -56,9 +56,7 @@ export function Navbar() {
 
   return (
     <div ref={centerWrapRef} className="lg-wrap lg-wrap--center">
-      <nav ref={centerNavRef} className="lg-nav" aria-label="Primary">
-        <span className="lg-shine" aria-hidden="true" />
-        <span className="lg-indicator" data-lg-indicator aria-hidden="true" />
+      <nav ref={centerNavRef} className="lg-nav px-16 py-3" aria-label="Primary">
         <ul className="lg-list">
           {NAV_ITEMS.map((item, i) => (
             <li key={item.href}>
