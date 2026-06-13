@@ -53,7 +53,7 @@ export function PricingSection() {
                 </li>
               ))}
             </ul>
-            <a href="/onboarding/tools" className="btn btn-ghost">
+            <a href="/onboarding" className="btn btn-ghost">
               Start free trial
             </a>
           </div>
@@ -76,7 +76,7 @@ export function PricingSection() {
                 </li>
               ))}
             </ul>
-            <a href="/onboarding/tools" className="btn btn-gradient">
+            <a href="/onboarding" className="btn btn-gradient">
               Start free trial
             </a>
           </div>

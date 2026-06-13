@@ -2,7 +2,7 @@ export function HeroCtas() {
   return (
     <div className="hero-ctas">
       <a
-        href="/onboarding/tools"
+        href="/onboarding"
         className="hero-cta-primary"
         aria-current="page"
       >

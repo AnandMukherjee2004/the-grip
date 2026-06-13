@@ -24,7 +24,7 @@ export function CtaSection() {
           required. Just your pipeline, finally in one place.
         </p>
         <a
-          href="/onboarding/tools"
+          href="/onboarding"
           className="btn btn-gradient"
           data-rv
           style={{ "--d": "240ms" } as React.CSSProperties}
