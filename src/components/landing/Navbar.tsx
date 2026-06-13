@@ -1,101 +1,79 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
+import { initLiquidNav } from "@/lib/liquid-nav";
+
+const NAV_ITEMS = [
+  { href: "#solution", label: "Product" },
+  { href: "#pricing", label: "Pricing" },
+  { href: "#blog", label: "Blog" },
+  { href: "#docs", label: "Docs" },
+] as const;
 
 export function Navbar() {
-  const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
-  const [isScrolled, setIsScrolled] = useState(false);
+  const centerWrapRef = useRef<HTMLDivElement>(null);
+  const centerNavRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
+    const cleanups: Array<() => void> = [];
 
-      // Background styling trigger
-      if (currentScrollY > 50) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+    if (centerWrapRef.current && centerNavRef.current) {
+      cleanups.push(
+        initLiquidNav(centerWrapRef.current, centerNavRef.current, {
+          parallax: true,
+        })
+      );
+    }
 
-      // Hide/Show navbar behavior
-      if (currentScrollY < 50) {
-        setIsVisible(true);
-      } else if (currentScrollY > lastScrollY) {
-        // Scrolling down -> hide
-        setIsVisible(false);
-      } else {
-        // Scrolling up -> show
-        setIsVisible(true);
-      }
+    let lastY = window.scrollY;
+    let ticking = false;
+    const wrap = centerWrapRef.current;
+    const nav = centerNavRef.current;
 
-      setLastScrollY(currentScrollY);
+    const applyScroll = () => {
+      const y = window.scrollY;
+      const hidden = y > 60 && y > lastY;
+      if (wrap) wrap.dataset.hidden = hidden ? "true" : "false";
+      if (nav) nav.classList.toggle("is-scrolled", y > 50);
+      lastY = y;
+      ticking = false;
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [lastScrollY]);
+    const onScroll = () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(applyScroll);
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cleanups.forEach((fn) => fn());
+    };
+  }, []);
 
   return (
-    <>
-      {/* Floating Centered Navbar */}
-      <nav
-        className={`fixed left-1/2 z-50 w-[90%] max-w-[480px] rounded-full border bg-[#0d0d1a]/45 backdrop-blur-[20px] py-3 px-7 flex items-center justify-center transition-all duration-500 ease-out shadow-[0_8px_32px_rgba(0,0,0,0.5)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ${isScrolled
-          ? "bg-[#0d0d1a]/65 border-white/20 shadow-[0_16px_48px_rgba(0,0,0,0.7)] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]"
-          : "border-white/15"
-          }`}
-        style={{
-          top: isVisible ? "24px" : "-80px",
-          opacity: isVisible ? 1 : 0,
-          pointerEvents: isVisible ? "auto" : "none",
-          transform: "translate3d(-50%, 0, 0)",
-        }}
-      >
-        {/* Navigation Links */}
-        <div className="flex items-center gap-8">
-          <a
-            href="#solution"
-            className="font-sans text-sm font-medium text-[#9a9ac0] hover:text-white transition-colors duration-200"
-          >
-            Product
-          </a>
-          <a
-            href="#pricing"
-            className="font-sans text-sm font-medium text-[#9a9ac0] hover:text-white transition-colors duration-200"
-          >
-            Pricing
-          </a>
-          <a
-            href="#blog"
-            className="font-sans text-sm font-medium text-[#9a9ac0] hover:text-white transition-colors duration-200"
-          >
-            Blog
-          </a>
-          <a
-            href="#docs"
-            className="font-sans text-sm font-medium text-[#9a9ac0] hover:text-white transition-colors duration-200"
-          >
-            Docs
-          </a>
-        </div>
+    <div ref={centerWrapRef} className="lg-wrap lg-wrap--center">
+      <nav ref={centerNavRef} className="lg-nav" aria-label="Primary">
+        <span className="lg-shine" aria-hidden="true" />
+        <span className="lg-indicator" data-lg-indicator aria-hidden="true" />
+        <ul className="lg-list">
+          {NAV_ITEMS.map((item, i) => (
+            <li key={item.href}>
+              <a
+                href={item.href}
+                className="lg-item font-sans"
+                data-lg-item
+                {...(i === 0 ? { "aria-current": "page" as const } : {})}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </nav>
-
-      {/* Floating Get Started Button (Top Right) */}
-      <a
-        href="/onboarding/tools"
-        className={`fixed right-6 md:right-12 z-50 rounded-full border bg-[#0d0d1a]/45 backdrop-blur-[20px] py-3 px-6 flex items-center justify-center transition-all duration-500 ease-out font-sans text-sm font-medium text-white hover:text-indigo-200 active:scale-95 shadow-[0_8px_32px_rgba(0,0,0,0.5)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)] ${isScrolled
-          ? "bg-[#0d0d1a]/65 border-white/20 shadow-[0_16px_48px_rgba(0,0,0,0.7)] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]"
-          : "border-white/15"
-          }`}
-        style={{
-          top: isVisible ? "24px" : "-80px",
-          opacity: isVisible ? 1 : 0,
-          pointerEvents: isVisible ? "auto" : "none",
-          transform: "translate3d(0, 0, 0)",
-        }}
-      >
-        Get Started<span className="ml-2 inline-block">{"->"}</span>
-      </a>
-    </>
+    </div>
   );
 }

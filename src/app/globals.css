@@ -2,7 +2,202 @@
 @import "../styles/sections.css";
 @import "../styles/heroes.css";
 @import "../styles/grip-logo.css";
+@import "../styles/hero-premium.css";
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  /* ---- floating nav capsule ---- */
+  .lg-wrap {
+    @apply fixed z-50 top-6 opacity-100
+      transition-[top,opacity] duration-[400ms];
+    transition-timing-function: theme("transitionTimingFunction.lg");
+  }
+
+  .lg-wrap[data-hidden="true"] {
+    @apply -top-24 opacity-0 pointer-events-none;
+  }
+
+  .lg-wrap--center {
+    @apply left-0 right-0 flex justify-center pointer-events-none;
+  }
+
+  .lg-wrap--center .lg-nav {
+    @apply pointer-events-auto;
+  }
+
+  .lg-nav {
+    @apply relative flex items-center justify-center p-[4px] rounded-full
+      overflow-hidden transition-[box-shadow,background-color,border-color]
+      duration-[400ms];
+    background: rgba(7, 11, 26, 0.42);
+    border: 1px solid rgba(108, 118, 168, 0.14);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(24px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 10px 40px -12px rgba(0, 0, 0, 0.55);
+  }
+
+  .lg-nav.is-scrolled {
+    background: rgba(6, 10, 22, 0.52);
+    border-color: rgba(118, 128, 178, 0.18);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      0 12px 44px -10px rgba(0, 0, 0, 0.6);
+  }
+
+  /* top reflection */
+  .lg-nav::before {
+    @apply content-[''] absolute inset-0 rounded-[inherit] pointer-events-none z-10;
+    opacity: 0.22;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.14),
+      transparent 38%
+    );
+  }
+
+  /* cursor ambient */
+  .lg-nav::after {
+    @apply content-[''] absolute inset-0 rounded-[inherit] pointer-events-none z-20
+      transition-opacity duration-[350ms];
+    opacity: 0.55;
+    background: radial-gradient(
+      120px 64px at var(--mx) var(--my),
+      rgba(139, 139, 255, 0.08),
+      transparent 68%
+    );
+  }
+
+  /* moving shine */
+  .lg-shine {
+    @apply absolute inset-0 rounded-[inherit] pointer-events-none z-[15] overflow-hidden;
+    opacity: 0.35;
+  }
+
+  .lg-shine::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -60%;
+    width: 38%;
+    height: 100%;
+    background: linear-gradient(
+      105deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.06) 42%,
+      rgba(200, 208, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0.04) 58%,
+      transparent 100%
+    );
+    animation: navShine 6s ease-in-out infinite;
+  }
+
+  @keyframes navShine {
+    0%,
+    100% {
+      left: -60%;
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+    42% {
+      left: 125%;
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* active inner capsule */
+  .lg-indicator {
+    @apply absolute top-[4px] left-0 z-30 rounded-full pointer-events-none
+      origin-center transition-[transform,width,opacity,background-color,box-shadow]
+      duration-[400ms];
+    height: calc(100% - 8px);
+    width: var(--ind-w);
+    opacity: var(--ind-o);
+    transform: translateX(var(--ind-x)) scaleX(var(--ind-scale));
+    background: rgba(4, 8, 20, 0.62);
+    border: 1px solid rgba(90, 100, 150, 0.12);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.07),
+      0 0 14px rgba(99, 102, 241, 0.07);
+    transition-timing-function: theme("transitionTimingFunction.lg");
+  }
+
+  .lg-indicator::after {
+    @apply content-[''] absolute inset-0 rounded-[inherit] pointer-events-none;
+    opacity: 0.45;
+    background: radial-gradient(
+      90% 80% at 50% 0%,
+      rgba(139, 139, 255, 0.12),
+      transparent 70%
+    );
+  }
+
+  .lg-wrap[data-has-active="true"] .lg-indicator {
+    background: rgba(3, 7, 18, 0.72);
+    border-color: rgba(100, 110, 165, 0.16);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.09),
+      0 0 18px rgba(99, 102, 241, 0.1);
+  }
+
+  /* ---- nav items ---- */
+  .lg-list {
+    @apply relative z-40 flex items-center gap-0.5 m-0 p-0 list-none;
+  }
+
+  .lg-list > li {
+    @apply flex;
+  }
+
+  .lg-item {
+    @apply relative inline-flex items-center justify-center py-[9px] px-[17px]
+      rounded-full text-[13px] font-medium leading-none
+      whitespace-nowrap transition-[color,opacity] duration-[350ms];
+    color: rgba(154, 162, 195, 0.72);
+    -webkit-tap-highlight-color: transparent;
+    transition-timing-function: theme("transitionTimingFunction.lg");
+  }
+
+  .lg-item:hover,
+  .lg-item:focus-visible {
+    color: rgba(220, 224, 240, 0.88);
+  }
+
+  .lg-item[aria-current="page"] {
+    color: rgba(248, 249, 255, 0.96);
+    font-weight: 600;
+  }
+
+  .lg-item:focus-visible {
+    @apply outline outline-2 outline-offset-[3px];
+    outline-color: rgba(129, 140, 248, 0.4);
+  }
+}
+
+@layer utilities {
+  @media (prefers-reduced-motion: reduce) {
+    .lg-wrap,
+    .lg-nav,
+    .lg-indicator,
+    .lg-item {
+      transition: none !important;
+    }
+
+    .lg-shine::after {
+      animation: none !important;
+    }
+
+    .lg-indicator {
+      transform: translateX(var(--ind-x)) !important;
+    }
+  }
+}
