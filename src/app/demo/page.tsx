@@ -367,39 +367,24 @@ export default function DemoPage() {
             </div>
           ) : (
             /* Success confirmation card on the right */
-            <div className="w-full max-w-lg lg:ml-auto">
-              <div className="text-center mb-4">
-                <div className="w-10 h-10 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-md text-indigo-400">📅</span>
-                </div>
-                <h2 className="font-display text-xl font-bold text-white mb-1 leading-tight">
-                  Schedule Your Walkthrough
-                </h2>
-                <p className="text-white/50 text-[11px] max-w-sm mx-auto">
-                  Select a convenient slot below to secure your personalized demo. Your information has been pre-filled.
-                </p>
+            <div className="text-center w-full max-w-lg lg:ml-auto">
+              <div className="w-14 h-14 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
+                <span className="text-xl text-indigo-400">✨</span>
               </div>
 
-              {/* Inline Calendly Widget */}
-              <div className="w-full h-[520px] rounded-xl overflow-hidden border border-white/[0.08] bg-black/30 relative">
-                <iframe
-                  src={`https://calendly.com/anandmukherjee2004/new-meeting?embed_domain=localhost&embed_type=Inline&name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}`}
-                  width="100%"
-                  height="100%"
-                  frameBorder="0"
-                  className="w-full h-full"
-                  title="Calendly Scheduler"
-                />
-              </div>
+              <h2 className="font-display text-2xl font-bold text-white mb-2 leading-tight">
+                Request Reserved
+              </h2>
+              <p className="text-white/50 text-xs leading-relaxed mb-6">
+                Thank you, <span className="text-white font-semibold">{fullName}</span>. One of our pipeline architects will contact you at <span className="text-white font-semibold">{email}</span> within the next hour to select a demo time slot.
+              </p>
 
-              <div className="mt-4 text-center">
-                <button
-                  onClick={() => router.push("/")}
-                  className="px-6 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white/70 hover:text-white font-medium text-[11px] transition-all border border-white/5"
-                >
-                  Return to Home
-                </button>
-              </div>
+              <button
+                onClick={() => router.push("/")}
+                className="w-full h-10 rounded-lg bg-white/10 hover:bg-white/15 text-white font-semibold text-xs transition-all border border-white/10"
+              >
+                Return Home
+              </button>
             </div>
           )}
         </div>
