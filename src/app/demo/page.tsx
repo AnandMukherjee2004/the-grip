@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SolutionSection } from "@/components/landing/SolutionSection";
 import { useRevlineEffects } from "@/hooks/useRevlineEffects";
+import { SlotSelector } from "@/components/demo/SlotSelector";
 
 export default function DemoPage() {
   const router = useRouter();
@@ -26,6 +27,9 @@ export default function DemoPage() {
 
   // Submission States
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
@@ -97,8 +101,8 @@ export default function DemoPage() {
     // Simulate premium submission animation
     setTimeout(() => {
       setIsSubmitting(false);
-      setSubmitSuccess(true);
-    }, 2000);
+      setIsFormSubmitted(true);
+    }, 1500);
   };
 
   return (
@@ -138,7 +142,7 @@ export default function DemoPage() {
 
         {/* Right Side Form (Wizard Card) */}
         <div className="w-full lg:w-[40%] flex flex-col justify-center mr-5">
-          {!submitSuccess ? (
+          {!isFormSubmitted ? (
             <div className="w-full max-w-lg lg:ml-auto relative">
 
               {/* Step indicator header */}
@@ -365,18 +369,26 @@ export default function DemoPage() {
                 </div>
               </form>
             </div>
+          ) : !submitSuccess ? (
+            <SlotSelector
+              onConfirm={(date, time) => {
+                setSelectedDate(date);
+                setSelectedTime(time);
+                setSubmitSuccess(true);
+              }}
+            />
           ) : (
             /* Success confirmation card on the right */
-            <div className="text-center w-full max-w-lg lg:ml-auto">
+            <div className="text-center w-full max-w-lg lg:ml-auto animate-fadeIn">
               <div className="w-14 h-14 rounded-full bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mx-auto mb-5">
                 <span className="text-xl text-indigo-400">✨</span>
               </div>
 
               <h2 className="font-display text-2xl font-bold text-white mb-2 leading-tight">
-                Request Reserved
+                Walkthrough Confirmed!
               </h2>
               <p className="text-white/50 text-xs leading-relaxed mb-6">
-                Thank you, <span className="text-white font-semibold">{fullName}</span>. One of our pipeline architects will contact you at <span className="text-white font-semibold">{email}</span> within the next hour to select a demo time slot.
+                Thank you, <span className="text-white font-semibold">{fullName}</span>. Your custom walkthrough is confirmed for <span className="text-white font-semibold">{selectedDate}</span> at <span className="text-white font-semibold">{selectedTime}</span>. A calendar invitation has been sent to <span className="text-white font-semibold">{email}</span>.
               </p>
 
               <button
