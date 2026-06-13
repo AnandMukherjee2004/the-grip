@@ -216,7 +216,7 @@
     animation: fadeIn 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
 
-  /* Demo / onboarding split-layout solution panel */
+  /* Demo Page Solution Overrides */
   .demo-solution-wrapper .sec.solution {
     padding: 0 !important;
     background: transparent !important;
