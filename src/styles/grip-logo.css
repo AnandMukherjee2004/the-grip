@@ -1,0 +1,190 @@
+/* GRIP logo glow — matches grip_logo_glow_animation.html */
+
+.grip-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  gap: 28px;
+}
+
+.grip-hero-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 26px;
+  position: relative;
+  width: 100%;
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+body.loaded .grip-hero-stage {
+  animation: gripHeroIn 700ms var(--ease) 1200ms forwards;
+}
+
+@keyframes gripHeroIn {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* .wm — wordmark */
+.grip-wm {
+  font-family: var(--font-display);
+  font-size: 88px;
+  font-weight: 800;
+  letter-spacing: -4px;
+  line-height: 1.1;
+  padding-right: 0.05em;
+  padding-bottom: 0.05em;
+  user-select: none;
+  cursor: default;
+  transition: none;
+}
+
+.grip-wm.idle {
+  color: #f0f0ff;
+  animation: gripBreathe 3.5s ease-in-out infinite;
+}
+
+@keyframes gripBreathe {
+  0%, 100% {
+    text-shadow:
+      0 0 20px rgba(99, 102, 241, 0.4),
+      0 0 50px rgba(99, 102, 241, 0.15),
+      0 0 80px rgba(99, 102, 241, 0.05);
+  }
+  40% {
+    text-shadow:
+      0 0 35px rgba(99, 102, 241, 0.65),
+      0 0 80px rgba(99, 102, 241, 0.3),
+      0 0 130px rgba(56, 189, 248, 0.12);
+  }
+  70% {
+    text-shadow:
+      0 0 28px rgba(56, 189, 248, 0.45),
+      0 0 65px rgba(56, 189, 248, 0.2),
+      0 0 110px rgba(99, 102, 241, 0.08);
+  }
+}
+
+.grip-wm.sweep {
+  background: linear-gradient(
+    90deg,
+    #7b7fd4 0%,
+    #aaadf0 22%,
+    #ffffff 48%,
+    #7dd3fc 62%,
+    #aaadf0 80%,
+    #7b7fd4 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gripShine 2.2s linear infinite;
+}
+
+@keyframes gripShine {
+  0% { background-position: -60% 0; }
+  100% { background-position: 210% 0; }
+}
+
+.grip-wm.pulse {
+  color: #f0f0ff;
+  animation: gripBurst 1.8s ease-out infinite;
+}
+
+@keyframes gripBurst {
+  0% {
+    text-shadow:
+      0 0 8px rgba(255, 255, 255, 0.95),
+      0 0 24px rgba(99, 102, 241, 0.95),
+      0 0 60px rgba(99, 102, 241, 0.55),
+      0 0 110px rgba(56, 189, 248, 0.3);
+    color: #fff;
+  }
+  45%, 100% {
+    text-shadow:
+      0 0 20px rgba(99, 102, 241, 0.3),
+      0 0 50px rgba(99, 102, 241, 0.1);
+    color: #f0f0ff;
+  }
+}
+
+/* .pipe + .beam */
+.grip-pipe {
+  position: relative;
+  width: 200px;
+  height: 2px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 99px;
+}
+
+.grip-beam {
+  position: absolute;
+  top: -1.5px;
+  height: 5px;
+  width: 56px;
+  background: linear-gradient(90deg, transparent, #6366f1, #38bdf8, transparent);
+  border-radius: 99px;
+  animation: gripFlow 2.5s ease-in-out infinite;
+}
+
+@keyframes gripFlow {
+  0% { left: -56px; opacity: 0; }
+  8% { opacity: 1; }
+  92% { opacity: 1; }
+  100% { left: 200px; opacity: 0; }
+}
+
+.grip-slogan {
+  max-width: 640px;
+  font-size: clamp(20px, 3.2vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1.35;
+  color: var(--text-secondary);
+  opacity: 0;
+  transform: translateY(12px);
+}
+
+body.loaded .grip-slogan {
+  animation: gripHeroIn 600ms var(--ease) 1000ms forwards;
+}
+
+.grip-slogan em {
+  font-style: normal;
+  color: var(--act1-text);
+}
+
+.grip-slogan .q {
+  color: var(--indigo-light);
+}
+
+@media (max-width: 640px) {
+  .grip-wm {
+    font-size: clamp(56px, 18vw, 88px);
+    letter-spacing: -0.045em;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grip-hero-stage,
+  .grip-slogan {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .grip-wm.sweep {
+    -webkit-text-fill-color: #f0f0ff;
+    color: #f0f0ff;
+    background: none;
+    animation: none !important;
+    text-shadow: 0 0 24px rgba(99, 102, 241, 0.35);
+  }
+  .grip-beam {
+    animation: none !important;
+  }
+}
