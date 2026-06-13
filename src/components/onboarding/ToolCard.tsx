@@ -134,9 +134,17 @@ export function ToolCard({ tool, isSelected, onToggle }: ToolCardProps) {
     >
       {/* Top action/badge row */}
       <div className="flex justify-between items-start mb-4">
-        <div className={`w-11 h-11 flex items-center justify-center rounded-xl border transition-all duration-300 ${brand.iconContainer}`}>
-          <span className="text-xl transform group-hover:scale-110 transition-transform duration-300">{tool.icon}</span>
-        </div>
+        {tool.logo ? (
+          <img 
+            src={tool.logo} 
+            alt={tool.name} 
+            className="h-8 w-auto max-w-[100px] object-contain transform group-hover:scale-110 transition-transform duration-300 select-none my-1.5" 
+          />
+        ) : (
+          <div className={`w-11 h-11 flex items-center justify-center rounded-xl border transition-all duration-300 ${brand.iconContainer}`}>
+            <span className="text-xl transform group-hover:scale-110 transition-transform duration-300">{tool.icon}</span>
+          </div>
+        )}
         <div className="flex items-center space-x-1.5">
           {tool.popular && !isSelected && (
             <span className="text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-full bg-white/5 text-white/50 border border-white/10">

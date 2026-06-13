@@ -14,6 +14,7 @@ interface ToolGridProps {
   activeCategory: ToolCategory | "all";
   setActiveCategory: (category: ToolCategory | "all") => void;
   onAddCustomTool?: (name: string) => void;
+  embedded?: boolean;
 }
 
 export function ToolGrid({
@@ -25,6 +26,7 @@ export function ToolGrid({
   activeCategory,
   setActiveCategory,
   onAddCustomTool,
+  embedded = false,
 }: ToolGridProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [customToolName, setCustomToolName] = useState("");
@@ -65,9 +67,11 @@ export function ToolGrid({
   };
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6">
+    <div className={embedded ? "w-full" : "w-full max-w-6xl mx-auto px-6"}>
       {/* Search and Filter Section */}
-      <div className="flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between mb-10">
+      <div
+        className={`flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between ${embedded ? "mb-6" : "mb-10"}`}
+      >
         {/* Controlled Search Box */}
         <div className="relative flex-grow max-w-md">
           <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none">

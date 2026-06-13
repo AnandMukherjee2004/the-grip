@@ -135,7 +135,7 @@ export function useRevlineEffects() {
           entries.forEach((en) => {
             if (!en.isIntersecting) return;
             solIO.unobserve(en.target);
-            runSolution();
+            solInterval = runSolution();
           });
         },
         { threshold: 0.35 },
@@ -146,6 +146,9 @@ export function useRevlineEffects() {
         const beams = solStage!.querySelectorAll<HTMLElement>(".beam");
         const chips = solStage!.querySelectorAll<HTMLElement>(".conn-chip");
         const hub = solStage!.querySelector<HTMLElement>(".hub");
+        const counter = solStage!.querySelector<HTMLElement>("[data-dash-counter]");
+        const pill = solStage!.querySelector<HTMLElement>("[data-dash-pill]");
+        const toast = solStage!.querySelector<HTMLElement>("[data-dash-toast]");
 
         if (reduced) {
           beams.forEach((b) => b.classList.add("on"));
@@ -153,22 +156,44 @@ export function useRevlineEffects() {
           hub?.classList.add("lit");
           solStage!.classList.add("dash-on");
           if (solDash) animateDash(solDash, reduced);
-          return;
+          return undefined;
         }
-        beams.forEach((b, i) => {
+
+        let runCount = 0;
+        const playCycle = () => {
+          // Clear sub-timeouts if any or let them natural clear. Since we reset all classes, they'll visually restart clean.
+          beams.forEach((b) => b.classList.remove("on"));
+          chips.forEach((c) => c.classList.remove("ok-on"));
+          hub?.classList.remove("lit");
+          solStage!.classList.remove("dash-on");
+          pill?.classList.remove("win");
+          toast?.classList.remove("on");
+          if (counter) counter.textContent = "₹0";
+
+          beams.forEach((b, i) => {
+            setTimeout(() => {
+              b.classList.add("on");
+              if (chips[i])
+                setTimeout(() => chips[i].classList.add("ok-on"), 450);
+            }, i * 600);
+          });
+          setTimeout(() => hub?.classList.add("lit"), 5 * 600 + 300);
           setTimeout(() => {
-            b.classList.add("on");
-            if (chips[i])
-              setTimeout(() => chips[i].classList.add("ok-on"), 450);
-          }, i * 600);
-        });
-        setTimeout(() => hub?.classList.add("lit"), 5 * 600 + 300);
-        setTimeout(() => {
-          solStage!.classList.add("dash-on");
-          setTimeout(() => {
-            if (solDash) animateDash(solDash, reduced);
-          }, 700);
-        }, 5 * 600 + 800);
+            solStage!.classList.add("dash-on");
+            setTimeout(() => {
+              if (solDash) {
+                if (counter) countUp(counter, 1420000, 1800, "₹", "", reduced);
+                setTimeout(() => pill?.classList.add("win"), 1000);
+                setTimeout(() => toast?.classList.add("on"), 2200);
+                setTimeout(() => toast?.classList.remove("on"), 5400);
+              }
+            }, 700);
+          }, 5 * 600 + 800);
+          runCount++;
+        };
+
+        playCycle();
+        return setInterval(playCycle, 10000);
       }
     }
 
@@ -178,6 +203,7 @@ export function useRevlineEffects() {
     const isDesktop = window.matchMedia("(min-width: 1024px)");
     let liveDashStarted = false;
     let liveInterval: ReturnType<typeof setInterval> | undefined;
+    let solInterval: ReturnType<typeof setInterval> | undefined;
 
     function activatePanel(idx: number) {
       panels.forEach((p, i) => {
@@ -282,6 +308,7 @@ export function useRevlineEffects() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", howScroll);
       if (liveInterval) clearInterval(liveInterval);
+      if (solInterval) clearInterval(solInterval);
       rvIO.disconnect();
     };
   }, []);

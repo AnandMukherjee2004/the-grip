@@ -17,13 +17,23 @@ export function SelectionBar({ selectedTools, onContinue }: SelectionBarProps) {
         <div className="flex items-center space-x-4">
           <div className="flex -space-x-2 overflow-hidden py-1">
             {selectedTools.slice(0, 5).map((tool) => (
-              <div
-                key={tool.id}
-                title={tool.name}
-                className="w-8 h-8 rounded-xl bg-[#121226] border border-white/10 flex items-center justify-center text-sm shadow-lg transform hover:-translate-y-1 hover:scale-105 transition-all duration-200"
-              >
-                {tool.icon}
-              </div>
+              tool.logo ? (
+                <img
+                  key={tool.id}
+                  title={tool.name}
+                  src={tool.logo}
+                  alt={tool.name}
+                  className="h-6 w-auto max-w-[48px] object-contain select-none transform hover:-translate-y-1 hover:scale-105 transition-all duration-200 self-center"
+                />
+              ) : (
+                <div
+                  key={tool.id}
+                  title={tool.name}
+                  className="w-8 h-8 rounded-xl bg-[#121226] border border-white/10 flex items-center justify-center text-sm shadow-lg transform hover:-translate-y-1 hover:scale-105 transition-all duration-200"
+                >
+                  {tool.icon}
+                </div>
+              )
             ))}
             {count > 5 && (
               <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-600 border border-white/10 flex items-center justify-center text-[10px] font-bold text-white shadow-lg">

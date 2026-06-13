@@ -79,11 +79,9 @@ body.loaded .hero-ctas {
 .hero-cta-primary {
   position: relative;
   display: inline-flex;
-  flex-direction: column;
   align-items: center;
-  gap: 11px;
-  min-width: 132px;
-  padding: 2px 4px;
+  justify-content: center;
+  padding: 10px 16px 20px 16px;
   text-decoration: none;
   -webkit-tap-highlight-color: transparent;
   transition: filter 350ms var(--ease);
@@ -107,8 +105,10 @@ body.loaded .hero-ctas {
 }
 
 .hero-cta-streak {
-  position: relative;
-  width: 100%;
+  position: absolute;
+  bottom: 6px;
+  left: 8%;
+  width: 84%;
   height: 1px;
   overflow: hidden;
   border-radius: 99px;
@@ -167,36 +167,21 @@ body.loaded .hero-ctas {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 10px 20px;
-  border-radius: 9999px;
+  padding: 10px 16px 20px 16px;
   font-family: var(--font-body);
   font-size: 14px;
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1;
-  color: rgba(186, 192, 218, 0.72);
+  color: rgba(154, 162, 195, 0.72);
   text-decoration: none;
-  background: rgba(6, 10, 24, 0.38);
-  border: 1px solid rgba(108, 118, 168, 0.14);
-  -webkit-backdrop-filter: blur(16px) saturate(130%);
-  backdrop-filter: blur(16px) saturate(130%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   -webkit-tap-highlight-color: transparent;
-  transition:
-    color 350ms var(--ease),
-    border-color 350ms var(--ease),
-    background-color 350ms var(--ease),
-    box-shadow 350ms var(--ease);
+  transition: color 350ms var(--ease);
 }
 
 .hero-cta-secondary:hover,
 .hero-cta-secondary:focus-visible {
-  color: rgba(228, 230, 245, 0.9);
-  border-color: rgba(130, 140, 185, 0.22);
-  background: rgba(8, 13, 30, 0.52);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 20px rgba(99, 102, 241, 0.06);
+  color: rgba(248, 249, 255, 0.95);
 }
 
 .hero-cta-secondary:focus-visible {
