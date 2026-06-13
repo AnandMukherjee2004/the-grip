@@ -1,4 +1,4 @@
-/* GRIP logo glow — matches grip_logo_glow_animation.html */
+/* GRIP hero typography — premium reference */
 
 .grip-hero {
   display: flex;
@@ -7,14 +7,14 @@
   justify-content: center;
   text-align: center;
   width: 100%;
-  gap: 28px;
+  gap: 32px;
 }
 
 .grip-hero-stage {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 26px;
+  gap: 22px;
   position: relative;
   width: 100%;
   opacity: 0;
@@ -22,62 +22,30 @@
 }
 
 body.loaded .grip-hero-stage {
-  animation: gripHeroIn 700ms var(--ease) 1200ms forwards;
+  animation: gripHeroIn 700ms var(--ease) 1100ms forwards;
 }
 
-@keyframes gripHeroIn {
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* .wm — wordmark */
 .grip-wm {
   font-family: var(--font-display);
-  font-size: 88px;
+  font-size: clamp(72px, 11.5vw, 118px);
   font-weight: 800;
-  letter-spacing: -4px;
-  line-height: 1.1;
-  padding-right: 0.05em;
-  padding-bottom: 0.05em;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  padding-right: 0.04em;
   user-select: none;
   cursor: default;
-  transition: none;
-}
-
-.grip-wm.idle {
-  color: #f0f0ff;
-  animation: gripBreathe 3.5s ease-in-out infinite;
-}
-
-@keyframes gripBreathe {
-  0%, 100% {
-    text-shadow:
-      0 0 20px rgba(99, 102, 241, 0.4),
-      0 0 50px rgba(99, 102, 241, 0.15),
-      0 0 80px rgba(99, 102, 241, 0.05);
-  }
-  40% {
-    text-shadow:
-      0 0 35px rgba(99, 102, 241, 0.65),
-      0 0 80px rgba(99, 102, 241, 0.3),
-      0 0 130px rgba(56, 189, 248, 0.12);
-  }
-  70% {
-    text-shadow:
-      0 0 28px rgba(56, 189, 248, 0.45),
-      0 0 65px rgba(56, 189, 248, 0.2),
-      0 0 110px rgba(99, 102, 241, 0.08);
-  }
 }
 
 .grip-wm.sweep {
   background: linear-gradient(
     90deg,
-    #7b7fd4 0%,
-    #aaadf0 22%,
-    #ffffff 48%,
-    #7dd3fc 62%,
-    #aaadf0 80%,
-    #7b7fd4 100%
+    #8b8bff 0%,
+    #a8adff 18%,
+    #c8d0ff 36%,
+    #ffffff 50%,
+    #b8f3ff 64%,
+    #c8d0ff 82%,
+    #8b8bff 100%
   );
   background-size: 220% 100%;
   -webkit-background-clip: text;
@@ -87,86 +55,103 @@ body.loaded .grip-hero-stage {
 }
 
 @keyframes gripShine {
-  0% { background-position: -60% 0; }
-  100% { background-position: 210% 0; }
-}
-
-.grip-wm.pulse {
-  color: #f0f0ff;
-  animation: gripBurst 1.8s ease-out infinite;
-}
-
-@keyframes gripBurst {
   0% {
-    text-shadow:
-      0 0 8px rgba(255, 255, 255, 0.95),
-      0 0 24px rgba(99, 102, 241, 0.95),
-      0 0 60px rgba(99, 102, 241, 0.55),
-      0 0 110px rgba(56, 189, 248, 0.3);
-    color: #fff;
+    background-position: -60% 0;
   }
-  45%, 100% {
-    text-shadow:
-      0 0 20px rgba(99, 102, 241, 0.3),
-      0 0 50px rgba(99, 102, 241, 0.1);
-    color: #f0f0ff;
+  100% {
+    background-position: 210% 0;
   }
 }
 
-/* .pipe + .beam */
 .grip-pipe {
   position: relative;
-  width: 200px;
-  height: 2px;
-  background: rgba(99, 102, 241, 0.1);
+  width: min(300px, 52vw);
+  height: 1px;
   border-radius: 99px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.12) 18%,
+    rgba(56, 189, 248, 0.2) 50%,
+    rgba(99, 102, 241, 0.12) 82%,
+    transparent 100%
+  );
 }
 
 .grip-beam {
   position: absolute;
-  top: -1.5px;
-  height: 5px;
-  width: 56px;
-  background: linear-gradient(90deg, transparent, #6366f1, #38bdf8, transparent);
+  top: 0;
+  left: -72px;
+  width: 72px;
+  height: 1px;
   border-radius: 99px;
-  animation: gripFlow 2.5s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(184, 243, 255, 0.85),
+    rgba(200, 208, 255, 0.95),
+    transparent
+  );
+  animation: gripAccentSweep 3.2s ease-in-out infinite;
 }
 
-@keyframes gripFlow {
-  0% { left: -56px; opacity: 0; }
-  8% { opacity: 1; }
-  92% { opacity: 1; }
-  100% { left: 200px; opacity: 0; }
+@keyframes gripAccentSweep {
+  0% {
+    left: -72px;
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    left: calc(100% + 72px);
+    opacity: 0;
+  }
 }
 
 .grip-slogan {
-  max-width: 640px;
-  font-size: clamp(20px, 3.2vw, 32px);
+  max-width: 680px;
+  font-size: clamp(18px, 2.8vw, 28px);
   font-weight: 500;
-  letter-spacing: -0.025em;
-  line-height: 1.35;
-  color: var(--text-secondary);
+  letter-spacing: -0.022em;
+  line-height: 1.4;
+  color: rgba(210, 214, 240, 0.68);
   opacity: 0;
   transform: translateY(12px);
 }
 
 body.loaded .grip-slogan {
-  animation: gripHeroIn 600ms var(--ease) 1000ms forwards;
+  animation: gripHeroIn 600ms var(--ease) 900ms forwards;
 }
 
 .grip-slogan em {
   font-style: normal;
-  color: var(--act1-text);
+  color: rgba(232, 234, 248, 0.88);
+  font-weight: 600;
 }
 
 .grip-slogan .q {
-  color: var(--indigo-light);
+  color: rgba(129, 140, 248, 0.85);
+}
+
+@keyframes gripHeroIn {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (max-width: 640px) {
   .grip-wm {
-    font-size: clamp(56px, 18vw, 88px);
-    letter-spacing: -0.045em;
+    font-size: clamp(56px, 17vw, 88px);
+    letter-spacing: -0.04em;
+  }
+
+  .grip-hero {
+    gap: 24px;
   }
 }
 
@@ -177,14 +162,17 @@ body.loaded .grip-slogan {
     transform: none !important;
     animation: none !important;
   }
+
   .grip-wm.sweep {
-    -webkit-text-fill-color: #f0f0ff;
-    color: #f0f0ff;
+    -webkit-text-fill-color: #c8d0ff;
+    color: #c8d0ff;
     background: none;
     animation: none !important;
-    text-shadow: 0 0 24px rgba(99, 102, 241, 0.35);
   }
+
   .grip-beam {
     animation: none !important;
+    left: 35%;
+    opacity: 0.5;
   }
 }
