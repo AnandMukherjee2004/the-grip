@@ -383,7 +383,7 @@ export default function DemoPage() {
               {/* Inline Calendly Widget */}
               <div className="w-full h-[520px] rounded-xl overflow-hidden border border-white/[0.08] bg-black/30 relative">
                 <iframe
-                  src={`https://calendly.com/revline-demo/30min?embed_domain=localhost&embed_type=Inline&name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}`}
+                  src={`https://calendly.com/anandmukherjee2004/new-meeting?embed_domain=localhost&embed_type=Inline&name=${encodeURIComponent(fullName)}&email=${encodeURIComponent(email)}`}
                   width="100%"
                   height="100%"
                   frameBorder="0"
