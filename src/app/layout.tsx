@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import { ThemeScript } from "@/components/ThemeScript";
+import { ThemeProvider } from "@/components/theme/ThemeProvider";
+import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import "./globals.css";
 
 const geist = Geist({
@@ -32,9 +35,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-theme="dark"
+      data-theme-preference="dark"
       className={`${geist.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full" suppressHydrationWarning>{children}</body>
+      <body className="min-h-full" suppressHydrationWarning>
+        <ThemeScript />
+        <ThemeProvider>
+          {children}
+          <ThemeSwitcher />
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
