@@ -10,7 +10,7 @@ export function HeroNumbersDisagree() {
     <div className="hero-page hero-c">
       <div className="copy">
         <p className="hero-label">
-          Revline&nbsp;&nbsp;·&nbsp;&nbsp;Revenue Pipeline Automation
+          Grip&nbsp;&nbsp;·&nbsp;&nbsp;Revenue Pipeline Automation
         </p>
         <h1>
           Whose number

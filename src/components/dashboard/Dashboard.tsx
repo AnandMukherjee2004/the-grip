@@ -24,7 +24,7 @@ export function Dashboard({
       <div className="dash-bar">
         <div className="dash-brand">
           <span className="brand-line" />
-          Revline
+          Grip
         </div>
         <div className="dash-tabs">
           <span className="on">Pipeline</span>

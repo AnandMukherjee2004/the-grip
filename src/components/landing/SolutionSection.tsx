@@ -33,7 +33,7 @@ export function SolutionSection() {
             data-rv
             style={{ "--d": "160ms" } as React.CSSProperties}
           >
-            Revline sits between your tools and translates everything into one
+            Grip sits between your tools and translates everything into one
             live picture. No setup. No data team. 15 minutes.
           </p>
         </div>
@@ -162,7 +162,7 @@ export function SolutionSection() {
             ))}
             <div className="hub">
               <span className="hub-line" />
-              <span className="hub-name">Revline</span>
+              <span className="hub-name">Grip</span>
             </div>
           </div>
 

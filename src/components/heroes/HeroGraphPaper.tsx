@@ -4,7 +4,7 @@ export function HeroGraphPaper() {
       <div className="blob b1" />
       <div className="blob b2" />
       <p className="hero-label">
-        Revline&nbsp;&nbsp;·&nbsp;&nbsp;Revenue Pipeline Automation
+        Grip&nbsp;&nbsp;·&nbsp;&nbsp;Revenue Pipeline Automation
       </p>
       <h1>
         <span className="w" style={{ "--i": 0 } as React.CSSProperties}>

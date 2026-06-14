@@ -120,7 +120,7 @@ export function HowItWorksSection() {
               ))}
               <div className="connect-node">
                 <span className="hub-line" />
-                <span className="hub-name">Revline</span>
+                <span className="hub-name">Grip</span>
               </div>
             </div>
             <PanelCopy
@@ -176,7 +176,7 @@ export function HowItWorksSection() {
                 className="map-col"
                 style={{ left: "50%", top: 48, transform: "translateX(-50%)" }}
               >
-                <p className="map-col-title">Revline</p>
+                <p className="map-col-title grip-brand">Grip</p>
                 <div className="map-item pstage" style={{ "--d": "180ms" } as React.CSSProperties}>
                   New
                 </div>

@@ -36,6 +36,13 @@ body.loaded .grip-hero-stage {
   cursor: default;
 }
 
+/* Inline brand mark — same family as hero wordmark */
+.grip-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
 .grip-wm.sweep {
   background: linear-gradient(
     90deg,

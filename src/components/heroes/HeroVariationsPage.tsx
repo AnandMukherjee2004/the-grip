@@ -34,7 +34,7 @@ export function HeroVariationsPage() {
           Design canvas
         </p>
         <h1 className="mt-2 font-display text-3xl font-semibold tracking-tight text-[#2a251f]">
-          Revline — Hero Variations
+          Grip — Hero Variations
         </h1>
         <p className="mt-2 max-w-2xl text-base text-[#5a4a2a]/80">
           Three openings for the same story. Full page uses A — say the word to
