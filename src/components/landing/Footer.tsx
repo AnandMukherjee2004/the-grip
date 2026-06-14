@@ -3,7 +3,7 @@ export function Footer() {
     <footer className="footer" data-screen-label="09 Footer">
       <div className="footer-brand">
         <span className="brand-line" />
-        Revline
+        Grip
       </div>
       <nav className="footer-links">
         <a href="#">Product</a>

@@ -2,7 +2,7 @@ export function HeroLeakingLine() {
   return (
     <div className="hero-page hero-b">
       <p className="hero-label">
-        Revline&nbsp;&nbsp;·&nbsp;&nbsp;Revenue Pipeline Automation
+        Grip&nbsp;&nbsp;·&nbsp;&nbsp;Revenue Pipeline Automation
       </p>
       <h1>
         Your pipeline

@@ -287,7 +287,7 @@
   transition: transform 300ms var(--ease), box-shadow 400ms ease-out;
 }
 .hub-line { width: 28px; height: 1px; background: var(--indigo); }
-.hub-name { font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--act2-text); letter-spacing: -0.01em; }
+.hub-name { font-family: var(--font-display); font-weight: 700; font-size: 14px; color: var(--act2-text); letter-spacing: -0.03em; }
 .hub::before {
   content: "";
   position: absolute;
@@ -353,9 +353,10 @@
   align-items: center;
   gap: 9px;
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
   color: var(--act2-text);
+  letter-spacing: -0.03em;
 }
 .dash-brand .brand-line { width: 18px; height: 1px; background: var(--indigo); }
 .dash-tabs { display: flex; gap: 18px; font-size: 12.5px; color: var(--text-muted); }
@@ -616,6 +617,14 @@
   gap: 12px;
 }
 .map-col-title { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+.map-col-title.grip-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: -0.03em;
+  text-transform: none;
+  color: var(--act2-text);
+}
 .map-item {
   padding: 11px 16px;
   border: 1px solid var(--rule);
@@ -898,7 +907,7 @@
   font-size: 13.5px;
   color: var(--text-muted);
 }
-.footer-brand { display: flex; align-items: center; gap: 11px; color: var(--act1-text); font-family: var(--font-display); font-weight: 600; font-size: 15px; }
+.footer-brand { display: flex; align-items: center; gap: 11px; color: var(--act1-text); font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.03em; }
 .footer-brand .brand-line { width: 26px; height: 1px; background: var(--indigo); }
 .footer-links { display: flex; gap: 28px; }
 .footer-links a { transition: color 200ms ease-out; }
