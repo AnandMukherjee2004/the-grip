@@ -66,6 +66,7 @@ export const TOOLS: Tool[] = [
     category: "crm",
     description: "Inside sales CRM designed to double productivity.",
     icon: "🎯",
+    logo: "/assets/crm-logos/close-crm.svg",
   },
 
   // Payments
@@ -128,7 +129,7 @@ export const TOOLS: Tool[] = [
     category: "ecommerce",
     description: "Open-source e-commerce plugin built for WordPress.",
     icon: "🛒",
-    logo: "/assets/crm-logos/WooCommerce_Logo.svg"
+    logo: "/assets/crm-logos/WooCommerce_Logo.svg",
   },
   {
     id: "magento",
@@ -136,6 +137,7 @@ export const TOOLS: Tool[] = [
     category: "ecommerce",
     description: "Flexible, enterprise-grade e-commerce storefront builder.",
     icon: "🧡",
+    logo: "/assets/crm-logos/magento.svg",
   },
   {
     id: "unicommerce",
@@ -146,6 +148,26 @@ export const TOOLS: Tool[] = [
     logo: "/assets/crm-logos/unicommerce.jpeg",
   },
 
+  // Ads
+  {
+    id: "meta-ads",
+    name: "Meta Ads",
+    category: "ads",
+    description: "Sync campaign spend, impressions, and leads.",
+    icon: "📢",
+    logo: "/assets/crm-logos/meta.svg",
+    popular: true,
+  },
+  {
+    id: "google-ads",
+    name: "Google Ads",
+    category: "ads",
+    description: "Sync campaign performance and conversions.",
+    icon: "🔍",
+    logo: "/assets/crm-logos/google-ads.svg",
+    popular: true,
+  },
+
   // Communication
   {
     id: "whatsapp-business",
@@ -153,6 +175,7 @@ export const TOOLS: Tool[] = [
     category: "communication",
     description: "Interact with customers via automated messages and support.",
     icon: "💬",
+    logo: "/assets/crm-logos/whatsapp.svg",
     popular: true,
   },
   {
@@ -178,6 +201,25 @@ export const TOOLS: Tool[] = [
     category: "communication",
     description: "Omnichannel customer service and ticketing system.",
     icon: "🎧",
+    logo: "/assets/crm-logos/freshdesk.svg",
+  },
+
+  // Accounting
+  {
+    id: "tally",
+    name: "Tally",
+    category: "accounting",
+    description: "Sync invoices, ledgers, and financial data.",
+    icon: "📊",
+    logo: "/assets/crm-logos/tally.svg",
+  },
+  {
+    id: "zoho-books",
+    name: "Zoho Books",
+    category: "accounting",
+    description: "Sync invoices, expenses, and payments.",
+    icon: "📓",
+    logo: "/assets/crm-logos/zoho-books.svg",
   },
 ];
 
