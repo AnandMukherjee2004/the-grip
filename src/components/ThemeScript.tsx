@@ -1,4 +1,3 @@
-import Script from "next/script";
 
 const THEME_INIT_SCRIPT = `
 (function () {
@@ -39,8 +38,9 @@ const THEME_INIT_SCRIPT = `
 
 export function ThemeScript() {
   return (
-    <Script id="grip-theme-init" strategy="beforeInteractive">
-      {THEME_INIT_SCRIPT}
-    </Script>
+    <script
+      id="grip-theme-init"
+      dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
+    />
   );
 }

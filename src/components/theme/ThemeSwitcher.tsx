@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { usePathname } from "next/navigation";
 import { useTheme } from "./ThemeProvider";
 import type { ThemePreference } from "@/lib/theme";
 
@@ -72,6 +73,7 @@ const OPTIONS = [
 ];
 
 export function ThemeSwitcher() {
+  const pathname = usePathname();
   const { preference, setPreference } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -101,7 +103,7 @@ export function ThemeSwitcher() {
     }
   };
 
-  if (!mounted) {
+  if (!mounted || pathname.startsWith("/dashboard")) {
     return null;
   }
 

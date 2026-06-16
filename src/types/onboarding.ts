@@ -1,4 +1,4 @@
-export type ToolCategory = 'crm' | 'payments' | 'ecommerce' | 'communication';
+export type ToolCategory = 'crm' | 'payments' | 'ecommerce' | 'communication' | 'ads' | 'accounting';
 
 export interface Tool {
   id: string;
