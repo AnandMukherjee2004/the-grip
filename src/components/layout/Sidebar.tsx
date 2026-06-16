@@ -35,7 +35,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
 
   return (
     <aside
-      className={`h-screen bg-[#07070e] border-r border-white/[0.04] flex flex-col justify-between shrink-0 select-none font-sans transition-all duration-300 ${
+      className={`h-full bg-[#07070e] border-r border-white/[0.04] flex flex-col justify-between shrink-0 select-none font-sans transition-all duration-300 ${
         isCollapsed ? "w-[60px]" : "w-[220px]"
       }`}
     >
