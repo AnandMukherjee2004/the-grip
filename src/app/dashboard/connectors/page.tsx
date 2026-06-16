@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useOnboarding } from "@/context/OnboardingContext";
-import TopBar, { DateRangeOption } from "@/components/layout/TopBar";
+import TopBar, { DEFAULT_DATE_RANGE } from "@/components/layout/TopBar";
+import type { DateRangeSelection } from "@/lib/dateRange";
 import { ConnectedToolsGrid } from "@/components/dashboard/connectors/ConnectedToolsGrid";
 import { AvailableToolsGrid } from "@/components/dashboard/connectors/AvailableToolsGrid";
 import { DisconnectModal } from "@/components/dashboard/connectors/DisconnectModal";
@@ -17,7 +18,7 @@ export default function ConnectorsPage() {
     updateSyncInfo,
   } = useOnboarding();
 
-  const [dateRange, setDateRange] = useState<DateRangeOption>("Last 30 days");
+  const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
   const [disconnectTool, setDisconnectTool] = useState<Tool | null>(null);
 
   // Sync now mock action
@@ -81,7 +82,7 @@ export default function ConnectorsPage() {
 
   return (
     <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
-      <TopBar selectedRange={dateRange} onRangeChange={setDateRange} />
+      <TopBar dateRange={dateRange} onDateRangeChange={setDateRange} />
 
       {/* Main content scrollable area */}
       <main className="flex-grow overflow-y-auto p-6 space-y-8 scrollbar-thin">

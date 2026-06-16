@@ -160,7 +160,7 @@ export function ConnectedToolCard({
           type="button"
           disabled={isSyncing}
           onClick={handleSyncClick}
-          className="h-8 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs transition-all active:scale-[0.98] flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+          className="connector-sync-btn h-8 px-3 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs transition-all active:scale-[0.98] flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isSyncing ? (
             <>

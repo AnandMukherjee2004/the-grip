@@ -15,6 +15,7 @@ import EmptyState from "@/components/dashboard/EmptyState";
 import ReportSectionHeader from "./ReportSectionHeader";
 import ReportKPICard from "./ReportKPICard";
 import { DashboardIcon } from "@/components/ui/Icons";
+import { useChartColors } from "@/hooks/useChartColors";
 
 interface AttributionReportProps {
   connectedTools: string[];
@@ -55,6 +56,7 @@ export default function AttributionReport({
   dateRange,
   compareMode,
 }: AttributionReportProps) {
+  const { colors, axis } = useChartColors();
   const [loading, setLoading] = useState(true);
   const [campaigns, setCampaigns] = useState<CampaignItem[]>(mockCampaigns);
   const [sortKey, setSortKey] = useState<SortKey>("roas");
@@ -186,25 +188,14 @@ export default function AttributionReport({
         <div className="h-[250px] w-full text-xs text-[#70709a]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={mockChannelPerformance} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(208,208,232,0.02)" vertical={false} />
-              <XAxis dataKey="channel" stroke="rgba(208,208,232,0.3)" tickLine={false} axisLine={false} />
-              <YAxis
-                stroke="rgba(208,208,232,0.3)"
-                tickFormatter={(val) => `₹${val / 1000}k`}
-                tickLine={false}
-                axisLine={false}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+              <XAxis dataKey="channel" {...axis} />
+              <YAxis {...axis} tickFormatter={(val) => `₹${val / 1000}k`} />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0d0d1a",
-                  borderColor: "rgba(208, 208, 232, 0.08)",
-                  borderRadius: 8,
-                  fontSize: 11,
-                  color: "#d0d0e8",
-                }}
+                contentStyle={colors.tooltip}
                 formatter={(val: unknown) => `₹${Number(val).toLocaleString("en-IN")}`}
               />
-              <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: 10 }} />
+              <Legend verticalAlign="top" height={36} wrapperStyle={colors.legend} />
               <Bar dataKey="Spend" fill="#EC4899" radius={[4, 4, 0, 0]} barSize={24} />
               <Bar dataKey="Revenue" fill="#10B981" radius={[4, 4, 0, 0]} barSize={24} />
             </BarChart>

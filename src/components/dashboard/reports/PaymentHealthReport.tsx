@@ -15,6 +15,7 @@ import EmptyState from "@/components/dashboard/EmptyState";
 import ReportSectionHeader from "./ReportSectionHeader";
 import ReportKPICard from "./ReportKPICard";
 import { PaymentsIcon } from "@/components/ui/Icons";
+import { useChartColors } from "@/hooks/useChartColors";
 
 interface PaymentHealthReportProps {
   connectedTools: string[];
@@ -65,6 +66,7 @@ export default function PaymentHealthReport({
   dateRange,
   compareMode,
 }: PaymentHealthReportProps) {
+  const { colors, axis } = useChartColors();
   const [loading, setLoading] = useState(true);
 
   const hasPayments = connectedTools.some((t) =>
@@ -173,23 +175,15 @@ export default function PaymentHealthReport({
         <div className="h-[250px] w-full text-xs text-[#70709a]">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={mockDailyHealth} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(208,208,232,0.02)" vertical={false} />
-              <XAxis dataKey="date" stroke="rgba(208,208,232,0.3)" tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+              <XAxis dataKey="date" {...axis} />
               <YAxis
-                stroke="rgba(208,208,232,0.3)"
+                {...axis}
                 domain={[90, 100]}
                 tickFormatter={(val) => `${val}%`}
-                tickLine={false}
-                axisLine={false}
               />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0d0d1a",
-                  borderColor: "rgba(208, 208, 232, 0.08)",
-                  borderRadius: 8,
-                  fontSize: 11,
-                  color: "#d0d0e8",
-                }}
+                contentStyle={colors.tooltip}
                 formatter={(val) => [`${val}%`, "Success Rate"]}
               />
               <ReferenceLine y={95} stroke="#EF4444" strokeDasharray="3 3" label={{ value: "95% Benchmark", fill: "#EF4444", position: "top", fontSize: 9 }} />

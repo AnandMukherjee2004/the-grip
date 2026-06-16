@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
-import { ThemeScript } from "@/components/ThemeScript";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
 import "./globals.css";
@@ -40,8 +39,11 @@ export default function RootLayout({
       className={`${geist.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
       suppressHydrationWarning
     >
+      <head>
+        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
+        <script src="/theme-init.js" suppressHydrationWarning />
+      </head>
       <body className="min-h-full" suppressHydrationWarning>
-        <ThemeScript />
         <ThemeProvider>
           {children}
           <ThemeSwitcher />

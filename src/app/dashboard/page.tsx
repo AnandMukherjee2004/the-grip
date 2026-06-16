@@ -3,7 +3,8 @@
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useOnboarding } from "@/context/OnboardingContext";
-import TopBar, { DateRangeOption } from "@/components/layout/TopBar";
+import TopBar, { DEFAULT_DATE_RANGE } from "@/components/layout/TopBar";
+import { getDateRangeLabel, type DateRangeSelection } from "@/lib/dateRange";
 import KPIStrip from "@/components/dashboard/KPIStrip";
 import PipelineFunnel from "@/components/dashboard/PipelineFunnel";
 import RecentLeads from "@/components/dashboard/RecentLeads";
@@ -17,7 +18,7 @@ const AttributionChart = dynamic(() => import("@/components/dashboard/Attributio
 export default function DashboardPage() {
   const { connectedTools } = useOnboarding();
   const [loading, setLoading] = useState(true);
-  const [dateRange, setDateRange] = useState<DateRangeOption>("Last 30 days");
+  const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
 
   useEffect(() => {
     // Simulate async data fetching loading delay (800ms)
@@ -86,7 +87,7 @@ export default function DashboardPage() {
 
   return (
     <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
-      <TopBar selectedRange={dateRange} onRangeChange={setDateRange} />
+      <TopBar dateRange={dateRange} onDateRangeChange={setDateRange} />
 
       {/* Scrollable Main Content Center Area */}
       <main className="flex-grow overflow-y-auto p-6 space-y-6 scrollbar-thin">
@@ -94,7 +95,7 @@ export default function DashboardPage() {
         <KPIStrip connectedTools={connectedTools} />
 
         {/* Zone 2 — Revenue chart */}
-        <RevenueChart connectedTools={connectedTools} dateRange={dateRange} />
+        <RevenueChart connectedTools={connectedTools} dateRange={getDateRangeLabel(dateRange)} />
 
         {/* Zone 3 — Pipeline funnel (60%) + New leads (40%) */}
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-6">

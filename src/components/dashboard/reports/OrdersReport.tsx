@@ -16,6 +16,7 @@ import EmptyState from "@/components/dashboard/EmptyState";
 import ReportSectionHeader from "./ReportSectionHeader";
 import ReportKPICard from "./ReportKPICard";
 import { OrdersIcon } from "@/components/ui/Icons";
+import { useChartColors } from "@/hooks/useChartColors";
 
 interface OrdersReportProps {
   connectedTools: string[];
@@ -50,6 +51,7 @@ const mockDailyOrders = [
 ];
 
 export default function OrdersReport({ connectedTools, dateRange, compareMode }: OrdersReportProps) {
+  const { colors, axis } = useChartColors();
   const [loading, setLoading] = useState(true);
 
   const hasEcom = connectedTools.some((t) =>
@@ -159,27 +161,17 @@ export default function OrdersReport({ connectedTools, dateRange, compareMode }:
                   <stop offset="95%" stopColor="#818CF8" stopOpacity={0.05} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(208,208,232,0.02)" vertical={false} />
-              <XAxis dataKey="date" stroke="rgba(208,208,232,0.3)" tickLine={false} axisLine={false} />
-              <YAxis yAxisId="left" stroke="rgba(208,208,232,0.3)" tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+              <XAxis dataKey="date" {...axis} />
+              <YAxis yAxisId="left" {...axis} />
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                stroke="rgba(208,208,232,0.3)"
+                {...axis}
                 tickFormatter={(val) => `₹${val}`}
-                tickLine={false}
-                axisLine={false}
               />
-              <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0d0d1a",
-                  borderColor: "rgba(208, 208, 232, 0.08)",
-                  borderRadius: 8,
-                  fontSize: 11,
-                  color: "#d0d0e8",
-                }}
-              />
-              <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: 10 }} />
+              <Tooltip contentStyle={colors.tooltip} />
+              <Legend verticalAlign="top" height={36} wrapperStyle={colors.legend} />
               <Bar
                 yAxisId="left"
                 dataKey="orders"

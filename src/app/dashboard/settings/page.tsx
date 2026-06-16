@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import TopBar, { DateRangeOption } from "@/components/layout/TopBar";
+import TopBar, { DEFAULT_DATE_RANGE } from "@/components/layout/TopBar";
+import CustomSelect from "@/components/ui/CustomSelect";
+import type { DateRangeSelection } from "@/lib/dateRange";
 import { InfoIcon, CheckCircleIcon, SettingsIcon } from "@/components/ui/Icons";
 import { useOnboarding } from "@/context/OnboardingContext";
 
@@ -32,6 +34,40 @@ interface ApiKeyItem {
   lastUsed: string;
 }
 
+const INDUSTRY_OPTIONS = [
+  { value: "E-commerce", label: "E-commerce" },
+  { value: "SaaS", label: "SaaS / Software" },
+  { value: "Fintech", label: "Fintech" },
+  { value: "Retail & Brands", label: "Retail & Brands" },
+  { value: "Agency / Services", label: "Agency / Services" },
+];
+
+const CURRENCY_OPTIONS = [
+  { value: "INR", label: "INR (₹) - Indian Rupee" },
+  { value: "USD", label: "USD ($) - US Dollar" },
+  { value: "EUR", label: "EUR (€) - Euro" },
+  { value: "GBP", label: "GBP (£) - British Pound" },
+];
+
+const TIMEZONE_OPTIONS = [
+  { value: "IST", label: "IST (UTC+05:30) - India Standard Time" },
+  { value: "UTC", label: "UTC (UTC+00:00) - Coordinated Universal Time" },
+  { value: "EST", label: "EST (UTC-05:00) - Eastern Standard Time" },
+  { value: "PST", label: "PST (UTC-08:00) - Pacific Standard Time" },
+];
+
+const INVITE_ROLE_OPTIONS = [
+  { value: "Admin", label: "Admin" },
+  { value: "Member", label: "Member" },
+  { value: "Viewer", label: "Viewer (Read-only)" },
+];
+
+const RETENTION_OPTIONS = [
+  { value: "30", label: "30 Days" },
+  { value: "90", label: "90 Days (Recommended)" },
+  { value: "180", label: "180 Days" },
+];
+
 export default function SettingsPage() {
   const { workspaces, activeWorkspaceId, updateWorkspaceName } = useOnboarding();
   const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId) || {
@@ -39,7 +75,7 @@ export default function SettingsPage() {
     name: "Frido",
   };
 
-  const [dateRange, setDateRange] = useState<DateRangeOption>("Last 30 days");
+  const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
   const [activeTab, setActiveTab] = useState<TabId>("workspace");
 
   // State: Workspace details
@@ -226,7 +262,7 @@ export default function SettingsPage() {
 
   return (
     <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
-      <TopBar selectedRange={dateRange} onRangeChange={setDateRange} />
+      <TopBar dateRange={dateRange} onDateRangeChange={setDateRange} />
 
       {/* Main content scrollable area */}
       <main className="flex-grow overflow-y-auto p-6 space-y-8 scrollbar-thin relative">
@@ -329,45 +365,32 @@ export default function SettingsPage() {
 
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-white/60 tracking-wider uppercase">Industry / Business Type</label>
-                      <select
+                      <CustomSelect
                         value={industry}
-                        onChange={(e) => setIndustry(e.target.value)}
-                        className="w-full h-9 px-3 rounded-lg text-xs bg-[#040409] border border-white/10 text-white focus:outline-none focus:border-indigo-500/50 transition-all font-sans cursor-pointer"
-                      >
-                        <option value="E-commerce">E-commerce</option>
-                        <option value="SaaS">SaaS / Software</option>
-                        <option value="Fintech">Fintech</option>
-                        <option value="Retail & Brands">Retail & Brands</option>
-                        <option value="Agency / Services">Agency / Services</option>
-                      </select>
+                        onChange={setIndustry}
+                        options={INDUSTRY_OPTIONS}
+                        aria-label="Industry / Business Type"
+                      />
                     </div>
 
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-white/60 tracking-wider uppercase">Default Currency</label>
-                      <select
+                      <CustomSelect
                         value={currency}
-                        onChange={(e) => setCurrency(e.target.value)}
-                        className="w-full h-9 px-3 rounded-lg text-xs bg-[#040409] border border-white/10 text-white focus:outline-none focus:border-indigo-500/50 transition-all font-sans cursor-pointer"
-                      >
-                        <option value="INR">INR (₹) - Indian Rupee</option>
-                        <option value="USD">USD ($) - US Dollar</option>
-                        <option value="EUR">EUR (€) - Euro</option>
-                        <option value="GBP">GBP (£) - British Pound</option>
-                      </select>
+                        onChange={setCurrency}
+                        options={CURRENCY_OPTIONS}
+                        aria-label="Default Currency"
+                      />
                     </div>
 
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-white/60 tracking-wider uppercase">Time Zone</label>
-                      <select
+                      <CustomSelect
                         value={timezone}
-                        onChange={(e) => setTimezone(e.target.value)}
-                        className="w-full h-9 px-3 rounded-lg text-xs bg-[#040409] border border-white/10 text-white focus:outline-none focus:border-indigo-500/50 transition-all font-sans cursor-pointer"
-                      >
-                        <option value="IST">IST (UTC+05:30) - India Standard Time</option>
-                        <option value="UTC">UTC (UTC+00:00) - Coordinated Universal Time</option>
-                        <option value="EST">EST (UTC-05:00) - Eastern Standard Time</option>
-                        <option value="PST">PST (UTC-08:00) - Pacific Standard Time</option>
-                      </select>
+                        onChange={setTimezone}
+                        options={TIMEZONE_OPTIONS}
+                        aria-label="Time Zone"
+                      />
                     </div>
                   </div>
 
@@ -425,15 +448,15 @@ export default function SettingsPage() {
                         className="flex-grow h-9 px-3 rounded-lg text-xs bg-[#040409] border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-indigo-500/50 transition-all font-sans"
                       />
                       <div className="flex gap-2">
-                        <select
+                        <CustomSelect
                           value={inviteRole}
-                          onChange={(e) => setInviteRole(e.target.value as "Admin" | "Member" | "Viewer")}
-                          className="h-9 px-3 rounded-lg text-xs bg-[#040409] border border-white/10 text-white focus:outline-none transition-all cursor-pointer font-semibold"
-                        >
-                          <option value="Admin">Admin</option>
-                          <option value="Member">Member</option>
-                          <option value="Viewer">Viewer (Read-only)</option>
-                        </select>
+                          onChange={(value) =>
+                            setInviteRole(value as "Admin" | "Member" | "Viewer")
+                          }
+                          options={INVITE_ROLE_OPTIONS}
+                          className="w-[160px]"
+                          aria-label="Invite role"
+                        />
                         <button
                           type="submit"
                           className="px-4 h-9 rounded-lg btn-gradient bg-gradient-to-r text-xs font-semibold text-white cursor-pointer active:scale-95 transition-all whitespace-nowrap"
@@ -713,15 +736,13 @@ export default function SettingsPage() {
                   {/* Retention selector */}
                   <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-2.5">
                     <div className="text-xs font-semibold text-white">Synced Data Ingestion Retention Window</div>
-                    <select
+                    <CustomSelect
                       value={retention}
-                      onChange={(e) => setRetention(e.target.value)}
-                      className="h-8 px-3 rounded-lg text-xs bg-[#040409] border border-white/10 text-white focus:outline-none transition-all cursor-pointer font-semibold"
-                    >
-                      <option value="30">30 Days</option>
-                      <option value="90">90 Days (Recommended)</option>
-                      <option value="180">180 Days</option>
-                    </select>
+                      onChange={setRetention}
+                      options={RETENTION_OPTIONS}
+                      className="max-w-xs"
+                      aria-label="Data retention window"
+                    />
                     <div className="text-[10px] text-white/40">Raw synchronizations of CRM fields and invoice ledgers are compressed or deleted permanently past this timeline.</div>
                   </div>
 

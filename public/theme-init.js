@@ -1,5 +1,3 @@
-
-const THEME_INIT_SCRIPT = `
 (function () {
   var KEY = "theme";
   var preference = "dark";
@@ -34,13 +32,3 @@ const THEME_INIT_SCRIPT = `
   document.documentElement.setAttribute("data-theme", resolved);
   document.documentElement.setAttribute("data-theme-preference", preference);
 })();
-`;
-
-export function ThemeScript() {
-  return (
-    <script
-      id="grip-theme-init"
-      dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
-    />
-  );
-}
