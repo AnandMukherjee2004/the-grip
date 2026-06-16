@@ -1,16 +1,18 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { useOnboarding } from "@/context/OnboardingContext";
 import TopBar, { DateRangeOption } from "@/components/layout/TopBar";
 import KPIStrip from "@/components/dashboard/KPIStrip";
-import RevenueChart from "@/components/dashboard/RevenueChart";
 import PipelineFunnel from "@/components/dashboard/PipelineFunnel";
 import RecentLeads from "@/components/dashboard/RecentLeads";
 import OrdersSummary from "@/components/dashboard/OrdersSummary";
 import PaymentsSummary from "@/components/dashboard/PaymentsSummary";
-import AttributionChart from "@/components/dashboard/AttributionChart";
 import AgentLeaderboard from "@/components/dashboard/AgentLeaderboard";
+
+const RevenueChart = dynamic(() => import("@/components/dashboard/RevenueChart"), { ssr: false });
+const AttributionChart = dynamic(() => import("@/components/dashboard/AttributionChart"), { ssr: false });
 
 export default function DashboardPage() {
   const { connectedTools } = useOnboarding();
