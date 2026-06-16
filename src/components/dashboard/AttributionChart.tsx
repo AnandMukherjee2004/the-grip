@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useChartColors } from "@/hooks/useChartColors";
 
 interface AttributionChartProps {
   connectedTools: string[];
@@ -24,6 +25,7 @@ const mockAttributionSummary = [
 ];
 
 export default function AttributionChart({ connectedTools }: AttributionChartProps) {
+  const { colors, axis } = useChartColors();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -63,33 +65,25 @@ export default function AttributionChart({ connectedTools }: AttributionChartPro
         {mounted ? (
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={mockAttributionData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(208,208,232,0.02)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
               <XAxis
                 dataKey="channel"
-                stroke="rgba(208,208,232,0.3)"
-                tickLine={false}
-                axisLine={false}
+                {...axis}
                 dy={8}
                 style={{ fontSize: 9, fontWeight: 500 }}
               />
               <YAxis
-                stroke="rgba(208,208,232,0.3)"
+                {...axis}
                 tickFormatter={formatYAxis}
-                tickLine={false}
-                axisLine={false}
                 style={{ fontSize: 9, fontWeight: 500 }}
               />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0d0d1a",
-                  borderColor: "rgba(208, 208, 232, 0.08)",
-                  borderRadius: 8,
-                  fontSize: 11,
-                  color: "#d0d0e8",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-                }}
-                formatter={(value: any) => [`₹${Number(value).toLocaleString("en-IN")}`, "Revenue"]}
-                labelStyle={{ fontWeight: "bold", color: "#fff", marginBottom: 4 }}
+                contentStyle={colors.tooltip}
+                formatter={(value: unknown) => [
+                  `₹${Number(value).toLocaleString("en-IN")}`,
+                  "Revenue",
+                ]}
+                labelStyle={{ fontWeight: "bold", color: colors.labelFill, marginBottom: 4 }}
               />
               <Bar dataKey="revenue" radius={[4, 4, 0, 0]} maxBarSize={40}>
                 {mockAttributionData.map((entry, index) => (

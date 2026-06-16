@@ -1,11 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import TopBar, { DateRangeOption } from "@/components/layout/TopBar";
+import TopBar, { DEFAULT_DATE_RANGE } from "@/components/layout/TopBar";
+import CustomSelect from "@/components/ui/CustomSelect";
+import type { DateRangeSelection } from "@/lib/dateRange";
 import { CheckCircleIcon } from "@/components/ui/Icons";
+import { ThemePreferenceSelector } from "@/components/theme/ThemePreferenceSelector";
+
+const TIMEZONE_OPTIONS = [
+  { value: "UTC-08:00 (Pacific Time)", label: "UTC-08:00 (Pacific Time)" },
+  { value: "UTC-05:00 (Eastern Time)", label: "UTC-05:00 (Eastern Time)" },
+  { value: "UTC+00:00 (Greenwich Mean Time)", label: "UTC+00:00 (GMT)" },
+  { value: "UTC+01:00 (Central European Time)", label: "UTC+01:00 (CET)" },
+  { value: "UTC+05:30 (India Standard Time)", label: "UTC+05:30 (India Standard Time)" },
+  { value: "UTC+09:00 (Japan Standard Time)", label: "UTC+09:00 (Japan Standard Time)" },
+];
 
 export default function ProfilePage() {
-  const [dateRange, setDateRange] = useState<DateRangeOption>("Last 30 days");
+  const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
@@ -34,7 +46,7 @@ export default function ProfilePage() {
 
   return (
     <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
-      <TopBar selectedRange={dateRange} onRangeChange={setDateRange} />
+      <TopBar dateRange={dateRange} onDateRangeChange={setDateRange} />
 
       {/* Main content scrollable area */}
       <main className="flex-grow overflow-y-auto p-6 space-y-8 scrollbar-thin relative">
@@ -51,7 +63,7 @@ export default function ProfilePage() {
           <div className="space-y-1">
             <h1 className="text-xl font-bold text-white tracking-tight">User Profile</h1>
             <p className="text-white/40 text-xs">
-              Manage your personal identity, company details, and local timezone settings.
+              Manage your personal identity, company details, appearance, and local timezone settings.
             </p>
           </div>
 
@@ -114,20 +126,26 @@ export default function ProfilePage() {
 
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-white/60 tracking-wider uppercase">Time Zone</label>
-                  <select
+                  <CustomSelect
                     value={profile.timezone}
-                    onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
+                    onChange={(value) => setProfile({ ...profile, timezone: value })}
+                    options={TIMEZONE_OPTIONS}
                     disabled={saving}
-                    className="w-full h-9 px-3 rounded-lg text-xs bg-[#0d0d1a] border border-white/10 text-white hover:border-white/20 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all font-sans cursor-pointer"
-                  >
-                    <option value="UTC-08:00 (Pacific Time)">UTC-08:00 (Pacific Time)</option>
-                    <option value="UTC-05:00 (Eastern Time)">UTC-05:00 (Eastern Time)</option>
-                    <option value="UTC+00:00 (Greenwich Mean Time)">UTC+00:00 (GMT)</option>
-                    <option value="UTC+01:00 (Central European Time)">UTC+01:00 (CET)</option>
-                    <option value="UTC+05:30 (India Standard Time)">UTC+05:30 (India Standard Time)</option>
-                    <option value="UTC+09:00 (Japan Standard Time)">UTC+09:00 (Japan Standard Time)</option>
-                  </select>
+                    aria-label="Time Zone"
+                  />
                 </div>
+              </div>
+
+              <div className="space-y-3 pt-2 border-t border-white/10">
+                <div>
+                  <h3 className="text-[10px] font-bold text-white/60 tracking-wider uppercase">
+                    Appearance
+                  </h3>
+                  <p className="text-white/40 text-[11px] mt-1">
+                    Choose how Grip looks on your device.
+                  </p>
+                </div>
+                <ThemePreferenceSelector />
               </div>
 
               <div className="pt-4 border-t border-white/10 flex justify-end">

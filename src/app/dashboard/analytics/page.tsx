@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useOnboarding } from "@/context/OnboardingContext";
-import TopBar, { DateRangeOption } from "@/components/layout/TopBar";
+import TopBar, { DEFAULT_DATE_RANGE } from "@/components/layout/TopBar";
+import type { DateRangeSelection } from "@/lib/dateRange";
 
 // Report Sections
 import RevenueReport from "@/components/dashboard/reports/RevenueReport";
@@ -30,7 +31,7 @@ export default function AnalyticsPage() {
   const { connectedTools } = useOnboarding();
 
   // Reports local date selection (independent of global TopBar date range option)
-  const [dummyGlobalRange, setDummyGlobalRange] = useState<DateRangeOption>("Last 30 days");
+  const [dummyGlobalRange, setDummyGlobalRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
   const [reportsRange, setReportsRange] = useState<ReportsDateRange>("Last 30 days");
   const [reportsRangeOpen, setReportsRangeOpen] = useState(false);
 
@@ -64,7 +65,7 @@ export default function AnalyticsPage() {
   return (
     <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
       {/* TopBar with dummy state (standard dashboard layout shell) */}
-      <TopBar selectedRange={dummyGlobalRange} onRangeChange={setDummyGlobalRange} />
+      <TopBar dateRange={dummyGlobalRange} onDateRangeChange={setDummyGlobalRange} />
 
       {/* Sticky sub-header */}
       <div className="sticky top-0 z-20 shrink-0 h-14 w-full bg-[#07070e]/95 border-b border-white/[0.04] backdrop-blur-md px-6 flex items-center justify-between select-none font-sans">
