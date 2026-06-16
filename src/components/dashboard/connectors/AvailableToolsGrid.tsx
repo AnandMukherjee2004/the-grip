@@ -30,6 +30,9 @@ export function AvailableToolsGrid({
 
   // Filter logic
   const filteredTools = TOOLS.filter((tool) => {
+    const isConnected = connectedTools.includes(tool.id);
+    if (isConnected) return false;
+    
     const matchesSearch = tool.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = activeCategory === "all" || tool.category === activeCategory;
     return matchesSearch && matchesCategory;

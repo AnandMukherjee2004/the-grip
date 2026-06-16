@@ -1,0 +1,155 @@
+"use client";
+
+import { useState } from "react";
+import TopBar, { DateRangeOption } from "@/components/layout/TopBar";
+import { CheckCircleIcon } from "@/components/ui/Icons";
+
+export default function ProfilePage() {
+  const [dateRange, setDateRange] = useState<DateRangeOption>("Last 30 days");
+  const [saving, setSaving] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  const [profile, setProfile] = useState({
+    name: "Anand Mukherjee",
+    email: "anand.mukherjee@example.com",
+    company: "The Grip Co.",
+    timezone: "UTC+05:30 (India Standard Time)",
+  });
+
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage("");
+    }, 3500);
+  };
+
+  const handleProfileSave = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    setTimeout(() => {
+      setSaving(false);
+      triggerToast("Profile settings updated successfully!");
+    }, 1200);
+  };
+
+  return (
+    <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
+      <TopBar selectedRange={dateRange} onRangeChange={setDateRange} />
+
+      {/* Main content scrollable area */}
+      <main className="flex-grow overflow-y-auto p-6 space-y-8 scrollbar-thin relative">
+        {/* Floating Toast Notification */}
+        {toastMessage && (
+          <div className="fixed top-20 right-6 z-50 flex items-center gap-3 bg-[#0d0d1a] border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md animate-fadeIn transition-all duration-300">
+            <CheckCircleIcon className="text-emerald-400" size={16} />
+            <span className="text-xs font-semibold">{toastMessage}</span>
+          </div>
+        )}
+
+        <div className="max-w-4xl mx-auto space-y-8">
+          {/* Header Title */}
+          <div className="space-y-1">
+            <h1 className="text-xl font-bold text-white tracking-tight">User Profile</h1>
+            <p className="text-white/40 text-xs">
+              Manage your personal identity, company details, and local timezone settings.
+            </p>
+          </div>
+
+          {/* Profile Form Panel */}
+          <div className="bg-[#0d0d1a] border border-white/10 rounded-2xl p-6 shadow-xl">
+            <form onSubmit={handleProfileSave} className="space-y-6">
+              <div>
+                <h2 className="text-sm font-bold text-white mb-1">General Profile Details</h2>
+                <p className="text-white/40 text-[11px]">Manage how your identity appears in reports and invoices.</p>
+              </div>
+
+              {/* Avatar Upload Preview */}
+              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
+                <div className="w-14 h-14 rounded-full border border-white/10 bg-gradient-to-tr from-indigo-500 to-sky-500 flex items-center justify-center text-sm font-bold text-white shadow-lg relative">
+                  AM
+                </div>
+                <div className="space-y-1">
+                  <div className="text-xs font-semibold text-white">Profile Avatar</div>
+                  <div className="text-[10px] text-white/40">Avatar dynamically generated from your display initials.</div>
+                </div>
+              </div>
+
+              {/* Grid fields */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-white/60 tracking-wider uppercase">Full Name</label>
+                  <input
+                    type="text"
+                    value={profile.name}
+                    onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                    required
+                    disabled={saving}
+                    className="w-full h-9 px-3 rounded-lg text-xs bg-white/5 border border-white/10 text-white placeholder-white/30 hover:border-white/20 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all font-sans"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-white/60 tracking-wider uppercase">Email Address</label>
+                  <input
+                    type="email"
+                    value={profile.email}
+                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                    required
+                    disabled={saving}
+                    className="w-full h-9 px-3 rounded-lg text-xs bg-white/5 border border-white/10 text-white placeholder-white/30 hover:border-white/20 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all font-sans"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-white/60 tracking-wider uppercase">Organization Name</label>
+                  <input
+                    type="text"
+                    value={profile.company}
+                    onChange={(e) => setProfile({ ...profile, company: e.target.value })}
+                    required
+                    disabled={saving}
+                    className="w-full h-9 px-3 rounded-lg text-xs bg-white/5 border border-white/10 text-white placeholder-white/30 hover:border-white/20 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all font-sans"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-[10px] font-bold text-white/60 tracking-wider uppercase">Time Zone</label>
+                  <select
+                    value={profile.timezone}
+                    onChange={(e) => setProfile({ ...profile, timezone: e.target.value })}
+                    disabled={saving}
+                    className="w-full h-9 px-3 rounded-lg text-xs bg-[#0d0d1a] border border-white/10 text-white hover:border-white/20 focus:border-indigo-500/50 focus:outline-none focus:ring-1 focus:ring-indigo-500/50 transition-all font-sans cursor-pointer"
+                  >
+                    <option value="UTC-08:00 (Pacific Time)">UTC-08:00 (Pacific Time)</option>
+                    <option value="UTC-05:00 (Eastern Time)">UTC-05:00 (Eastern Time)</option>
+                    <option value="UTC+00:00 (Greenwich Mean Time)">UTC+00:00 (GMT)</option>
+                    <option value="UTC+01:00 (Central European Time)">UTC+01:00 (CET)</option>
+                    <option value="UTC+05:30 (India Standard Time)">UTC+05:30 (India Standard Time)</option>
+                    <option value="UTC+09:00 (Japan Standard Time)">UTC+09:00 (Japan Standard Time)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="pt-4 border-t border-white/10 flex justify-end">
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="px-4 py-2 rounded-lg btn-gradient bg-gradient-to-r disabled:opacity-50 text-white text-xs font-semibold shadow-lg hover:shadow-indigo-500/20 active:scale-95 transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  {saving ? (
+                    <>
+                      <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Saving changes...
+                    </>
+                  ) : (
+                    "Save Profile"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+}

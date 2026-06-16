@@ -854,5 +854,17 @@
   border-color: rgba(99, 102, 241, 0.2) !important;
 }
 
+/* ---------- Reports Page Light Theme overrides ---------- */
+[data-theme="light"] .bg-\[\#0d0d1a\]\/20 {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  border-color: var(--light-border) !important;
+}
 
+[data-theme="light"] .bg-\[\#07070e\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: var(--light-border) !important;
+}
 
+[data-theme="light"] .border-white\/\[0\.03\] {
+  border-color: var(--light-border) !important;
+}
