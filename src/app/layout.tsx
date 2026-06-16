@@ -40,8 +40,10 @@ export default function RootLayout({
       className={`${geist.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full" suppressHydrationWarning>
+      <head>
         <ThemeScript />
+      </head>
+      <body className="min-h-full" suppressHydrationWarning>
         <ThemeProvider>
           {children}
           <ThemeSwitcher />
