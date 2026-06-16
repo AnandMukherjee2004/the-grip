@@ -185,9 +185,10 @@
 
   /* ---- theme switcher ---- */
   .theme-switcher {
-    @apply fixed z-[60] flex items-center gap-0.5 p-1 rounded-full pointer-events-auto;
-    bottom: 1.25rem;
-    left: 1.25rem;
+    @apply fixed z-[60] flex flex-col items-center gap-1 p-1 rounded-full pointer-events-auto
+      transition-[background-color,border-color,box-shadow,gap] duration-[300ms] ease-in-out;
+    top: 1.5rem;
+    right: 1.5rem;
     background: rgba(7, 11, 26, 0.42);
     border: 1px solid rgba(108, 118, 168, 0.14);
     -webkit-backdrop-filter: blur(24px) saturate(140%);
@@ -197,13 +198,29 @@
       0 10px 40px -12px rgba(0, 0, 0, 0.55);
   }
 
+  .theme-switcher:not([data-open="true"]) {
+    gap: 0;
+  }
+
   .theme-switcher__btn {
-    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1.5 text-[11px] font-medium leading-none
-      transition-[background-color,color,box-shadow] duration-[250ms] cursor-pointer;
+    @apply inline-flex items-center justify-center rounded-full w-8 h-8 text-[11px] font-medium leading-none
+      transition-[background-color,color,box-shadow,opacity,transform,height,width] duration-[300ms] ease-in-out cursor-pointer;
     color: rgba(154, 162, 195, 0.78);
     background: transparent;
     border: 1px solid transparent;
     -webkit-tap-highlight-color: transparent;
+  }
+
+  .theme-switcher:not([data-open="true"]) .theme-switcher__btn:not([data-active="true"]) {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.4);
+    height: 0;
+    width: 0;
+    margin: 0;
+    padding: 0;
+    border-width: 0;
+    overflow: hidden;
   }
 
   .theme-switcher__btn:hover {
@@ -225,11 +242,11 @@
   }
 
   .theme-switcher__icon {
-    @apply text-xs leading-none;
+    @apply flex items-center justify-center;
   }
 
   .theme-switcher__label {
-    @apply hidden sm:inline;
+    @apply hidden;
   }
 }
 
