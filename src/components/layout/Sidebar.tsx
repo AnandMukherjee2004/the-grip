@@ -35,15 +35,15 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
 
   return (
     <aside
-      className={`h-full bg-[#07070e] border-r border-white/[0.04] flex flex-col justify-between shrink-0 select-none font-sans transition-all duration-300 ${
+      className={`h-screen bg-[#07070e] border-r border-white/[0.04] flex flex-col justify-between shrink-0 select-none font-sans transition-all duration-300 ${
         isCollapsed ? "w-[60px]" : "w-[220px]"
       }`}
     >
       {/* Top Section */}
-      <div className="flex flex-col">
+      <div className="flex flex-col min-h-0 flex-grow">
         {/* Brand/Logo */}
         <div
-          className={`h-14 px-4 flex items-center border-b border-b-white/[0.03] ${
+          className={`h-14 px-4 flex items-center border-b border-b-white/[0.03] shrink-0 ${
             isCollapsed ? "justify-center" : "justify-between"
           }`}
         >
@@ -66,7 +66,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
         </div>
 
         {/* Nav Links */}
-        <nav className={`space-y-5 ${isCollapsed ? "p-2" : "p-4"}`}>
+        <nav className={`flex-grow overflow-y-auto space-y-5 scrollbar-thin ${isCollapsed ? "p-2" : "p-4"}`}>
           {/* Section: Overview */}
           <div>
             {!isCollapsed && (
@@ -240,7 +240,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
       </div>
 
       {/* Bottom Pinned Section */}
-      <div className={`border-t border-white/[0.03] space-y-4 ${isCollapsed ? "p-2" : "p-4"}`}>
+      <div className={`border-t border-white/[0.03] space-y-4 shrink-0 ${isCollapsed ? "p-2" : "p-4"}`}>
         <ul className="space-y-1">
           <li>
             <Link
