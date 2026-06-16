@@ -10,7 +10,7 @@ export function SlotSelector({ onConfirm }: SlotSelectorProps) {
   // Generate next 5 business days
   const getNextBusinessDays = () => {
     const days = [];
-    let current = new Date();
+    const current = new Date();
     
     // Start from tomorrow
     current.setDate(current.getDate() + 1);

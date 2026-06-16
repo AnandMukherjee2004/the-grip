@@ -576,8 +576,7 @@
 /* Primary — shared gradient treatment */
 [data-theme="light"] .btn-gradient,
 [data-theme="light"] button.bg-gradient-to-r,
-[data-theme="light"] a.bg-gradient-to-r,
-[data-theme="light"] .hero-cta-primary {
+[data-theme="light"] a.bg-gradient-to-r {
   background: var(--lt-cta-gradient) !important;
   background-image: var(--lt-cta-gradient) !important;
   color: #ffffff !important;
@@ -593,9 +592,7 @@
 
 [data-theme="light"] .btn-gradient:hover,
 [data-theme="light"] button.bg-gradient-to-r:not(:disabled):hover,
-[data-theme="light"] a.bg-gradient-to-r:hover,
-[data-theme="light"] .hero-cta-primary:hover,
-[data-theme="light"] .hero-cta-primary:focus-visible {
+[data-theme="light"] a.bg-gradient-to-r:hover {
   transform: translateY(-1px) !important;
   box-shadow: var(--lt-cta-shadow-hover) !important;
   filter: brightness(1.05) !important;
@@ -605,29 +602,55 @@
 
 [data-theme="light"] .btn-gradient:active,
 [data-theme="light"] button.bg-gradient-to-r:not(:disabled):active,
-[data-theme="light"] a.bg-gradient-to-r:active,
-[data-theme="light"] .hero-cta-primary:active {
+[data-theme="light"] a.bg-gradient-to-r:active {
   transform: translateY(0) !important;
   box-shadow: var(--lt-cta-shadow-active) !important;
   filter: none !important;
 }
 
-/* Hero Get Started — filled primary CTA */
-[data-theme="light"] .hero-cta-primary-text,
-[data-theme="light"] .hero-cta-primary .hero-cta-arrow {
-  color: #ffffff !important;
-  filter: none !important;
+/* Hero Get Started — text and arrow colors on light background */
+[data-theme="light"] .hero-cta-primary {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: filter 350ms var(--ease);
+}
+
+[data-theme="light"] .hero-cta-primary:hover,
+[data-theme="light"] .hero-cta-primary:focus-visible {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-theme="light"] .hero-cta-primary-text {
+  color: var(--light-text) !important;
 }
 
 [data-theme="light"] .hero-cta-primary:hover .hero-cta-primary-text,
-[data-theme="light"] .hero-cta-primary:focus-visible .hero-cta-primary-text,
+[data-theme="light"] .hero-cta-primary:focus-visible .hero-cta-primary-text {
+  color: #000000 !important;
+}
+
+[data-theme="light"] .hero-cta-primary .hero-cta-arrow {
+  color: var(--light-text) !important;
+}
+
 [data-theme="light"] .hero-cta-primary:hover .hero-cta-arrow,
 [data-theme="light"] .hero-cta-primary:focus-visible .hero-cta-arrow {
-  color: #ffffff !important;
+  color: #000000 !important;
 }
 
 [data-theme="light"] .hero-cta-streak {
-  display: none;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.35) 22%,
+    rgba(79, 110, 247, 0.8) 50%,
+    rgba(99, 102, 241, 0.35) 78%,
+    transparent 100%
+  ) !important;
 }
 
 /* Primary button label text — force white on gradient controls */
@@ -668,24 +691,19 @@
 
 /* Secondary / ghost CTAs */
 [data-theme="light"] .hero-cta-secondary {
-  background: rgba(255, 255, 255, 0.8) !important;
-  border: 1px solid rgba(99, 102, 241, 0.15) !important;
-  color: #374151 !important;
-  border-radius: 8px;
-  box-shadow: none;
-  transition:
-    background 200ms ease-out,
-    border-color 200ms ease-out,
-    box-shadow 200ms ease-out,
-    color 200ms ease-out;
+  background: transparent !important;
+  border: none !important;
+  color: var(--light-text-secondary) !important;
+  box-shadow: none !important;
+  transition: color 350ms var(--ease);
 }
 
 [data-theme="light"] .hero-cta-secondary:hover,
 [data-theme="light"] .hero-cta-secondary:focus-visible {
-  background: #ffffff !important;
-  border-color: rgba(99, 102, 241, 0.25) !important;
-  color: #374151 !important;
-  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.08) !important;
+  background: transparent !important;
+  border: none !important;
+  color: var(--light-text) !important;
+  box-shadow: none !important;
 }
 
 /* Onboarding back / skip text links */
@@ -740,3 +758,31 @@
 [data-theme="light"] [class*="bg-purple-500"].text-white {
   color: #ffffff !important;
 }
+
+/* Connect page specific connector cards under light theme */
+[data-theme="light"] .bg-\[\#0c1514\]\/40 {
+  background-color: rgba(209, 250, 229, 0.4) !important;
+  border-color: rgba(29, 158, 117, 0.3) !important;
+}
+
+[data-theme="light"] .bg-\[\#140b0d\]\/40 {
+  background-color: rgba(254, 226, 226, 0.4) !important;
+  border-color: rgba(244, 63, 94, 0.25) !important;
+}
+
+[data-theme="light"] .bg-\[\#0e0e1a\]\/20 {
+  background-color: rgba(243, 244, 246, 0.45) !important;
+}
+
+[data-theme="light"] .bg-\[\#07070f\]\/90 {
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  border-top-color: var(--light-border) !important;
+  backdrop-filter: blur(18px) !important;
+}
+
+[data-theme="light"] .bg-\[\#090911\]\/95 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  border-color: var(--light-border) !important;
+  box-shadow: 0 20px 50px rgba(99, 102, 241, 0.08) !important;
+}
+
