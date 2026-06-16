@@ -66,7 +66,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
         </div>
 
         {/* Nav Links */}
-        <nav className={`flex-grow overflow-y-auto space-y-5 scrollbar-thin ${isCollapsed ? "p-2" : "p-4"}`}>
+        <nav className={`flex-grow overflow-y-auto space-y-5 scrollbar-none ${isCollapsed ? "p-2" : "p-4"}`}>
           {/* Section: Overview */}
           <div>
             {!isCollapsed && (
