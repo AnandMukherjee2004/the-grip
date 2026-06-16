@@ -3,6 +3,7 @@
 import Link from "next/link";
 import EmptyState from "./EmptyState";
 import { LeadsIcon } from "@/components/ui/Icons";
+import { TOOLS } from "@/lib/tools";
 
 interface RecentLeadsProps {
   connectedTools: string[];
@@ -85,9 +86,21 @@ export default function RecentLeads({ connectedTools }: RecentLeadsProps) {
           >
             <div className="flex items-center gap-2">
               <span className="font-semibold text-white/85">{lead.name}</span>
-              <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${getSourceStyle(lead.source)}`}>
-                {lead.source}
-              </span>
+              {(() => {
+                const tool = TOOLS.find((t) => t.name.toLowerCase() === lead.source.toLowerCase());
+                return tool?.logo ? (
+                  <img
+                    src={tool.logo}
+                    alt={lead.source}
+                    className="w-4 h-4 object-contain opacity-85 hover:opacity-100 transition-opacity"
+                    title={lead.source}
+                  />
+                ) : (
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${getSourceStyle(lead.source)}`}>
+                    {lead.source}
+                  </span>
+                );
+              })()}
             </div>
 
             <div className="flex items-center gap-3">
