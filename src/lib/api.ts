@@ -35,11 +35,11 @@ export function getStatus() {
 }
 
 // Next.js API configuration for connectors
-export const BASE_URL = 'http://localhost:3001';
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export async function getConnectors(workspaceId: string): Promise<string[]> {
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/connectors?workspaceId=${workspaceId}`, {
+    const res = await fetch(`${API_URL}/api/v1/connectors?workspaceId=${workspaceId}`, {
       headers: { Accept: "application/json" },
       next: { revalidate: 0 },
     });
