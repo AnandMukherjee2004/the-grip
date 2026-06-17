@@ -1,6 +1,6 @@
 "use client";
 
-import { useRevlineEffects } from "@/hooks/useRevlineEffects";
+import { useGripEffects } from "@/hooks/useGripEffects";
 import { Navbar } from "./Navbar";
 import { BeforeAfterSection } from "./BeforeAfterSection";
 import { CtaSection } from "./CtaSection";
@@ -14,7 +14,7 @@ import { ProofSection } from "./ProofSection";
 import { SolutionSection } from "./SolutionSection";
 
 export function LandingPage() {
-  useRevlineEffects();
+  useGripEffects();
 
   return (
     <>

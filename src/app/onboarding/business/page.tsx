@@ -10,6 +10,8 @@ import {
   onboardingSubmitClass,
 } from "@/components/onboarding/OnboardingStepShell";
 
+import { useOnboarding } from "@/context/OnboardingContext";
+
 type BusinessValues = {
   companyName: string;
   industry: string;
@@ -103,6 +105,7 @@ function SelectField({
 
 export default function OnboardingBusinessPage() {
   const router = useRouter();
+  const { setOrgId, setWorkspaceId } = useOnboarding();
   const [values, setValues] = useState<BusinessValues>({
     companyName: "",
     industry: "",
@@ -112,6 +115,8 @@ export default function OnboardingBusinessPage() {
   const [errors, setErrors] = useState<
     Partial<Record<keyof BusinessValues, string>>
   >({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [globalError, setGlobalError] = useState("");
 
   const validate = () => {
     const next: Partial<Record<keyof BusinessValues, string>> = {};
@@ -123,9 +128,81 @@ export default function OnboardingBusinessPage() {
     return Object.keys(next).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const generateSlug = (name: string) => {
+    return name
+      .toLowerCase()
+      .replace(/\s+/g, "-")
+      .replace(/[^a-z0-9-]/g, "")
+      .replace(/--+/g, "-")
+      .replace(/^-+|-+$/g, "");
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) router.push("/onboarding/tools");
+    if (!validate()) return;
+
+    setIsLoading(true);
+    setGlobalError("");
+
+    const baseSlug = generateSlug(values.companyName);
+
+    const callApi = async (slugToUse: string): Promise<boolean> => {
+      try {
+        const response = await fetch("http://localhost:3001/api/v1/onboarding/complete", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orgName: values.companyName,
+            orgSlug: slugToUse,
+            workspaceName: values.companyName,
+            workspaceSlug: slugToUse,
+            clerkOrgId: `org_${Date.now()}`,
+            clerkUserId: `user_${Date.now()}`,
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setOrgId(data.orgId);
+          setWorkspaceId(data.workspaceId);
+          return true;
+        }
+
+        if (response.status === 409) {
+          return false; // conflict, retry with suffix
+        }
+
+        throw new Error("API responded with an error");
+      } catch (err) {
+        throw err;
+      }
+    };
+
+    try {
+      // First attempt
+      const success = await callApi(baseSlug);
+      if (success) {
+        router.push("/onboarding/tools");
+        return;
+      }
+
+      // Conflict (409) fallback retry
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const fallbackSlug = `${baseSlug}-${randomSuffix}`;
+      const successFallback = await callApi(fallbackSlug);
+      if (successFallback) {
+        router.push("/onboarding/tools");
+      } else {
+        setGlobalError("Something went wrong, please try again");
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error(err);
+      setGlobalError("Something went wrong, please try again");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -136,6 +213,11 @@ export default function OnboardingBusinessPage() {
       onBack={() => router.back()}
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+        {globalError && (
+          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium">
+            ⚠️ {globalError}
+          </div>
+        )}
         <div className="space-y-4 animate-fadeIn">
           <div className="space-y-2">
             <label htmlFor="companyName" className={onboardingLabelClass}>
@@ -145,6 +227,7 @@ export default function OnboardingBusinessPage() {
               id="companyName"
               type="text"
               autoComplete="organization"
+              disabled={isLoading}
               value={values.companyName}
               onChange={(e) =>
                 setValues((v) => ({ ...v, companyName: e.target.value }))
@@ -183,6 +266,7 @@ export default function OnboardingBusinessPage() {
               id="website"
               type="url"
               autoComplete="url"
+              disabled={isLoading}
               value={values.website}
               onChange={(e) =>
                 setValues((v) => ({ ...v, website: e.target.value }))
@@ -194,8 +278,19 @@ export default function OnboardingBusinessPage() {
         </div>
 
         <div className="flex gap-3 pt-3 border-t border-white/[0.04]">
-          <button type="submit" className={onboardingSubmitClass}>
-            Continue →
+          <button
+            type="submit"
+            disabled={isLoading}
+            className={`${onboardingSubmitClass} disabled:opacity-50 disabled:pointer-events-none`}
+          >
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <span className="w-3.5 h-3.5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                Processing...
+              </span>
+            ) : (
+              "Continue →"
+            )}
           </button>
         </div>
       </form>

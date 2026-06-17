@@ -31,7 +31,7 @@ function shutdown(code = 0) {
 process.on("SIGINT", () => shutdown(0));
 process.on("SIGTERM", () => shutdown(0));
 
-console.log("Starting Revline dev stack (Next.js + Hono/Bun)…\n");
+console.log("Starting GRIP dev stack (Next.js + Hono/Bun)…\n");
 
 spawnDev(["bun", "run", "--hot", "server/index.ts"], "api");
-spawnDev(["bunx", "next", "dev"], "web");
+spawnDev(["bunx", "next", "dev", "-p", "3000"], "web");

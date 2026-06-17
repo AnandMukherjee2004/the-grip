@@ -81,7 +81,7 @@ export default function ConnectorsPage() {
   };
 
   return (
-    <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
+    <div className="flex-grow flex flex-col overflow-hidden bg-[#040409]">
       <TopBar dateRange={dateRange} onDateRangeChange={setDateRange} />
 
       {/* Main content scrollable area */}

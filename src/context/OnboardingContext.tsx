@@ -27,6 +27,12 @@ interface OnboardingContextType {
   setActiveWorkspaceId: (id: string) => void;
   createWorkspace: (name: string) => void;
   updateWorkspaceName: (id: string, name: string) => void;
+  
+  // Organization and Workspace database identifiers
+  orgId: string;
+  setOrgId: (id: string) => void;
+  workspaceId: string;
+  setWorkspaceId: (id: string) => void;
 }
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
@@ -40,6 +46,17 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
   const [selectedTools, setSelectedToolsState] = useState<string[]>([]);
   const [connectedTools, setConnectedToolsState] = useState<string[]>([]);
   const [syncInfo, setSyncInfoState] = useState<Record<string, SyncDetails>>({});
+
+  const [orgId, setOrgIdState] = useState<string>("");
+  const [workspaceId, setWorkspaceIdState] = useState<string>("frido");
+
+  // Load orgId and workspaceId from localStorage on init
+  useEffect(() => {
+    const savedOrgId = localStorage.getItem("grip_org_id");
+    const savedWorkspaceId = localStorage.getItem("grip_workspace_id");
+    if (savedOrgId) setOrgIdState(savedOrgId);
+    if (savedWorkspaceId) setWorkspaceIdState(savedWorkspaceId);
+  }, []);
 
   // 1. Initial load of Workspaces and Active workspace ID
   useEffect(() => {
@@ -156,6 +173,16 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     localStorage.setItem("grip_workspaces", JSON.stringify(updated));
   };
 
+  const setOrgId = (id: string) => {
+    setOrgIdState(id);
+    localStorage.setItem("grip_org_id", id);
+  };
+
+  const setWorkspaceId = (id: string) => {
+    setWorkspaceIdState(id);
+    localStorage.setItem("grip_workspace_id", id);
+  };
+
   return (
     <OnboardingContext.Provider
       value={{
@@ -171,6 +198,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         setActiveWorkspaceId,
         createWorkspace,
         updateWorkspaceName,
+        orgId,
+        setOrgId,
+        workspaceId,
+        setWorkspaceId,
       }}
     >
       {children}

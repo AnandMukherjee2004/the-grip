@@ -8,7 +8,7 @@ import { ConnectProgressBar } from "@/components/onboarding/ConnectProgressBar";
 import { ConnectorGrid } from "@/components/onboarding/ConnectorGrid";
 import { CONNECTORS } from "@/lib/connectors";
 import { ConnectorStatus, OnboardingStep } from "@/types/onboarding";
-import { useRevlineEffects } from "@/hooks/useRevlineEffects";
+import { useGripEffects } from "@/hooks/useGripEffects";
 
 const ONBOARDING_STEPS: OnboardingStep[] = [
   { id: 1, label: "Account", path: "/onboarding" },
@@ -24,7 +24,15 @@ export default function OnboardingConnectPage() {
   const [isRedirecting, setIsRedirecting] = useState(false);
 
   // Apply visual effects if any (from original design system)
-  useRevlineEffects();
+  useGripEffects();
+
+  const [workspaceId, setWorkspaceId] = useState<string | null>(null);
+
+  // Read workspaceId from localStorage key 'grip_workspace_id' on mount
+  useEffect(() => {
+    const savedWorkspaceId = localStorage.getItem("grip_workspace_id");
+    setWorkspaceId(savedWorkspaceId);
+  }, []);
 
   // Guard: Redirect if no tools selected
   useEffect(() => {
@@ -37,31 +45,57 @@ export default function OnboardingConnectPage() {
     }
   }, [selectedTools, router]);
 
-  const handleConnect = (toolId: string) => {
+  const handleConnect = async (toolId: string) => {
     // Set to connecting state
     setLocalStatuses((prev) => ({ ...prev, [toolId]: "connecting" }));
 
-    // TODO: Replace with real OAuth redirect flow or API validation call
-    // Simulated connection delay (1.5 seconds)
-    setTimeout(() => {
-      // 5% chance of mock error for razorpay/stripe just to demonstrate error UI state fallback
-      const shouldFail = (toolId === "razorpay" || toolId === "stripe") && Math.random() < 0.05;
+    // Find the config for the current tool
+    const toolConfig = CONNECTORS[toolId];
+    if (!toolConfig) {
+      setLocalStatuses((prev) => ({ ...prev, [toolId]: "error" }));
+      return;
+    }
 
-      if (shouldFail) {
-        setLocalStatuses((prev) => ({ ...prev, [toolId]: "error" }));
-      } else {
+    // Map authMethod values
+    let authMethod: "api_key" | "oauth2" = "api_key";
+    if (toolConfig.authMethod === "oauth") {
+      authMethod = "oauth2";
+    } else if (toolConfig.authMethod === "apikey") {
+      authMethod = "api_key";
+    }
+
+    try {
+      const response = await fetch("http://localhost:3001/api/v1/connectors", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          workspaceId: workspaceId || "placeholder_workspace_id",
+          toolId,
+          authMethod,
+          credentials: { apiKey: "test_key", apiSecret: "test_secret" },
+        }),
+      });
+
+      if (response.ok) {
         setLocalStatuses((prev) => {
           const next = { ...prev };
           delete next[toolId];
           return next;
         });
-        
+
         // Add to connected list in context if not already present
         if (!connectedTools.includes(toolId)) {
           setConnectedTools([...connectedTools, toolId]);
         }
+      } else {
+        setLocalStatuses((prev) => ({ ...prev, [toolId]: "error" }));
       }
-    }, 1500);
+    } catch (error) {
+      console.error("Failed to connect tool:", error);
+      setLocalStatuses((prev) => ({ ...prev, [toolId]: "error" }));
+    }
   };
 
   const handleSkip = (toolId: string) => {
@@ -103,7 +137,7 @@ export default function OnboardingConnectPage() {
   const handleGoToDashboard = () => {
     setIsRedirecting(true);
     setTimeout(() => {
-      router.push("/");
+      router.push("/dashboard");
     }, 1000);
   };
 

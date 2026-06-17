@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { SolutionSection } from "@/components/landing/SolutionSection";
-import { useRevlineEffects } from "@/hooks/useRevlineEffects";
+import { useGripEffects } from "@/hooks/useGripEffects";
 
 const TOTAL_STEPS = 3;
 
@@ -28,7 +28,7 @@ export function OnboardingStepShell({
   children,
 }: OnboardingStepShellProps) {
   const router = useRouter();
-  useRevlineEffects();
+  useGripEffects();
 
   return (
     <main

@@ -1,5 +1,5 @@
 /* ============================================================
-   REVLINE — base.css
+   GRIP — base.css
    Tokens · reset · type · buttons · reveals · preloader · hero
    ============================================================ */
 
@@ -467,4 +467,12 @@ body.scrolled .scroll-hint {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
