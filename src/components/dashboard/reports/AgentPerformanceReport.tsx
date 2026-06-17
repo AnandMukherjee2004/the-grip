@@ -14,6 +14,7 @@ import {
 import EmptyState from "@/components/dashboard/EmptyState";
 import ReportSectionHeader from "./ReportSectionHeader";
 import { LeadsIcon } from "@/components/ui/Icons";
+import { useChartColors } from "@/hooks/useChartColors";
 
 interface AgentPerformanceReportProps {
   connectedTools: string[];
@@ -90,6 +91,7 @@ export default function AgentPerformanceReport({
   connectedTools,
   dateRange,
 }: AgentPerformanceReportProps) {
+  const { colors, axis } = useChartColors();
   const [loading, setLoading] = useState(true);
   const [agents, setAgents] = useState<AgentData[]>(initialAgentData);
   const [sortKey, setSortKey] = useState<SortKey>("revenueGenerated");
@@ -254,18 +256,12 @@ export default function AgentPerformanceReport({
               }}
               onMouseLeave={() => setHoveredAgent(null)}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(208,208,232,0.02)" vertical={false} />
-              <XAxis dataKey="name" stroke="rgba(208,208,232,0.3)" tickLine={false} axisLine={false} />
-              <YAxis stroke="rgba(208,208,232,0.3)" tickLine={false} axisLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+              <XAxis dataKey="name" {...axis} />
+              <YAxis {...axis} />
               <Tooltip
                 cursor={{ fill: "rgba(99, 102, 241, 0.05)" }}
-                contentStyle={{
-                  backgroundColor: "#0d0d1a",
-                  borderColor: "rgba(208, 208, 232, 0.08)",
-                  borderRadius: 8,
-                  fontSize: 11,
-                  color: "#d0d0e8",
-                }}
+                contentStyle={colors.tooltip}
               />
               <Bar dataKey="dealsClosed" name="Deals Closed" radius={[4, 4, 0, 0]} barSize={35}>
                 {agents.map((entry, index) => (

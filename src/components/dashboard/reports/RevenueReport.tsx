@@ -14,6 +14,7 @@ import {
 } from "recharts";
 import ReportSectionHeader from "./ReportSectionHeader";
 import ReportKPICard from "./ReportKPICard";
+import { useChartColors } from "@/hooks/useChartColors";
 
 interface RevenueReportProps {
   dateRange: string;
@@ -66,6 +67,7 @@ const generateMockData = (paymentSource: "Razorpay" | "Stripe" | "Cashfree" | "A
 };
 
 export default function RevenueReport({ dateRange, compareMode }: RevenueReportProps) {
+  const { colors, axis } = useChartColors();
   const [loading, setLoading] = useState(true);
   const [paymentSource, setPaymentSource] = useState<"Razorpay" | "Stripe" | "Cashfree" | "All">("All");
 
@@ -190,38 +192,17 @@ export default function RevenueReport({ dateRange, compareMode }: RevenueReportP
                   <stop offset="95%" stopColor="#6366F1" stopOpacity={0.05} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(208,208,232,0.02)" vertical={false} />
-              <XAxis
-                dataKey="date"
-                stroke="rgba(208,208,232,0.3)"
-                tickLine={false}
-                axisLine={false}
-                dy={10}
-              />
-              <YAxis
-                yAxisId="left"
-                stroke="rgba(208,208,232,0.3)"
-                tickFormatter={formatYAxis}
-                tickLine={false}
-                axisLine={false}
-              />
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+              <XAxis dataKey="date" {...axis} dy={10} />
+              <YAxis yAxisId="left" {...axis} tickFormatter={formatYAxis} />
               <YAxis
                 yAxisId="right"
                 orientation="right"
-                stroke="rgba(208,208,232,0.3)"
+                {...axis}
                 tickFormatter={formatYAxis}
-                tickLine={false}
-                axisLine={false}
               />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0d0d1a",
-                  borderColor: "rgba(208, 208, 232, 0.08)",
-                  borderRadius: 8,
-                  fontSize: 11,
-                  color: "#d0d0e8",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-                }}
+                contentStyle={colors.tooltip}
                 formatter={(value: unknown, name?: string | number) => [
                   formatCurrency(Number(value)),
                   name === "All" || name === "Razorpay" || name === "Stripe" || name === "Cashfree"
@@ -229,7 +210,7 @@ export default function RevenueReport({ dateRange, compareMode }: RevenueReportP
                     : "Cumulative Revenue",
                 ]}
               />
-              <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: 10 }} />
+              <Legend verticalAlign="top" height={36} wrapperStyle={colors.legend} />
               <Bar
                 yAxisId="left"
                 dataKey={paymentSource}
@@ -245,7 +226,7 @@ export default function RevenueReport({ dateRange, compareMode }: RevenueReportP
                 name="Cumulative"
                 stroke="#38BDF8"
                 strokeWidth={2.5}
-                dot={{ r: 4, strokeWidth: 1.5, fill: "#0d0d1a" }}
+                dot={{ r: 4, strokeWidth: 1.5, fill: colors.dotFill }}
                 activeDot={{ r: 6 }}
               />
             </ComposedChart>

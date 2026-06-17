@@ -18,6 +18,7 @@ import EmptyState from "@/components/dashboard/EmptyState";
 import ReportSectionHeader from "./ReportSectionHeader";
 import ReportKPICard from "./ReportKPICard";
 import { LeadsIcon } from "@/components/ui/Icons";
+import { useChartColors } from "@/hooks/useChartColors";
 
 interface SalesFunnelReportProps {
   connectedTools: string[];
@@ -50,6 +51,7 @@ export default function SalesFunnelReport({
   dateRange,
   compareMode,
 }: SalesFunnelReportProps) {
+  const { colors, axis } = useChartColors();
   const [loading, setLoading] = useState(true);
 
   const hasCrm = connectedTools.some((t) =>
@@ -174,7 +176,7 @@ export default function SalesFunnelReport({
                   }}
                 />
                 <Funnel dataKey="value" data={funnelData} isAnimationActive>
-                  <LabelList position="right" fill="#fff" stroke="none" dataKey="name" style={{ fontSize: 10 }} />
+                  <LabelList position="right" fill={colors.labelFill} stroke="none" dataKey="name" style={{ fontSize: 10 }} />
                 </Funnel>
               </FunnelChart>
             </ResponsiveContainer>
@@ -187,29 +189,11 @@ export default function SalesFunnelReport({
           <div className="flex-grow w-full relative min-h-0 text-xs text-[#70709a]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={dailyLeadsData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(208,208,232,0.02)" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  stroke="rgba(208,208,232,0.3)"
-                  tickLine={false}
-                  axisLine={false}
-                  dy={10}
-                />
-                <YAxis
-                  stroke="rgba(208,208,232,0.3)"
-                  tickLine={false}
-                  axisLine={false}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#0d0d1a",
-                    borderColor: "rgba(208, 208, 232, 0.08)",
-                    borderRadius: 8,
-                    fontSize: 11,
-                    color: "#d0d0e8",
-                  }}
-                />
-                <Legend verticalAlign="top" height={36} wrapperStyle={{ fontSize: 10 }} />
+                <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
+                <XAxis dataKey="date" {...axis} dy={10} />
+                <YAxis {...axis} />
+                <Tooltip contentStyle={colors.tooltip} />
+                <Legend verticalAlign="top" height={36} wrapperStyle={colors.legend} />
                 <Line
                   type="monotone"
                   dataKey="New leads"

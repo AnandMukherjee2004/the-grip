@@ -88,11 +88,14 @@ interface ActivityFeedProps {
 export default function ActivityFeed({ isCollapsed, onToggleCollapse }: ActivityFeedProps) {
   const { connectedTools } = useOnboarding();
   const [events, setEvents] = useState<ActivityEvent[]>(initialEvents);
+  const [timeReady, setTimeReady] = useState(false);
 
   // Map connected tool IDs to their configs
   const activeTools = TOOLS.filter((t) => connectedTools.includes(t.id));
 
   useEffect(() => {
+    setTimeReady(true);
+
     // Poll every 30 seconds for new events
     // TODO: wire to real events endpoint
     const interval = setInterval(() => {
@@ -241,14 +244,10 @@ export default function ActivityFeed({ isCollapsed, onToggleCollapse }: Activity
                     <span className="text-xs">{tool.icon}</span>
                   )}
 
-                  {/* Status dot in the corner */}
+                  {/* Status dot — minimal, bottom-right */}
                   <span
-                    className={`absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full border border-black/50 ${status === "green"
-                        ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse"
-                        : status === "yellow"
-                          ? "bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
-                          : "bg-rose-500 shadow-[0_0_8px_rgba(239,68,68,0.5)]"
-                      }`}
+                    className={`connector-status-dot connector-status-dot--${status}`}
+                    aria-hidden="true"
                   />
 
                   {/* Tooltip */}
@@ -305,7 +304,11 @@ export default function ActivityFeed({ isCollapsed, onToggleCollapse }: Activity
                     {evt.description}
                   </span>
                   <span className="text-[9px] text-[#70709a] mt-0.5 font-medium">
-                    {evt.timeAgo === "Just now" ? "Just now" : updateTimeAgo(evt.timestamp)}
+                    {timeReady
+                      ? evt.timeAgo === "Just now"
+                        ? "Just now"
+                        : updateTimeAgo(evt.timestamp)
+                      : evt.timeAgo}
                   </span>
                 </div>
               </div>

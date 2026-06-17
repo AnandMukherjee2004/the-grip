@@ -143,9 +143,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                     {!isCollapsed && <span>Payments</span>}
                   </div>
                   {!isCollapsed && failedPaymentsCount > 0 && (
-                    <span className="h-4 min-w-4 px-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-[9px] font-bold flex items-center justify-center">
-                      {failedPaymentsCount}
-                    </span>
+                    <span className="sidebar-count">{failedPaymentsCount}</span>
                   )}
                 </Link>
               </li>
@@ -227,10 +225,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                     <ConnectorsIcon className={pathname === "/dashboard/connectors" ? "text-white/70" : "text-white/40 group-hover:text-white/70"} size={14} />
                     {!isCollapsed && <span>Connectors</span>}
                   </div>
-                  {!isCollapsed && (
-                    <span className="h-4 min-w-4 px-1 rounded-full bg-white/5 border border-white/10 text-white/40 text-[9px] font-bold flex items-center justify-center font-mono">
-                      {connectedTools.length}
-                    </span>
+                  {!isCollapsed && connectedTools.length > 0 && (
+                    <span className="sidebar-count">{connectedTools.length}</span>
                   )}
                 </Link>
               </li>

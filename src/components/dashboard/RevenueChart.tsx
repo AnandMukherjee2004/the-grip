@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import EmptyState from "./EmptyState";
 import { PaymentsIcon } from "@/components/ui/Icons";
+import { useChartColors } from "@/hooks/useChartColors";
 
 interface RevenueChartProps {
   connectedTools: string[];
@@ -45,6 +46,7 @@ const monthlyData = [
 ];
 
 export default function RevenueChart({ connectedTools, dateRange }: RevenueChartProps) {
+  const { colors, axis } = useChartColors();
   const [mounted, setMounted] = useState(false);
   const [groupBy, setGroupBy] = useState<"Daily" | "Weekly" | "Monthly">("Daily");
 
@@ -139,33 +141,25 @@ export default function RevenueChart({ connectedTools, dateRange }: RevenueChart
                     )
                 )}
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="rgba(208,208,232,0.02)" vertical={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} vertical={false} />
               <XAxis
                 dataKey="date"
-                stroke="rgba(208,208,232,0.3)"
-                tickLine={false}
-                axisLine={false}
+                {...axis}
                 dy={10}
                 style={{ fontSize: 9, fontWeight: 500 }}
               />
               <YAxis
-                stroke="rgba(208,208,232,0.3)"
+                {...axis}
                 tickFormatter={formatYAxis}
-                tickLine={false}
-                axisLine={false}
                 style={{ fontSize: 9, fontWeight: 500 }}
               />
               <Tooltip
-                contentStyle={{
-                  backgroundColor: "#0d0d1a",
-                  borderColor: "rgba(208, 208, 232, 0.08)",
-                  borderRadius: 8,
-                  fontSize: 11,
-                  color: "#d0d0e8",
-                  boxShadow: "0 10px 30px rgba(0,0,0,0.5)",
-                }}
-                formatter={(value: any, name?: any) => [`₹${Number(value).toLocaleString("en-IN")}`, name || ""]}
-                labelStyle={{ fontWeight: "bold", color: "#fff", marginBottom: 4 }}
+                contentStyle={colors.tooltip}
+                formatter={(value: unknown, name?: string | number) => [
+                  `₹${Number(value).toLocaleString("en-IN")}`,
+                  name || "",
+                ]}
+                labelStyle={{ fontWeight: "bold", color: colors.labelFill, marginBottom: 4 }}
               />
               {activeSources.map(
                 (s) =>
