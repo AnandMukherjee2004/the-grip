@@ -11,6 +11,7 @@ import {
 } from "@/components/onboarding/OnboardingStepShell";
 
 import { useOnboarding } from "@/context/OnboardingContext";
+import { API_URL } from "@/lib/api";
 
 type BusinessValues = {
   companyName: string;
@@ -148,7 +149,7 @@ export default function OnboardingBusinessPage() {
 
     const callApi = async (slugToUse: string): Promise<boolean> => {
       try {
-        const response = await fetch("http://localhost:3001/api/v1/onboarding/complete", {
+        const response = await fetch(`${API_URL}/api/v1/onboarding/complete`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

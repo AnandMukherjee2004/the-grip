@@ -9,6 +9,7 @@ import { ConnectorGrid } from "@/components/onboarding/ConnectorGrid";
 import { CONNECTORS } from "@/lib/connectors";
 import { ConnectorStatus, OnboardingStep } from "@/types/onboarding";
 import { useGripEffects } from "@/hooks/useGripEffects";
+import { API_URL } from "@/lib/api";
 
 const ONBOARDING_STEPS: OnboardingStep[] = [
   { id: 1, label: "Account", path: "/onboarding" },
@@ -65,7 +66,7 @@ export default function OnboardingConnectPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:3001/api/v1/connectors", {
+      const response = await fetch(`${API_URL}/api/v1/connectors`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
