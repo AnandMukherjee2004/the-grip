@@ -12,7 +12,7 @@ RUN bun install
 COPY . .
 
 # Expose the port Hono API listens on
-EXPOSE 3001
+EXPOSE 8080
 
 # Run the Hono server
 CMD ["bun", "run", "server/index.ts"]
