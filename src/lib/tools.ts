@@ -155,7 +155,7 @@ export const TOOLS: Tool[] = [
     category: "ads",
     description: "Sync campaign spend, impressions, and leads.",
     icon: "📢",
-    logo: "/assets/crm-logos/meta.svg",
+    logo: "/assets/crm-logos/meta-ads.png",
     popular: true,
   },
   {
@@ -164,7 +164,7 @@ export const TOOLS: Tool[] = [
     category: "ads",
     description: "Sync campaign performance and conversions.",
     icon: "🔍",
-    logo: "/assets/crm-logos/google-ads.svg",
+    logo: "/assets/crm-logos/google-ads.png",
     popular: true,
   },
 
@@ -219,7 +219,7 @@ export const TOOLS: Tool[] = [
     category: "accounting",
     description: "Sync invoices, expenses, and payments.",
     icon: "📓",
-    logo: "/assets/crm-logos/zoho-books.svg",
+    logo: "/assets/crm-logos/zoho-books.png",
   },
 ];
 
