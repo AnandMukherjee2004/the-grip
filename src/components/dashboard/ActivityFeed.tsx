@@ -204,7 +204,7 @@ export default function ActivityFeed({ isCollapsed, onToggleCollapse }: Activity
   return (
     <aside className="w-[280px] h-full bg-[#07070e] border-l border-white/[0.04] flex flex-col shrink-0 select-none font-sans relative transition-all">
       {/* Main Top Header */}
-      <div className="h-14 px-4 flex items-center justify-between border-b border-white/[0.03]">
+      <div className="h-14 px-4 flex items-center justify-between border-b border-white/[0.04] shrink-0">
         <span className="font-semibold text-xs text-white">Feed</span>
         <button
           type="button"

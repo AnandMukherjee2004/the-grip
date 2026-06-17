@@ -15,27 +15,42 @@ import AgentLeaderboard from "@/components/dashboard/AgentLeaderboard";
 const RevenueChart = dynamic(() => import("@/components/dashboard/RevenueChart"), { ssr: false });
 const AttributionChart = dynamic(() => import("@/components/dashboard/AttributionChart"), { ssr: false });
 
+import { getConnectors } from "@/lib/api";
+
 export default function DashboardPage() {
-  const { connectedTools } = useOnboarding();
+  const [connectedTools, setConnectedTools] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
 
   useEffect(() => {
-    // Simulate async data fetching loading delay (800ms)
-    // TODO: replace with real API call
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 800);
+    async function fetchConnectedTools() {
+      const workspaceId = localStorage.getItem("grip_workspace_id");
+      if (!workspaceId) {
+        setConnectedTools([]);
+        setLoading(false);
+        return;
+      }
 
-    return () => clearTimeout(timer);
+      try {
+        const tools = await getConnectors(workspaceId);
+        setConnectedTools(tools);
+      } catch (err) {
+        console.error("Failed to load connected tools:", err);
+        setConnectedTools([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchConnectedTools();
   }, []);
 
   // Skeleton Loader that mimics the structure of the dashboard layout
   if (loading) {
     return (
-      <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
+      <div className="flex-grow flex flex-col overflow-hidden bg-[#040409]">
         {/* TopBar skeleton */}
-        <div className="h-14 w-full bg-[#07070e]/80 border-b border-white/[0.04] px-6 flex items-center justify-between">
+        <div className="h-14 w-full bg-[#07070e] border-b border-white/[0.04] px-5 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-4">
             <div className="h-4 w-20 rounded bg-white/5 animate-pulse" />
             <div className="h-4 w-px bg-white/10" />
@@ -86,7 +101,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
+    <div className="flex-grow flex flex-col overflow-hidden bg-[#040409]">
       <TopBar dateRange={dateRange} onDateRangeChange={setDateRange} />
 
       {/* Scrollable Main Content Center Area */}
