@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import {
   OnboardingStepShell,
   onboardingInputClass,
@@ -84,6 +85,7 @@ function SelectField({
 
 export default function OnboardingBusinessPage() {
   const router = useRouter();
+  const { data: session } = useSession();
   const { setOrgId, setWorkspaceId } = useOnboarding();
   const [values, setValues] = useState<BusinessValues>({
     companyName: "",
@@ -137,8 +139,8 @@ export default function OnboardingBusinessPage() {
             orgSlug: slugToUse,
             workspaceName: values.companyName,
             workspaceSlug: slugToUse,
-            clerkOrgId: `org_${Date.now()}`,
-            clerkUserId: `user_${Date.now()}`,
+            clerkOrgId: `na_${slugToUse}`,
+            clerkUserId: session?.user?.id ?? `user_${Date.now()}`,
           }),
         });
 

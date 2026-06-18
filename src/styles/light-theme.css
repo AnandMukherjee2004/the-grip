@@ -566,6 +566,80 @@
   background-color: rgba(255, 255, 255, 0.9) !important;
 }
 
+/* Tools onboarding — platform cards, filters, custom tool tile */
+[data-theme="light"] .tool-card {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-color: rgba(99, 102, 241, 0.14) !important;
+  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.06) !important;
+}
+
+[data-theme="light"] .tool-card:hover {
+  background-color: #ffffff !important;
+  border-color: rgba(99, 102, 241, 0.28) !important;
+  box-shadow: 0 14px 34px rgba(99, 102, 241, 0.12) !important;
+}
+
+[data-theme="light"] .tool-card h3,
+[data-theme="light"] .tool-card:hover h3,
+[data-theme="light"] .tool-card .group-hover\:text-white\/95 {
+  color: var(--light-text) !important;
+}
+
+[data-theme="light"] .tool-card p,
+[data-theme="light"] .tool-card:hover p,
+[data-theme="light"] .tool-card .group-hover\:text-white\/50 {
+  color: var(--light-text-secondary) !important;
+}
+
+[data-theme="light"] .tool-card .rounded-full.bg-white\/5 {
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #6366f1 !important;
+  border-color: rgba(99, 102, 241, 0.18) !important;
+}
+
+[data-theme="light"] .tool-card .border-t.border-white\/5 {
+  border-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+[data-theme="light"] .tool-card .border-t + span,
+[data-theme="light"] .tool-card span.rounded.bg-white\/5 {
+  background: rgba(99, 102, 241, 0.06) !important;
+  color: var(--light-text-muted) !important;
+  border-color: rgba(99, 102, 241, 0.12) !important;
+}
+
+[data-theme="light"] .tool-card[aria-pressed="true"] {
+  background: linear-gradient(
+    180deg,
+    rgba(99, 102, 241, 0.1) 0%,
+    rgba(255, 255, 255, 0.98) 100%
+  ) !important;
+  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.14) !important;
+}
+
+[data-theme="light"] .tools-page .hover\:text-white:hover,
+[data-theme="light"] .tools-page .hover\:text-white\/70:hover {
+  color: var(--light-text) !important;
+}
+
+[data-theme="light"] .tool-grid .group.rounded-xl.border-dashed {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(99, 102, 241, 0.18) !important;
+}
+
+[data-theme="light"] .tool-grid .group.rounded-xl.border-dashed:hover {
+  background: rgba(99, 102, 241, 0.05) !important;
+  border-color: rgba(168, 85, 247, 0.35) !important;
+}
+
+[data-theme="light"] .tool-grid .group.rounded-xl.border-dashed .group-hover\:text-white {
+  color: var(--light-text) !important;
+}
+
+[data-theme="light"] .tool-grid .group.rounded-xl.border-dashed .group-hover\:text-purple-400 {
+  color: #7c3aed !important;
+}
+
 /* Tools page headline gradient on light */
 [data-theme="light"] .bg-gradient-to-b.from-white.via-white.to-white\/70 {
   background-image: linear-gradient(

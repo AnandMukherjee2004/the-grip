@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
 import { ThemeScript } from "@/components/ThemeScript";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { ThemeSwitcher } from "@/components/theme/ThemeSwitcher";
@@ -44,10 +45,12 @@ export default function RootLayout({
         <ThemeScript />
       </head>
       <body className="min-h-full" suppressHydrationWarning>
-        <ThemeProvider>
-          {children}
-          <ThemeSwitcher />
-        </ThemeProvider>
+        <SessionProvider>
+          <ThemeProvider>
+            {children}
+            <ThemeSwitcher />
+          </ThemeProvider>
+        </SessionProvider>
       </body>
     </html>
   );

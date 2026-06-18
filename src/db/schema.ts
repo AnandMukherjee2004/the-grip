@@ -375,3 +375,66 @@ export const auditLogs = pgTable('audit_logs', {
   workspaceIdx: index('audit_logs_workspace_idx').on(t.workspaceId),
   createdAtIdx: index('audit_logs_created_at_idx').on(t.createdAt),
 }))
+
+// ─────────────────────────────────────────────
+// LAYER 0 — NEXTAUTH IDENTITY TABLES
+// (appended — do not rename or move existing tables)
+// ─────────────────────────────────────────────
+
+export const users = pgTable('users', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar('name', { length: 255 }),
+  email: varchar('email', { length: 255 }).notNull(),
+  emailVerified: timestamp('email_verified', { mode: 'date' }),
+  image: text('image'),
+  // bcrypt hash — only set for credentials users; null for OAuth users
+  passwordHash: text('password_hash'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
+}, (t) => ({
+  emailUnique: uniqueIndex('users_email_unique').on(t.email),
+}))
+
+export const accounts = pgTable('accounts', {
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  type: varchar('type', { length: 255 }).notNull(),
+  provider: varchar('provider', { length: 255 }).notNull(),
+  providerAccountId: varchar('provider_account_id', { length: 255 }).notNull(),
+  refresh_token: text('refresh_token'),
+  access_token: text('access_token'),
+  expires_at: integer('expires_at'),
+  token_type: varchar('token_type', { length: 255 }),
+  scope: varchar('scope', { length: 255 }),
+  id_token: text('id_token'),
+  session_state: varchar('session_state', { length: 255 }),
+}, (t) => ({
+  providerUnique: uniqueIndex('accounts_provider_unique').on(t.provider, t.providerAccountId),
+}))
+
+export const sessions = pgTable('sessions', {
+  sessionToken: varchar('session_token', { length: 255 }).primaryKey(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  expires: timestamp('expires', { mode: 'date' }).notNull(),
+})
+
+export const verificationTokens = pgTable('verification_tokens', {
+  identifier: varchar('identifier', { length: 255 }).notNull(),
+  token: varchar('token', { length: 255 }).notNull(),
+  expires: timestamp('expires', { mode: 'date' }).notNull(),
+}, (t) => ({
+  identifierTokenUnique: uniqueIndex('verification_tokens_unique').on(t.identifier, t.token),
+}))
+
+export const passwordResetTokens = pgTable('password_reset_tokens', {
+  id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  // 64-char hex string from crypto.randomBytes(32)
+  token: varchar('token', { length: 128 }).notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  // Null = unused. Set on consumption to prevent replay.
+  usedAt: timestamp('used_at'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (t) => ({
+  tokenUnique: uniqueIndex('password_reset_tokens_token_unique').on(t.token),
+  userIdx: index('password_reset_tokens_user_idx').on(t.userId),
+}))
