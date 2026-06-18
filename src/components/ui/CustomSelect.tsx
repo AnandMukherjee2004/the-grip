@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 export type CustomSelectOption = {
   value: string;
@@ -77,7 +78,12 @@ export default function CustomSelect({
   const selectId = id ?? generatedId;
   const triggerRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const panelStyle = useAnchoredPanel(open, triggerRef);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const selected = options.find((opt) => opt.value === value);
 
@@ -113,7 +119,7 @@ export default function CustomSelect({
         </svg>
       </button>
 
-      {open && (
+      {open && mounted && createPortal(
         <>
           <div className="custom-select__backdrop" onClick={() => setOpen(false)} />
           <div
@@ -142,7 +148,8 @@ export default function CustomSelect({
               );
             })}
           </div>
-        </>
+        </>,
+        document.body
       )}
     </div>
   );

@@ -61,3 +61,25 @@ export async function getConnectors(workspaceId: string): Promise<string[]> {
     return [];
   }
 }
+export async function getWorkspace(workspaceId: string): Promise<{ id: string; name: string } | null> {
+  try {
+    const res = await fetch(`${API_URL}/api/v1/workspaces?workspaceId=${workspaceId}`, {
+      headers: { Accept: "application/json" },
+      next: { revalidate: 0 },
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+    if (data && data.id && data.name) {
+      return { id: data.id, name: data.name };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Failed to fetch workspace from API", error);
+    return null;
+  }
+}

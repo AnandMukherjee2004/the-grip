@@ -9,6 +9,9 @@ import { AvailableToolsGrid } from "@/components/dashboard/connectors/AvailableT
 import { DisconnectModal } from "@/components/dashboard/connectors/DisconnectModal";
 import { TOOLS } from "@/lib/tools";
 import { Tool } from "@/types/onboarding";
+import { API_URL } from "@/lib/api";
+import { CONNECTORS } from "@/lib/connectors";
+import { APIKeyModal } from "@/components/onboarding/APIKeyModal";
 
 export default function ConnectorsPage() {
   const {
@@ -16,10 +19,13 @@ export default function ConnectorsPage() {
     setConnectedTools,
     syncInfo,
     updateSyncInfo,
+    activeWorkspaceId: workspaceId,
   } = useOnboarding();
 
   const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
   const [disconnectTool, setDisconnectTool] = useState<Tool | null>(null);
+  const [modalToolId, setModalToolId] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Sync now mock action
   const handleSyncNow = async (toolId: string) => {
@@ -52,9 +58,12 @@ export default function ConnectorsPage() {
     if (!disconnectTool) return;
     const toolId = disconnectTool.id;
 
-    // TODO: wire to disconnect endpoint
-    await new Promise<void>((resolve) => {
-      setTimeout(() => {
+    try {
+      const response = await fetch(`${API_URL}/api/v1/connectors?workspaceId=${workspaceId}&toolId=${toolId}`, {
+        method: "DELETE",
+      });
+
+      if (response.ok) {
         // Remove from connectedTools in context
         setConnectedTools(connectedTools.filter((id) => id !== toolId));
         // Reset sync state in syncInfo
@@ -62,19 +71,46 @@ export default function ConnectorsPage() {
           lastSyncedAt: undefined,
           status: undefined,
         });
-        resolve();
-      }, 500);
-    });
+      } else {
+        console.error("Failed to disconnect tool from DB");
+      }
+    } catch (error) {
+      console.error("Failed to disconnect tool:", error);
+    }
+    setDisconnectTool(null);
   };
 
-  // Connect new tool action
-  const handleConnect = async (toolId: string) => {
+  const handleConnectClick = async (toolId: string) => {
+    setModalToolId(toolId);
+    setIsModalOpen(true);
+  };
+
+  const handleModalSubmit = async (credentials: Record<string, string>) => {
+    if (!modalToolId) return;
+
+    const response = await fetch(`${API_URL}/api/v1/connectors`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        workspaceId: workspaceId || "placeholder_workspace_id",
+        toolId: modalToolId,
+        credentials,
+      }),
+    });
+
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data.message || "Failed to connect. Please check credentials and try again.");
+    }
+
     // Add to connectedTools list
-    if (!connectedTools.includes(toolId)) {
-      setConnectedTools([...connectedTools, toolId]);
+    if (!connectedTools.includes(modalToolId)) {
+      setConnectedTools([...connectedTools, modalToolId]);
     }
     // Set healthy initial sync state
-    updateSyncInfo(toolId, {
+    updateSyncInfo(modalToolId, {
       lastSyncedAt: new Date().toISOString(),
       status: "synced",
     });
@@ -106,7 +142,7 @@ export default function ConnectorsPage() {
           {/* Section 2: Available Tools to Add */}
           <AvailableToolsGrid
             connectedTools={connectedTools}
-            onConnect={handleConnect}
+            onConnect={handleConnectClick}
           />
         </div>
       </main>
@@ -118,6 +154,23 @@ export default function ConnectorsPage() {
           isOpen={!!disconnectTool}
           onClose={() => setDisconnectTool(null)}
           onConfirm={handleDisconnectConfirm}
+        />
+      )}
+
+      {/* API Key Modal */}
+      {isModalOpen && modalToolId && (
+        <APIKeyModal
+          tool={TOOLS.find((t) => t.id === modalToolId) || {
+            id: modalToolId,
+            name: modalToolId.charAt(0).toUpperCase() + modalToolId.slice(1).replace("-", " "),
+            category: "crm" as const,
+            description: "Sync custom data and pipeline stages.",
+            icon: "🔌",
+          }}
+          toolId={modalToolId}
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={handleModalSubmit}
         />
       )}
     </div>

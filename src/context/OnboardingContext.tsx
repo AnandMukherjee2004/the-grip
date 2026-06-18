@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { getConnectors } from "@/lib/api";
+import { getConnectors, getWorkspace } from "@/lib/api";
 
 export interface Workspace {
   id: string;
@@ -39,17 +39,15 @@ interface OnboardingContextType {
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([
-    { id: "frido", name: "Frido" }
-  ]);
-  const [activeWorkspaceId, setActiveWorkspaceIdState] = useState<string>("frido");
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [activeWorkspaceId, setActiveWorkspaceIdState] = useState<string>("");
   
   const [selectedTools, setSelectedToolsState] = useState<string[]>([]);
   const [connectedTools, setConnectedToolsState] = useState<string[]>([]);
   const [syncInfo, setSyncInfoState] = useState<Record<string, SyncDetails>>({});
 
   const [orgId, setOrgIdState] = useState<string>("");
-  const [workspaceId, setWorkspaceIdState] = useState<string>("frido");
+  const [workspaceId, setWorkspaceIdState] = useState<string>("");
 
   // Load orgId and workspaceId from localStorage on init
   useEffect(() => {
@@ -64,6 +62,13 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
       getConnectors(savedWorkspaceId).then((tools) => {
         setConnectedToolsState(tools);
         localStorage.setItem(`grip_connected_tools_${savedWorkspaceId}`, JSON.stringify(tools));
+      });
+      // Fetch workspace details from API on mount
+      getWorkspace(savedWorkspaceId).then((workspace) => {
+        if (workspace) {
+          setWorkspaces([{ id: workspace.id, name: workspace.name }]);
+          setActiveWorkspaceIdState(workspace.id);
+        }
       });
     }
   }, []);

@@ -32,7 +32,7 @@ export function OnboardingStepShell({
 
   return (
     <main
-      className={`min-h-screen bg-[#040409] text-[#d0d0e8] relative ${bottomPadding} overflow-x-hidden font-sans flex flex-col`}
+      className={`auth-page onboarding-page min-h-screen bg-[#040409] text-[#d0d0e8] relative ${bottomPadding} overflow-x-hidden font-sans flex flex-col`}
     >
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none" />
 

@@ -29,8 +29,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
   const failedPaymentsCount = 3;
 
   const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId) || {
-    id: "frido",
-    name: "Frido",
+    id: "",
+    name: "...",
   };
 
   return (

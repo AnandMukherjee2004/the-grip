@@ -9,6 +9,7 @@ import {
   onboardingLabelClass,
   onboardingSubmitClass,
 } from "@/components/onboarding/OnboardingStepShell";
+import CustomSelect from "@/components/ui/CustomSelect";
 
 import { useOnboarding } from "@/context/OnboardingContext";
 import { API_URL } from "@/lib/api";
@@ -61,44 +62,21 @@ function SelectField({
   placeholder: string;
   error?: string;
 }) {
+  const selectOptions = options.map((opt) => ({ value: opt, label: opt }));
   return (
     <div className="space-y-2">
       <label htmlFor={id} className={onboardingLabelClass}>
         {label}
       </label>
-      <div className="relative">
-        <select
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className={`${onboardingInputClass} appearance-none pr-10 ${error ? onboardingInputErrorClass : ""} ${!value ? "text-white/20" : ""}`}
-        >
-          <option value="" disabled>
-            {placeholder}
-          </option>
-          {options.map((opt) => (
-            <option key={opt} value={opt} className="bg-[#0c0f20] text-white">
-              {opt}
-            </option>
-          ))}
-        </select>
-        <svg
-          className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-white/40"
-          width="16"
-          height="16"
-          viewBox="0 0 16 16"
-          fill="none"
-          aria-hidden
-        >
-          <path
-            d="M4 6l4 4 4-4"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
+      <CustomSelect
+        id={id}
+        value={value}
+        onChange={onChange}
+        options={selectOptions}
+        placeholder={placeholder}
+        aria-label={label}
+        className={error ? "custom-select--error" : ""}
+      />
       <FieldError message={error} />
     </div>
   );
