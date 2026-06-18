@@ -41,24 +41,27 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
     >
       {/* Top Section */}
       <div className="flex flex-col">
-        {/* Brand/Logo */}
+        {/* Brand/Logo -> Active Workspace */}
         <div
-          className={`h-14 px-4 flex items-center border-b border-b-white/[0.03] ${
-            isCollapsed ? "justify-center" : "justify-between"
-          }`}
+          className={`h-14 px-4 flex items-center border-b border-white/[0.04] shrink-0 ${isCollapsed ? "justify-center" : "justify-between"
+            }`}
         >
           {!isCollapsed && (
-            <div className="flex items-center gap-2.5">
-              <span className="w-5 h-5 rounded-md bg-gradient-to-tr from-indigo-600 to-purple-600 shadow-[0_0_12px_rgba(99,102,241,0.4)]" />
-              <span className="font-semibold text-sm tracking-wider text-white font-display">
-                GRIP
-              </span>
+            <div className="flex items-center gap-2.5 min-w-0 flex-grow mr-2">
+              <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-indigo-500 to-sky-500 border border-white/10 flex items-center justify-center text-[10px] font-bold text-white shadow-md shrink-0">
+                {activeWorkspace.name.substring(0, 2).toUpperCase()}
+              </div>
+              <div className="flex flex-col min-w-0">
+                <span className="font-semibold text-xs text-white/90 truncate font-sans leading-tight">
+                  {activeWorkspace.name}
+                </span>
+              </div>
             </div>
           )}
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="text-[10px] text-white/40 hover:text-white transition-colors cursor-pointer w-6 h-6 rounded bg-white/5 border border-white/10 flex items-center justify-center"
+            className="text-[10px] text-white/40 hover:text-white transition-colors cursor-pointer w-6 h-6 rounded bg-white/5 border border-white/10 flex items-center justify-center shrink-0"
             title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
           >
             {isCollapsed ? "▶" : "◀"}
@@ -268,28 +271,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
           </li>
         </ul>
 
-        {/* User profile & Workspace representation */}
+        {/* User profile */}
         <div className="space-y-2">
-          <div
-            className={`flex items-center gap-3 rounded-xl p-1.5 ${
-              isCollapsed ? "justify-center" : "px-2"
-            }`}
-          >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-sky-500 border border-white/10 flex items-center justify-center text-xs font-bold text-white shadow-md shrink-0">
-              {activeWorkspace.name.substring(0, 2).toUpperCase()}
-            </div>
-            {!isCollapsed && (
-              <div className="flex-grow flex flex-col min-w-0">
-                <span className="text-xs font-semibold text-white/90 truncate leading-tight font-sans">
-                  {activeWorkspace.name}
-                </span>
-                <span className="text-[10px] text-white/40 truncate">
-                  Active Workspace
-                </span>
-              </div>
-            )}
-          </div>
-
           {/* User Profile Link */}
           <Link
             href="/dashboard/profile"

@@ -19,7 +19,7 @@ export default function ConnectorsPage() {
     setConnectedTools,
     syncInfo,
     updateSyncInfo,
-    workspaceId,
+    activeWorkspaceId: workspaceId,
   } = useOnboarding();
 
   const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);

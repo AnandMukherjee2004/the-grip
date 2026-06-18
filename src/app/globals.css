@@ -292,6 +292,14 @@
     border-color: rgba(255, 255, 255, 0.1);
   }
 
+  .custom-select--error .custom-select__trigger {
+    border-color: rgba(244, 63, 94, 0.5) !important;
+  }
+
+  .onboarding-page .custom-select__trigger {
+    @apply h-11 px-4 text-sm;
+  }
+
   .custom-select__trigger:hover:not(:disabled) {
     border-color: rgba(255, 255, 255, 0.2);
     background: rgba(255, 255, 255, 0.08);
