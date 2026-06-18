@@ -33,3 +33,54 @@ export function getHealth() {
 export function getStatus() {
   return apiFetch<StatusResponse>("/status");
 }
+
+// Next.js API configuration for connectors
+export const API_URL = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
+
+export async function getConnectors(workspaceId: string): Promise<string[]> {
+  try {
+    const res = await fetch(`${API_URL}/api/v1/connectors?workspaceId=${workspaceId}`, {
+      headers: { Accept: "application/json" },
+      next: { revalidate: 0 },
+    });
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = await res.json();
+    if (data && Array.isArray(data.connectors)) {
+      return data.connectors
+        .filter((c: any) => c.status === 'active')
+        .map((c: any) => c.toolId);
+    }
+
+    return [];
+  } catch (error) {
+    console.error("Failed to fetch connectors from API", error);
+    return [];
+  }
+}
+
+export async function getWorkspace(workspaceId: string): Promise<{ id: string; name: string } | null> {
+  try {
+    const res = await fetch(`${API_URL}/api/v1/workspaces?workspaceId=${workspaceId}`, {
+      headers: { Accept: "application/json" },
+      next: { revalidate: 0 },
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+    if (data && data.id && data.name) {
+      return { id: data.id, name: data.name };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Failed to fetch workspace from API", error);
+    return null;
+  }
+}

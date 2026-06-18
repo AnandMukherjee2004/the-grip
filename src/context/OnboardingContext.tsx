@@ -1,6 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { getConnectors, getWorkspace } from "@/lib/api";
 
 export interface Workspace {
   id: string;
@@ -32,24 +33,39 @@ interface OnboardingContextType {
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
 
 export function OnboardingProvider({ children }: { children: React.ReactNode }) {
-  const [workspaces, setWorkspaces] = useState<Workspace[]>([
-    { id: "frido", name: "Frido" }
-  ]);
-  const [activeWorkspaceId, setActiveWorkspaceIdState] = useState<string>("frido");
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [activeWorkspaceId, setActiveWorkspaceIdState] = useState<string>("");
   
   const [selectedTools, setSelectedToolsState] = useState<string[]>([]);
   const [connectedTools, setConnectedToolsState] = useState<string[]>([]);
   const [syncInfo, setSyncInfoState] = useState<Record<string, SyncDetails>>({});
 
-  // 1. Initial load of Workspaces and Active workspace ID
-  useEffect(() => {
-    // Force active workspace to be "frido"
-    setActiveWorkspaceIdState("frido");
-    localStorage.setItem("grip_active_workspace_id", "frido");
+  const [orgId, setOrgIdState] = useState<string>("");
+  const [workspaceId, setWorkspaceIdState] = useState<string>("");
 
-    const defaultWorkspaces = [{ id: "frido", name: "Frido" }];
-    setWorkspaces(defaultWorkspaces);
-    localStorage.setItem("grip_workspaces", JSON.stringify(defaultWorkspaces));
+  // Load orgId and workspaceId from localStorage on init
+  useEffect(() => {
+    const savedOrgId = localStorage.getItem("grip_org_id");
+    const savedWorkspaceId = localStorage.getItem("grip_workspace_id");
+    if (savedOrgId) setOrgIdState(savedOrgId);
+    if (savedWorkspaceId) {
+      setWorkspaceIdState(savedWorkspaceId);
+      setActiveWorkspaceIdState(savedWorkspaceId);
+      
+      // Hydrate connected tools from API on mount
+      getConnectors(savedWorkspaceId).then((tools) => {
+        setConnectedToolsState(tools);
+        localStorage.setItem(`grip_connected_tools_${savedWorkspaceId}`, JSON.stringify(tools));
+      });
+
+      // Fetch workspace details from API on mount
+      getWorkspace(savedWorkspaceId).then((workspace) => {
+        if (workspace) {
+          setWorkspaces([{ id: workspace.id, name: workspace.name }]);
+          setActiveWorkspaceIdState(workspace.id);
+        }
+      });
+    }
   }, []);
 
   // 2. Load workspace specific details when activeWorkspaceId changes

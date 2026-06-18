@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "bun run scripts/dev.ts",
     "dev:web": "next dev",
-    "dev:api": "bun run --hot server/index.ts",
+    "dev:api": "bun --env-file=.env run --hot server/index.ts",
     "build": "next build",
     "start": "next start",
     "start:api": "bun run server/index.ts",

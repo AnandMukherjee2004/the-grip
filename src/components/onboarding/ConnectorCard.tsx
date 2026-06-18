@@ -5,6 +5,7 @@ import { ConnectorConfig, ConnectorStatus } from "@/types/onboarding";
 import { TOOLS } from "@/lib/tools";
 import { APIKeyModal } from "./APIKeyModal";
 import { AuthMethodModal } from "./AuthMethodModal";
+import { API_URL } from "@/lib/api";
 
 interface ConnectorCardProps {
   toolId: string;
@@ -64,12 +65,30 @@ export function ConnectorCard({
     setIsModalOpen(true);
   };
 
-  const handleModalSubmit = async () => {
-    // Simulate API connection delay
-    await new Promise<void>((resolve) => {
-      onConnect(toolId);
-      resolve();
+  const handleModalSubmit = async (credentials: Record<string, string>) => {
+    const workspaceId = localStorage.getItem("grip_workspace_id");
+    if (!workspaceId) {
+      throw new Error("No active workspace found in local storage.");
+    }
+
+    const res = await fetch(`${API_URL}/api/v1/connectors`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        workspaceId,
+        toolId,
+        credentials,
+      }),
     });
+
+    if (res.status !== 201) {
+      const data = await res.json().catch(() => ({}));
+      throw new Error(data.message || "Failed to connect. Please check credentials and try again.");
+    }
+
+    onConnect(toolId);
   };
 
   // Outer border and shadow styling based on state
@@ -238,7 +257,7 @@ export function ConnectorCard({
       {isModalOpen && (
         <APIKeyModal
           tool={tool}
-          config={config}
+          toolId={toolId}
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           onSubmit={handleModalSubmit}
