@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 import { db } from '../db/index';
-import { organizations, workspaces, orgMembers } from '../db/schema';
+import { organizations, workspaces, orgMembers, users } from '../db/schema';
 import { eq, or } from 'drizzle-orm';
 
 const onboardingRouter = new Hono();
@@ -31,6 +31,16 @@ onboardingRouter.post('/complete', async (c) => {
       return c.json({ error: 'slug_taken' }, 409);
     }
 
+    const [user] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.id, clerkUserId))
+      .limit(1);
+
+    if (!user) {
+      return c.json({ error: 'user_not_found', message: 'Invalid user session' }, 401);
+    }
+
     // Execute database operations inside a single transaction
     const result = await db.transaction(async (tx) => {
       // 1. Insert into organizations
@@ -57,7 +67,8 @@ onboardingRouter.post('/complete', async (c) => {
       // 3. Insert into org_members
       await tx.insert(orgMembers).values({
         orgId: newOrg.id,
-        clerkUserId: clerkUserId,
+        userId: user.id,
+        clerkUserId: user.id,
         role: 'owner',
       });
 

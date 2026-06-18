@@ -1,10 +1,10 @@
 import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import { DrizzleAdapter } from '@auth/drizzle-adapter'
-import { eq } from 'drizzle-orm'
+import { eq, or } from 'drizzle-orm'
 import bcrypt from 'bcryptjs'
 import { db } from '@/db/index'
-import { users, accounts, sessions, verificationTokens } from '@/db/schema'
+import { users, accounts, sessions, verificationTokens, orgMembers } from '@/db/schema'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: DrizzleAdapter(db, {
@@ -58,11 +58,28 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (user) {
         token.id = user.id
       }
+
+      if (token.id) {
+        const [membership] = await db
+          .select({ orgId: orgMembers.orgId })
+          .from(orgMembers)
+          .where(
+            or(
+              eq(orgMembers.userId, token.id as string),
+              eq(orgMembers.clerkUserId, token.id as string),
+            ),
+          )
+          .limit(1)
+
+        token.hasOrgMembership = Boolean(membership)
+      }
+
       return token
     },
     async session({ session, token }) {
       if (session.user && token?.id) {
         session.user.id = token.id as string
+        session.user.hasOrgMembership = Boolean(token.hasOrgMembership)
       }
       return session
     },

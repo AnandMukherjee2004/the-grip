@@ -2,12 +2,12 @@
 
 import { randomBytes } from 'crypto'
 import bcrypt from 'bcryptjs'
-import { and, eq, gt, isNull } from 'drizzle-orm'
+import { and, eq, gt, isNull, or } from 'drizzle-orm'
 import { AuthError } from 'next-auth'
 import { Resend } from 'resend'
 import { signIn } from '@/auth'
 import { db } from '@/db/index'
-import { users, passwordResetTokens } from '@/db/schema'
+import { users, orgMembers, passwordResetTokens } from '@/db/schema'
 
 export async function signUpAction(data: {
   firstName: string
@@ -57,7 +57,31 @@ export async function signInAction(data: {
       password: data.password,
       redirect: false,
     })
-    return { redirect: '/dashboard' }
+
+    const [userRecord] = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, data.email.toLowerCase()))
+      .limit(1)
+
+    if (!userRecord) return { error: 'Account not found.' }
+
+    const [membership] = await db
+      .select({ orgId: orgMembers.orgId })
+      .from(orgMembers)
+      .where(
+        or(
+          eq(orgMembers.userId, userRecord.id),
+          eq(orgMembers.clerkUserId, userRecord.id),
+        ),
+      )
+      .limit(1)
+
+    if (membership) {
+      return { redirect: '/dashboard' }
+    }
+
+    return { redirect: '/onboarding/business' }
   } catch (err) {
     if (err instanceof AuthError) {
       return { error: 'Incorrect email or password.' }

@@ -74,6 +74,7 @@ export const organizations = pgTable('organizations', {
 export const orgMembers = pgTable('org_members', {
   id: uuid('id').primaryKey().default(sql`gen_random_uuid()`),
   orgId: uuid('org_id').notNull().references(() => organizations.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }),
   clerkUserId: varchar('clerk_user_id', { length: 255 }).notNull(),
   role: memberRoleEnum('role').notNull().default('member'),
   // Timestamps
@@ -81,8 +82,9 @@ export const orgMembers = pgTable('org_members', {
   updatedAt: timestamp('updated_at').defaultNow().$onUpdate(() => new Date()).notNull(),
 }, (t) => ({
   // One user per org — no duplicate memberships
-  memberUnique: uniqueIndex('org_members_unique').on(t.orgId, t.clerkUserId),
+  memberUnique: uniqueIndex('org_members_unique').on(t.orgId, t.userId),
   orgIdx: index('org_members_org_idx').on(t.orgId),
+  userIdx: index('org_members_user_idx').on(t.userId),
 }))
 
 // ─────────────────────────────────────────────

@@ -122,6 +122,11 @@ export default function OnboardingBusinessPage() {
     e.preventDefault();
     if (!validate()) return;
 
+    if (!session?.user?.id) {
+      router.push("/onboarding?mode=signin");
+      return;
+    }
+
     setIsLoading(true);
     setGlobalError("");
 
@@ -140,7 +145,7 @@ export default function OnboardingBusinessPage() {
             workspaceName: values.companyName,
             workspaceSlug: slugToUse,
             clerkOrgId: `na_${slugToUse}`,
-            clerkUserId: session?.user?.id ?? `user_${Date.now()}`,
+            clerkUserId: session.user.id,
           }),
         });
 

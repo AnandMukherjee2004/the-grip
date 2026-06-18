@@ -8,26 +8,29 @@ export default async function middleware(req: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   })
   const pathname = req.nextUrl.pathname
+  const hasSession = Boolean(token)
+  const hasOrgMembership = Boolean(token?.hasOrgMembership)
 
-  const protectedPrefixes = [
-    '/dashboard',
-    '/onboarding/business',
-    '/onboarding/tools',
-    '/onboarding/connect',
-  ]
-
-  const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p))
+  const isDashboard = pathname.startsWith('/dashboard')
+  const isOnboardingFlow = ['/onboarding/business', '/onboarding/tools', '/onboarding/connect'].some((p) =>
+    pathname.startsWith(p),
+  )
   const isAuthPage = pathname === '/onboarding'
 
-  if (isProtected && !token) {
-    const url = new URL('/onboarding', req.url)
-    return NextResponse.redirect(url)
+  if ((isDashboard || isOnboardingFlow) && !hasSession) {
+    return NextResponse.redirect(new URL('/onboarding?mode=signin', req.url))
   }
 
-  if (isAuthPage && token) {
-    const url = new URL('/dashboard', req.url)
-    return NextResponse.redirect(url)
+  if (isDashboard && hasSession && !hasOrgMembership) {
+    return NextResponse.redirect(new URL('/onboarding/business', req.url))
   }
+
+  if (isAuthPage && hasSession) {
+    const redirectPath = hasOrgMembership ? '/dashboard' : '/onboarding/business'
+    return NextResponse.redirect(new URL(redirectPath, req.url))
+  }
+
+  return NextResponse.next()
 }
 
 export const config = {
