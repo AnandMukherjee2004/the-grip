@@ -3,12 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { SolutionSection } from "@/components/landing/SolutionSection";
-import { useRevlineEffects } from "@/hooks/useRevlineEffects";
+import { useGripEffects } from "@/hooks/useGripEffects";
 import { SlotSelector } from "@/components/demo/SlotSelector";
 
 export default function DemoPage() {
   const router = useRouter();
-  useRevlineEffects();
+  useGripEffects();
 
   // Form states
   const [fullName, setFullName] = useState("");

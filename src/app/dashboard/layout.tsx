@@ -23,7 +23,7 @@ export default function DashboardLayout({
         />
 
         {/* Center column: Main content area (scrollable) */}
-        <div className="flex-grow flex flex-col min-w-0 h-full overflow-hidden">
+        <div className="flex-grow flex flex-col min-w-0 overflow-hidden">
           {children}
         </div>
 

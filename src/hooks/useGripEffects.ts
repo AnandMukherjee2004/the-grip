@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { countDown, countUp, prefersReducedMotion } from "@/lib/revline-utils";
+import { countDown, countUp, prefersReducedMotion } from "@/lib/grip-utils";
 
 function animateDash(dash: HTMLElement, reduced: boolean) {
   const counter = dash.querySelector<HTMLElement>("[data-dash-counter]");
@@ -18,7 +18,7 @@ function animateDash(dash: HTMLElement, reduced: boolean) {
   setTimeout(() => toast?.classList.remove("on"), 5400);
 }
 
-export function useRevlineEffects() {
+export function useGripEffects() {
   useEffect(() => {
     const reduced = prefersReducedMotion();
     const pre = document.querySelector<HTMLElement>(".preloader");

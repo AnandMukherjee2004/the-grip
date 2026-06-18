@@ -28,6 +28,12 @@ interface OnboardingContextType {
   setActiveWorkspaceId: (id: string) => void;
   createWorkspace: (name: string) => void;
   updateWorkspaceName: (id: string, name: string) => void;
+  
+  // Organization and Workspace database identifiers
+  orgId: string;
+  setOrgId: (id: string) => void;
+  workspaceId: string;
+  setWorkspaceId: (id: string) => void;
 }
 
 const OnboardingContext = createContext<OnboardingContextType | undefined>(undefined);
@@ -57,7 +63,6 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         setConnectedToolsState(tools);
         localStorage.setItem(`grip_connected_tools_${savedWorkspaceId}`, JSON.stringify(tools));
       });
-
       // Fetch workspace details from API on mount
       getWorkspace(savedWorkspaceId).then((workspace) => {
         if (workspace) {
@@ -83,7 +88,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         console.error("Failed to parse saved selected tools", e);
       }
     } else {
-      const defaultSelected = ["shopify", "razorpay"];
+      const defaultSelected: string[] = [];
       setSelectedToolsState(defaultSelected);
       localStorage.setItem(`grip_selected_tools_${activeWorkspaceId}`, JSON.stringify(defaultSelected));
     }
@@ -95,7 +100,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         console.error("Failed to parse saved connected tools", e);
       }
     } else {
-      const defaultConnected = ["shopify", "razorpay"];
+      const defaultConnected: string[] = [];
       setConnectedToolsState(defaultConnected);
       localStorage.setItem(`grip_connected_tools_${activeWorkspaceId}`, JSON.stringify(defaultConnected));
     }
@@ -107,17 +112,7 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         console.error("Failed to parse saved sync info", e);
       }
     } else {
-      const now = Date.now();
-      const defaultSyncInfo: Record<string, SyncDetails> = {
-        shopify: {
-          lastSyncedAt: new Date(now - 12 * 60 * 1000).toISOString(),
-          status: "synced",
-        },
-        razorpay: {
-          lastSyncedAt: new Date(now - 4 * 60 * 1000).toISOString(),
-          status: "synced",
-        },
-      };
+      const defaultSyncInfo: Record<string, SyncDetails> = {};
       setSyncInfoState(defaultSyncInfo);
       localStorage.setItem(`grip_connectors_sync_info_${activeWorkspaceId}`, JSON.stringify(defaultSyncInfo));
     }
@@ -172,6 +167,17 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
     localStorage.setItem("grip_workspaces", JSON.stringify(updated));
   };
 
+  const setOrgId = (id: string) => {
+    setOrgIdState(id);
+    localStorage.setItem("grip_org_id", id);
+  };
+
+  const setWorkspaceId = (id: string) => {
+    setWorkspaceIdState(id);
+    setActiveWorkspaceIdState(id);
+    localStorage.setItem("grip_workspace_id", id);
+  };
+
   return (
     <OnboardingContext.Provider
       value={{
@@ -187,6 +193,10 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         setActiveWorkspaceId,
         createWorkspace,
         updateWorkspaceName,
+        orgId,
+        setOrgId,
+        workspaceId,
+        setWorkspaceId,
       }}
     >
       {children}

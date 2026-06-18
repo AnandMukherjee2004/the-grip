@@ -63,7 +63,7 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="flex-grow flex flex-col h-full overflow-hidden bg-[#040409]">
+    <div className="flex-grow flex flex-col overflow-hidden bg-[#040409]">
       {/* TopBar with dummy state (standard dashboard layout shell) */}
       <TopBar dateRange={dummyGlobalRange} onDateRangeChange={setDummyGlobalRange} />
 
@@ -193,41 +193,39 @@ export default function AnalyticsPage() {
 
       {/* Main content scroll area */}
       <main className="flex-grow overflow-y-auto p-6 space-y-8 scrollbar-thin">
-        <div className="max-w-6xl mx-auto space-y-8">
-          {/* Section 1 - Revenue */}
-          <RevenueReport dateRange={reportsRange} compareMode={compareMode} />
+        {/* Section 1 - Revenue */}
+        <RevenueReport dateRange={reportsRange} compareMode={compareMode} />
 
-          {/* Section 2 - Sales funnel */}
-          <SalesFunnelReport
-            connectedTools={connectedTools}
-            dateRange={reportsRange}
-            compareMode={compareMode}
-          />
+        {/* Section 2 - Sales funnel */}
+        <SalesFunnelReport
+          connectedTools={connectedTools}
+          dateRange={reportsRange}
+          compareMode={compareMode}
+        />
 
-          {/* Section 3 - Agent performance */}
-          <AgentPerformanceReport connectedTools={connectedTools} dateRange={reportsRange} />
+        {/* Section 3 - Agent performance */}
+        <AgentPerformanceReport connectedTools={connectedTools} dateRange={reportsRange} />
 
-          {/* Section 4 - Orders */}
-          <OrdersReport
-            connectedTools={connectedTools}
-            dateRange={reportsRange}
-            compareMode={compareMode}
-          />
+        {/* Section 4 - Orders */}
+        <OrdersReport
+          connectedTools={connectedTools}
+          dateRange={reportsRange}
+          compareMode={compareMode}
+        />
 
-          {/* Section 5 - Attribution */}
-          <AttributionReport
-            connectedTools={connectedTools}
-            dateRange={reportsRange}
-            compareMode={compareMode}
-          />
+        {/* Section 5 - Attribution */}
+        <AttributionReport
+          connectedTools={connectedTools}
+          dateRange={reportsRange}
+          compareMode={compareMode}
+        />
 
-          {/* Section 6 - Payment health */}
-          <PaymentHealthReport
-            connectedTools={connectedTools}
-            dateRange={reportsRange}
-            compareMode={compareMode}
-          />
-        </div>
+        {/* Section 6 - Payment health */}
+        <PaymentHealthReport
+          connectedTools={connectedTools}
+          dateRange={reportsRange}
+          compareMode={compareMode}
+        />
       </main>
     </div>
   );

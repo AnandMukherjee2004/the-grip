@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3001';
 
 export type HealthResponse = {
   ok: boolean;
@@ -61,7 +61,6 @@ export async function getConnectors(workspaceId: string): Promise<string[]> {
     return [];
   }
 }
-
 export async function getWorkspace(workspaceId: string): Promise<{ id: string; name: string } | null> {
   try {
     const res = await fetch(`${API_URL}/api/v1/workspaces?workspaceId=${workspaceId}`, {
