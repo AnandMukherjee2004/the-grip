@@ -245,7 +245,7 @@ export async function resetPasswordAction(
 
     const passwordHash = await bcrypt.hash(newPassword, 12)
 
-    await db.transaction(async (tx) => {
+    await db.transaction(async (tx: any) => {
       await tx
         .update(users)
         .set({ passwordHash, updatedAt: new Date() })

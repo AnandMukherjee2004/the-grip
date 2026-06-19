@@ -42,7 +42,7 @@ onboardingRouter.post('/complete', async (c) => {
     }
 
     // Execute database operations inside a single transaction
-    const result = await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx: any) => {
       // 1. Insert into organizations
       const [newOrg] = await tx
         .insert(organizations)
