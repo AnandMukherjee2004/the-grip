@@ -68,6 +68,14 @@ export const TOOLS: Tool[] = [
     icon: "🎯",
     logo: "/assets/crm-logos/close-crm.svg",
   },
+  {
+    id: "limechat",
+    name: "LimeChat",
+    category: "communication",
+    description: "AI-powered WhatsApp CRM and support automation for e-commerce.",
+    icon: "💬",
+    logo: "/assets/crm-logos/limechat.jpeg",
+  },
 
   // Payments
   {
