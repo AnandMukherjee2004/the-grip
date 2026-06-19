@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useOnboarding } from "@/context/OnboardingContext";
 import {
   DashboardIcon,
@@ -24,6 +25,7 @@ interface SidebarProps {
 export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps) {
   const { connectedTools, workspaces, activeWorkspaceId } = useOnboarding();
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   // Mock value for failed payments
   const failedPaymentsCount = 3;
@@ -32,6 +34,13 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
     id: "",
     name: "...",
   };
+  const displayName = session?.user?.name ?? session?.user?.email ?? "Account";
+  const initials = displayName
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
     <aside
@@ -261,7 +270,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
         </ul>
 
         {/* User profile */}
-        <div className="space-y-2">
+        <div className="space-y-1">
           {/* User Profile Link */}
           <Link
             href="/dashboard/profile"
@@ -269,12 +278,12 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
               } ${isCollapsed ? "justify-center" : "px-2"}`}
           >
             <div className="w-8 h-8 rounded-full border border-white/10 bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-400 shrink-0">
-              AM
+              {initials}
             </div>
             {!isCollapsed && (
               <div className="flex flex-col min-w-0">
                 <span className="text-xs font-semibold text-white/80 truncate leading-tight">
-                  Anand Mukherjee
+                  {displayName}
                 </span>
                 <span className="text-[9px] text-white/30 truncate">
                   View profile
@@ -282,6 +291,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
               </div>
             )}
           </Link>
+
         </div>
       </div>
     </aside>

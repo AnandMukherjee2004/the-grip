@@ -58,7 +58,7 @@ export default function OnboardingToolsPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#040409] text-[#d0d0e8] relative pb-36 overflow-x-hidden font-sans">
+    <main className="tools-page min-h-screen bg-[#040409] text-[#d0d0e8] relative pb-36 overflow-x-hidden font-sans">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(99,102,241,0.03)_1px,transparent_1px),linear-gradient(to_bottom,rgba(99,102,241,0.03)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none" />
 
       <div className="absolute top-[-10%] left-[-10%] w-[600px] h-[600px] rounded-full bg-indigo-500/[0.04] blur-[150px] pointer-events-none" />

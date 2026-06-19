@@ -8,6 +8,13 @@
       "when": 1781702181069,
       "tag": "0000_burly_shockwave",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1781803060770,
+      "tag": "0001_cold_crystal",
+      "breakpoints": true
     }
   ]
 }

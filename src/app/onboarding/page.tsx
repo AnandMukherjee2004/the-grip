@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import {
   OnboardingStepShell,
   onboardingInputClass,
@@ -9,6 +11,7 @@ import {
   onboardingLabelClass,
   onboardingSubmitClass,
 } from "@/components/onboarding/OnboardingStepShell";
+import { signUpAction, signInAction } from "@/app/actions/auth";
 
 type Mode = "signup" | "signin";
 
@@ -70,9 +73,16 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
-export default function OnboardingPage() {
+function getModeFromSearchParams(searchParams: ReturnType<typeof useSearchParams>): Mode {
+  if (searchParams.get("mode") === "signin") return "signin";
+  if (searchParams.get("reset") === "success") return "signin";
+  return "signup";
+}
+
+function OnboardingPageInner() {
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("signup");
+  const searchParams = useSearchParams();
+  const [mode, setMode] = useState<Mode>(() => getModeFromSearchParams(searchParams));
   const [showPassword, setShowPassword] = useState(false);
 
   const [signUp, setSignUp] = useState<SignUpValues>({
@@ -92,12 +102,24 @@ export default function OnboardingPage() {
   const [signInErrors, setSignInErrors] = useState<
     Partial<Record<keyof SignInValues, string>>
   >({});
+  const [isLoading, setIsLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [resetSuccess, setResetSuccess] = useState(
+    searchParams.get("reset") === "success"
+  );
+
+  useEffect(() => {
+    setResetSuccess(searchParams.get("reset") === "success");
+    setMode(getModeFromSearchParams(searchParams));
+  }, [searchParams]);
 
   const switchMode = (next: Mode) => {
     setMode(next);
     setShowPassword(false);
     setSignUpErrors({});
     setSignInErrors({});
+    setServerError("");
+    setIsLoading(false);
   };
 
   const validateSignUp = () => {
@@ -124,14 +146,48 @@ export default function OnboardingPage() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSignUpSubmit = (e: React.FormEvent) => {
+  const handleSignUpSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateSignUp()) router.push("/onboarding/business");
+    if (!validateSignUp()) return;
+
+    setIsLoading(true);
+    setServerError("");
+
+    const result = await signUpAction({
+      firstName: signUp.firstName,
+      lastName: signUp.lastName,
+      email: signUp.email,
+      password: signUp.password,
+    });
+
+    if (result.error) {
+      setServerError(result.error);
+      setIsLoading(false);
+      return;
+    }
+
+    router.push("/onboarding/business");
   };
 
-  const handleSignInSubmit = (e: React.FormEvent) => {
+  const handleSignInSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateSignIn()) router.push("/onboarding/business");
+    if (!validateSignIn()) return;
+
+    setIsLoading(true);
+    setServerError("");
+
+    const result = await signInAction({
+      email: signIn.email,
+      password: signIn.password,
+    });
+
+    if (result.error) {
+      setServerError(result.error);
+      setIsLoading(false);
+      return;
+    }
+
+    router.push(result.redirect ?? "/dashboard");
   };
 
   return (
@@ -164,8 +220,21 @@ export default function OnboardingPage() {
         </button>
       </div>
 
+      {resetSuccess && mode === "signin" && (
+        <div className="mb-4 rounded-lg border border-emerald-500/20 bg-emerald-500/[0.08] px-3 py-2">
+          <p className="text-xs text-emerald-400 font-medium">
+            ✓ Password updated. Sign in with your new password.
+          </p>
+        </div>
+      )}
+
       {mode === "signup" ? (
         <form onSubmit={handleSignUpSubmit} className="space-y-5" noValidate>
+          {serverError && (
+            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium">
+              {serverError}
+            </div>
+          )}
           <div className="space-y-4 animate-fadeIn">
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-2">
@@ -248,13 +317,29 @@ export default function OnboardingPage() {
           </div>
 
           <div className="flex gap-3 pt-3 border-t border-white/[0.04]">
-            <button type="submit" className={onboardingSubmitClass}>
-              Continue →
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`${onboardingSubmitClass} disabled:opacity-50 disabled:pointer-events-none`}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                  {mode === "signup" ? "Creating account..." : "Signing in..."}
+                </span>
+              ) : (
+                mode === "signup" ? "Continue →" : "Sign in →"
+              )}
             </button>
           </div>
         </form>
       ) : (
         <form onSubmit={handleSignInSubmit} className="space-y-5" noValidate>
+          {serverError && (
+            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium">
+              {serverError}
+            </div>
+          )}
           <div className="space-y-4 animate-fadeIn">
             <div className="space-y-2">
               <label htmlFor="signin-email" className={onboardingLabelClass}>
@@ -279,12 +364,12 @@ export default function OnboardingPage() {
                 <label htmlFor="signin-password" className={onboardingLabelClass}>
                   Password
                 </label>
-                <a
-                  href="#"
+                <Link
+                  href="/forgot-password"
                   className="text-[10px] text-white/40 transition-colors hover:text-white/70"
                 >
                   Forgot password?
-                </a>
+                </Link>
               </div>
               <div className="relative">
                 <input
@@ -308,12 +393,31 @@ export default function OnboardingPage() {
           </div>
 
           <div className="flex gap-3 pt-3 border-t border-white/[0.04]">
-            <button type="submit" className={onboardingSubmitClass}>
-              Sign in →
+            <button
+              type="submit"
+              disabled={isLoading}
+              className={`${onboardingSubmitClass} disabled:opacity-50 disabled:pointer-events-none`}
+            >
+              {isLoading ? (
+                <span className="flex items-center gap-2">
+                  <span className="w-3.5 h-3.5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+                  Signing in...
+                </span>
+              ) : (
+                "Sign in →"
+              )}
             </button>
           </div>
         </form>
       )}
     </OnboardingStepShell>
+  );
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense>
+      <OnboardingPageInner />
+    </Suspense>
   );
 }
