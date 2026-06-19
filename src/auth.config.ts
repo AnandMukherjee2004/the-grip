@@ -8,9 +8,9 @@ export const authConfig = {
     signIn: '/onboarding',
     error: '/onboarding',
   },
-  providers: [],
+  providers: [] as any[],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id
       }
