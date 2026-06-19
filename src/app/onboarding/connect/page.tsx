@@ -7,9 +7,11 @@ import { StepProgress } from "@/components/onboarding/StepProgress";
 import { ConnectProgressBar } from "@/components/onboarding/ConnectProgressBar";
 import { ConnectorGrid } from "@/components/onboarding/ConnectorGrid";
 import { CONNECTORS } from "@/lib/connectors";
-import { ConnectorStatus, OnboardingStep } from "@/types/onboarding";
+import { ConnectorStatus, OnboardingStep, Tool } from "@/types/onboarding";
 import { useGripEffects } from "@/hooks/useGripEffects";
 import { API_URL } from "@/lib/api";
+import { TOOLS } from "@/lib/tools";
+import { APIKeyModal } from "@/components/onboarding/APIKeyModal";
 
 const ONBOARDING_STEPS: OnboardingStep[] = [
   { id: 1, label: "Account", path: "/onboarding" },
@@ -23,6 +25,8 @@ export default function OnboardingConnectPage() {
   const { selectedTools, connectedTools, setConnectedTools } = useOnboarding();
   const [localStatuses, setLocalStatuses] = useState<Record<string, ConnectorStatus>>({});
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [modalToolId, setModalToolId] = useState<string | null>(null);
+  const [modalTool, setModalTool] = useState<Tool | null>(null);
 
   // Apply visual effects if any (from original design system)
   useGripEffects();
@@ -50,11 +54,24 @@ export default function OnboardingConnectPage() {
     // Set to connecting state
     setLocalStatuses((prev) => ({ ...prev, [toolId]: "connecting" }));
 
-    // Find the config for the current tool
-    const toolConfig = CONNECTORS[toolId];
-    if (!toolConfig) {
+    // Find the tool from TOOLS array
+    const tool = TOOLS.find((t) => t.id === toolId);
+    if (!tool) {
       setLocalStatuses((prev) => ({ ...prev, [toolId]: "error" }));
       return;
+    }
+
+    setModalTool(tool);
+    setModalToolId(toolId);
+  };
+
+  const handleModalSubmit = async (credentials: Record<string, string>) => {
+    if (!modalToolId) return;
+
+    // Find the config for the current tool
+    const toolConfig = CONNECTORS[modalToolId];
+    if (!toolConfig) {
+      throw new Error(`Connector configuration not found for ${modalToolId}`);
     }
 
     // Map authMethod values
@@ -73,29 +90,27 @@ export default function OnboardingConnectPage() {
         },
         body: JSON.stringify({
           workspaceId: workspaceId || "placeholder_workspace_id",
-          toolId,
+          toolId: modalToolId,
           authMethod,
-          credentials: { apiKey: "test_key", apiSecret: "test_secret" },
+          credentials,
         }),
       });
 
-      if (response.ok) {
-        setLocalStatuses((prev) => {
-          const next = { ...prev };
-          delete next[toolId];
-          return next;
-        });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || "Failed to connect tool. Please check credentials.");
+      }
 
-        // Add to connected list in context if not already present
-        if (!connectedTools.includes(toolId)) {
-          setConnectedTools([...connectedTools, toolId]);
-        }
-      } else {
-        setLocalStatuses((prev) => ({ ...prev, [toolId]: "error" }));
+      setLocalStatuses((prev) => ({ ...prev, [modalToolId]: "connected" }));
+
+      // Add to connected list in context if not already present
+      if (!connectedTools.includes(modalToolId)) {
+        setConnectedTools([...connectedTools, modalToolId]);
       }
     } catch (error) {
+      setLocalStatuses((prev) => ({ ...prev, [modalToolId]: "error" }));
       console.error("Failed to connect tool:", error);
-      setLocalStatuses((prev) => ({ ...prev, [toolId]: "error" }));
+      throw error;
     }
   };
 
@@ -252,6 +267,21 @@ export default function OnboardingConnectPage() {
           </button>
         </div>
       </div>
+
+      <APIKeyModal
+        tool={modalTool as Tool}
+        toolId={modalToolId as string}
+        isOpen={Boolean(modalToolId && modalTool)}
+        onClose={() => {
+          const currentId = modalToolId;
+          setModalToolId(null);
+          setModalTool(null);
+          if (currentId) {
+            setLocalStatuses(prev => ({ ...prev, [currentId]: 'idle' }));
+          }
+        }}
+        onSubmit={handleModalSubmit}
+      />
     </main>
   );
 }

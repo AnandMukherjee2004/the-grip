@@ -27,14 +27,14 @@ export const CONNECTOR_REGISTRY = {
     capabilities: { webhooks: true, bidirectional: false },
     category: "crm"
   },
-  meta_ads: {
+  "meta-ads": {
     displayName: "Meta Ads",
     authMethod: "oauth2",
     oauthScopes: ["ads_read", "ads_management", "pages_read_engagement"],
     capabilities: { webhooks: true, bidirectional: false },
     category: "ads"
   },
-  google_ads: {
+  "google-ads": {
     displayName: "Google Ads",
     authMethod: "oauth2",
     oauthScopes: ["https://www.googleapis.com/auth/adwords"],
@@ -52,7 +52,7 @@ export const CONNECTOR_REGISTRY = {
     capabilities: { webhooks: true, bidirectional: true },
     category: "ecommerce"
   },
-  whatsapp: {
+  "whatsapp-business": {
     displayName: "WhatsApp Business",
     authMethod: "api_key",
     credentialFields: [
@@ -70,6 +70,16 @@ export const CONNECTOR_REGISTRY = {
     ],
     capabilities: { webhooks: false, bidirectional: false },
     category: "accounting"
+  },
+  limechat: {
+    displayName: "LimeChat",
+    authMethod: "api_key",
+    credentialFields: [
+      { key: 'account_id', label: 'Account ID', placeholder: 'Your LimeChat account ID', secret: false },
+      { key: 'api_token', label: 'API Token', secret: true }
+    ],
+    capabilities: { webhooks: true, bidirectional: false },
+    category: "communication"
   }
 } as const;
 

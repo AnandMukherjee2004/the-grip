@@ -18,6 +18,68 @@ connectorsRouter.post('/', async (c) => {
       return c.json({ error: 'bad_request', message: 'Missing required fields' }, 400);
     }
 
+    if (toolId === 'razorpay') {
+      const { key_id, key_secret } = credentials;
+      if (!key_id || !key_secret || !key_id.trim() || !key_secret.trim()) {
+        return c.json({ error: 'bad_request', message: 'Key ID and Key Secret are required for Razorpay' }, 400);
+      }
+
+      try {
+        const authHeader = `Basic ${Buffer.from(`${key_id}:${key_secret}`).toString('base64')}`;
+        const razorpayRes = await fetch('https://api.razorpay.com/v1/payments?count=1', {
+          method: 'GET',
+          headers: {
+            'Authorization': authHeader
+          }
+        });
+
+        if (razorpayRes.status === 401 || razorpayRes.status === 403) {
+          return c.json({ error: 'invalid_credentials', message: 'Invalid Razorpay Key ID or Key Secret. Please check and try again.' }, 400);
+        }
+      } catch (fetchError) {
+        console.error('Failed to validate Razorpay credentials due to network/timeout error, proceeding to save:', fetchError);
+      }
+    }
+
+    let lsqHost: string | null = null;
+    if (toolId === 'leadsquared') {
+      const accessKey = credentials.accessKey || credentials.access_key;
+      const secretKey = credentials.secretKey || credentials.secret_key;
+      if (!accessKey || !secretKey || !accessKey.trim() || !secretKey.trim()) {
+        return c.json({ error: 'bad_request', message: 'Access Key and Secret Key are required for LeadSquared' }, 400);
+      }
+
+      try {
+        const url = `https://api.leadsquared.com/v2/Authentication.svc/UserByAccessKey.Get?accessKey=${encodeURIComponent(accessKey)}&secretKey=${encodeURIComponent(secretKey)}`;
+        const leadsquaredRes = await fetch(url, {
+          method: 'GET',
+        });
+
+        if (leadsquaredRes.status === 401) {
+          return c.json({ error: 'invalid_credentials', message: 'Invalid LeadSquared Access Key or Secret Key. Please check and try again.' }, 400);
+        }
+
+        if (leadsquaredRes.status >= 200 && leadsquaredRes.status < 300) {
+          try {
+            const resBody = await leadsquaredRes.json();
+            const urls = resBody?.LSQCommonServiceURLs || resBody?.d?.LSQCommonServiceURLs;
+            const apiVal = urls?.api;
+            if (typeof apiVal === 'string' && apiVal.trim()) {
+              lsqHost = apiVal.trim();
+            } else {
+              console.warn('LSQCommonServiceURLs.api not found in LeadSquared response:', JSON.stringify(resBody));
+            }
+          } catch (parseError) {
+            console.warn('Failed to parse LeadSquared response body:', parseError);
+          }
+        }
+      } catch (fetchError) {
+        const errorMessage = fetchError instanceof Error ? fetchError.message : String(fetchError);
+        const redactedMessage = errorMessage.split(secretKey).join('[REDACTED]');
+        console.error('Failed to validate LeadSquared credentials due to network/timeout error, proceeding to save:', redactedMessage);
+      }
+    }
+
     const meta = getConnector(toolId);
     if (!meta) {
       return c.json({ error: 'bad_request', message: `Connector registry entry not found for tool: ${toolId}` }, 400);
@@ -37,6 +99,18 @@ connectorsRouter.post('/', async (c) => {
       )
       .limit(1);
 
+    let capabilitiesToSave: any = undefined;
+    if (toolId === 'leadsquared' && lsqHost) {
+      const existingCapabilities = existing.length > 0
+        ? (existing[0].capabilities || {})
+        : (meta.capabilities || {});
+
+      capabilitiesToSave = {
+        ...(typeof existingCapabilities === 'object' ? existingCapabilities : {}),
+        lsq_host: lsqHost
+      };
+    }
+
     let result;
 
     if (existing.length > 0) {
@@ -49,6 +123,7 @@ connectorsRouter.post('/', async (c) => {
           status: 'active',
           deletedAt: null, // restore if soft-deleted
           updatedAt: new Date(),
+          ...(capabilitiesToSave !== undefined ? { capabilities: capabilitiesToSave } : {})
         })
         .where(eq(connectors.id, existing[0].id))
         .returning({
@@ -76,6 +151,7 @@ connectorsRouter.post('/', async (c) => {
           authMethod: meta.authMethod,
           credentialsEncB64,
           status: 'active',
+          ...(capabilitiesToSave !== undefined ? { capabilities: capabilitiesToSave } : {})
         })
         .returning({
           id: connectors.id,

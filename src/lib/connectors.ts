@@ -117,4 +117,11 @@ export const CONNECTORS: Record<string, ConnectorConfig> = {
     apiKeyLabel: "Access Token",
     docsUrl: "https://developers.facebook.com/docs/whatsapp/cloud-api/get-started",
   },
+  limechat: {
+    toolId: "limechat",
+    authMethod: "apikey",
+    apiKeyLabel: "Account ID",
+    apiSecretLabel: "API Token",
+    docsUrl: "https://limechat.ai",
+  },
 };
