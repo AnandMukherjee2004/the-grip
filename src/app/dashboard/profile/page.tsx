@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { signOut, useSession } from "next-auth/react";
 import TopBar, { DEFAULT_DATE_RANGE } from "@/components/layout/TopBar";
 import CustomSelect from "@/components/ui/CustomSelect";
 import type { DateRangeSelection } from "@/lib/dateRange";
@@ -17,16 +18,25 @@ const TIMEZONE_OPTIONS = [
 ];
 
 export default function ProfilePage() {
+  const { data: session } = useSession();
   const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
   const [profile, setProfile] = useState({
-    name: "Anand Mukherjee",
-    email: "anand.mukherjee@example.com",
-    company: "The Grip Co.",
+    name: session?.user?.name ?? "",
+    email: session?.user?.email ?? "",
+    company: "",
     timezone: "UTC+05:30 (India Standard Time)",
   });
+
+  useEffect(() => {
+    setProfile((prev) => ({
+      ...prev,
+      name: session?.user?.name ?? "",
+      email: session?.user?.email ?? "",
+    }));
+  }, [session?.user?.name, session?.user?.email]);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -165,6 +175,27 @@ export default function ProfilePage() {
                 </button>
               </div>
             </form>
+          </div>
+
+          {/* Sign Out Section */}
+          <div className="bg-[#0d0d1a] border border-rose-500/20 rounded-2xl p-6 shadow-xl">
+            <div className="flex items-start justify-between gap-6">
+              <div className="space-y-1">
+                <h2 className="text-sm font-bold text-white">Sign Out</h2>
+                <p className="text-white/40 text-[11px]">
+                  You are signed in as{" "}
+                  <span className="text-white/60">{session?.user?.email}</span>.
+                  {" "}Signing out will clear your session on this device.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => signOut({ callbackUrl: "/onboarding?mode=signin" })}
+                className="shrink-0 px-4 py-2 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-xs font-semibold hover:bg-rose-500/20 hover:border-rose-500/50 transition-all active:scale-95"
+              >
+                Sign out
+              </button>
+            </div>
           </div>
         </div>
       </main>

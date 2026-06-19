@@ -128,7 +128,7 @@ export function ToolCard({ tool, isSelected, onToggle }: ToolCardProps) {
           onToggle(tool.id);
         }
       }}
-      className={`group relative flex flex-col justify-between p-5 rounded-xl border backdrop-blur-md cursor-pointer transition-all duration-300 select-none ${
+      className={`tool-card group relative flex flex-col justify-between p-5 rounded-xl border backdrop-blur-md cursor-pointer transition-all duration-300 select-none ${
         isSelected ? brand.selectedBg : "border-white/5 bg-[#0e0e1a]/40 hover:bg-[#121226]/50 " + brand.bgGlow
       } hover:-translate-y-0.5`}
     >
