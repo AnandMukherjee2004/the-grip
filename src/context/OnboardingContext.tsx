@@ -1,7 +1,8 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { getConnectors, getWorkspace } from "@/lib/api";
+import { getConnectors, getWorkspace, getWorkspaceByUser } from "@/lib/api";
+import { getSession } from "next-auth/react";
 
 export interface Workspace {
   id: string;
@@ -68,6 +69,17 @@ export function OnboardingProvider({ children }: { children: React.ReactNode }) 
         if (workspace) {
           setWorkspaces([{ id: workspace.id, name: workspace.name }]);
           setActiveWorkspaceIdState(workspace.id);
+        }
+      });
+    } else {
+      getSession().then((session) => {
+        if (session?.user?.id) {
+          getWorkspaceByUser(session.user.id).then((result) => {
+            if (result) {
+              setOrgId(result.orgId);
+              setWorkspaceId(result.workspaceId);
+            }
+          });
         }
       });
     }

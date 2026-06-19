@@ -83,3 +83,27 @@ export async function getWorkspace(workspaceId: string): Promise<{ id: string; n
     return null;
   }
 }
+
+export async function getWorkspaceByUser(userId: string): Promise<{ orgId: string; workspaceId: string } | null> {
+  try {
+    const res = await fetch(`${API_URL}/api/v1/workspaces/by-user?userId=${userId}`, {
+      headers: { Accept: "application/json" },
+      next: { revalidate: 0 },
+    });
+
+    if (!res.ok) {
+      return null;
+    }
+
+    const data = await res.json();
+    if (data && data.orgId && data.workspaceId) {
+      return { orgId: data.orgId, workspaceId: data.workspaceId };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Failed to fetch workspace by user from API", error);
+    return null;
+  }
+}
+
