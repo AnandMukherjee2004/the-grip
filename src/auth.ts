@@ -5,21 +5,16 @@ import { eq, or } from 'drizzle-orm'
 import bcrypt from 'bcryptjs'
 import { db } from '@/db/index'
 import { users, accounts, sessions, verificationTokens, orgMembers } from '@/db/schema'
+import { authConfig } from './auth.config'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  ...authConfig,
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,
     sessionsTable: sessions,
     verificationTokensTable: verificationTokens,
   }),
-  session: {
-    strategy: 'jwt',
-  },
-  pages: {
-    signIn: '/onboarding',
-    error: '/onboarding',
-  },
   providers: [
     Credentials({
       name: 'credentials',
@@ -54,6 +49,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
+    ...authConfig.callbacks,
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
@@ -76,12 +72,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       return token
     },
-    async session({ session, token }) {
-      if (session.user && token?.id) {
-        session.user.id = token.id as string
-        session.user.hasOrgMembership = Boolean(token.hasOrgMembership)
-      }
-      return session
-    },
   },
 })
+

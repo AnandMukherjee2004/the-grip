@@ -15,6 +15,10 @@ export async function signUpAction(data: {
   email: string
   password: string
 }): Promise<{ success?: boolean; error?: string }> {
+  if (!data.password || data.password.length < 8) {
+    return { error: 'Password must be at least 8 characters.' }
+  }
+
   try {
     const [existing] = await db
       .select({ id: users.id })
@@ -34,11 +38,15 @@ export async function signUpAction(data: {
       passwordHash,
     })
 
-    await signIn('credentials', {
+    const result = await signIn('credentials', {
       email: data.email.toLowerCase(),
       password: data.password,
       redirect: false,
     })
+
+    if (result?.error) {
+      return { error: 'Account created but sign-in failed. Please sign in manually.' }
+    }
 
     return { success: true }
   } catch (err) {
@@ -52,11 +60,15 @@ export async function signInAction(data: {
   password: string
 }): Promise<{ redirect?: string; error?: string }> {
   try {
-    await signIn('credentials', {
+    const result = await signIn('credentials', {
       email: data.email.toLowerCase(),
       password: data.password,
       redirect: false,
     })
+
+    if (result?.error) {
+      return { error: 'Incorrect email or password.' }
+    }
 
     const [userRecord] = await db
       .select({ id: users.id })
