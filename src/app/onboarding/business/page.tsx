@@ -14,6 +14,7 @@ import CustomSelect from "@/components/ui/CustomSelect";
 
 import { useOnboarding } from "@/context/OnboardingContext";
 import { API_URL } from "@/lib/api";
+import { onboardingAccountUrl } from "@/lib/onboarding-routes";
 
 type BusinessValues = {
   companyName: string;
@@ -85,7 +86,7 @@ function SelectField({
 
 export default function OnboardingBusinessPage() {
   const router = useRouter();
-  const { data: session } = useSession();
+  const { data: session, status, update } = useSession();
   const { setOrgId, setWorkspaceId } = useOnboarding();
   const [values, setValues] = useState<BusinessValues>({
     companyName: "",
@@ -118,9 +119,13 @@ export default function OnboardingBusinessPage() {
       .replace(/^-+|-+$/g, "");
   };
 
+  const sessionReady = status === "authenticated" && Boolean(session?.user?.id);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    if (status === "loading") return;
 
     if (!session?.user?.id) {
       router.push("/onboarding?mode=signin");
@@ -152,7 +157,7 @@ export default function OnboardingBusinessPage() {
         if (response.ok) {
           const data = await response.json();
           setOrgId(data.orgId);
-          setWorkspaceId(data.workspaceId);
+          setWorkspaceId(data.workspaceId, values.companyName.trim());
           return true;
         }
 
@@ -167,18 +172,18 @@ export default function OnboardingBusinessPage() {
     };
 
     try {
-      // First attempt
       const success = await callApi(baseSlug);
       if (success) {
+        await update();
         router.push("/onboarding/tools");
         return;
       }
 
-      // Conflict (409) fallback retry
       const randomSuffix = Math.floor(1000 + Math.random() * 9000);
       const fallbackSlug = `${baseSlug}-${randomSuffix}`;
       const successFallback = await callApi(fallbackSlug);
       if (successFallback) {
+        await update();
         router.push("/onboarding/tools");
       } else {
         setGlobalError("Something went wrong, please try again");
@@ -196,9 +201,15 @@ export default function OnboardingBusinessPage() {
       currentStep={2}
       title="Tell us about your business"
       subtitle="We'll personalise Grip to your team's workflow."
-      onBack={() => router.back()}
+      onBack={() => router.push(onboardingAccountUrl)}
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+        {status === "loading" && (
+          <p className="text-xs text-white/40">Setting up your session...</p>
+        )}
+        {!sessionReady && status === "unauthenticated" && (
+          <p className="text-xs text-rose-400">Please sign in to continue.</p>
+        )}
         {globalError && (
           <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium">
             ⚠️ {globalError}
@@ -266,7 +277,7 @@ export default function OnboardingBusinessPage() {
         <div className="flex gap-3 pt-3 border-t border-white/[0.04]">
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={isLoading || status === "loading" || !sessionReady}
             className={`${onboardingSubmitClass} disabled:opacity-50 disabled:pointer-events-none`}
           >
             {isLoading ? (

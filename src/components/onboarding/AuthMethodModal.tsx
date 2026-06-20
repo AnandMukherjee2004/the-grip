@@ -1,5 +1,7 @@
 "use client";
 
+import { ModalPortal } from "@/components/ui/ModalPortal";
+
 interface AuthMethodModalProps {
   toolName: string;
   toolLogo?: string;
@@ -22,15 +24,14 @@ export function AuthMethodModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300" 
-        onClick={onClose}
-      />
+    <ModalPortal>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300"
+          onClick={onClose}
+        />
 
-      {/* Modal Box */}
-      <div className="relative w-full max-w-md p-6 rounded-2xl bg-[#090911]/95 border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.8)] backdrop-blur-xl overflow-hidden transition-all duration-300">
+        <div className="relative w-full max-w-md p-6 rounded-2xl bg-[#090911]/95 border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.8)] backdrop-blur-xl overflow-hidden transition-all duration-300">
         {/* Decorative Glows */}
         <div className="absolute -top-20 -left-20 w-48 h-48 rounded-full bg-indigo-600/10 blur-[85px] pointer-events-none" />
         <div className="absolute -bottom-20 -right-20 w-48 h-48 rounded-full bg-purple-600/10 blur-[85px] pointer-events-none" />
@@ -132,7 +133,8 @@ export function AuthMethodModal({
             Cancel
           </button>
         </div>
+        </div>
       </div>
-    </div>
+    </ModalPortal>
   );
 }

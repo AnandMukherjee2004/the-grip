@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { ConnectorConfig, ConnectorStatus } from "@/types/onboarding";
 import { ConnectorCard } from "./ConnectorCard";
+
+type ModalView = "choice" | "apikey";
 
 interface ConnectorGridProps {
   selectedTools: string[];
@@ -20,9 +23,11 @@ export function ConnectorGrid({
   onSkip,
   onDisconnect,
 }: ConnectorGridProps) {
+  const [modalState, setModalState] = useState<{ toolId: string; view: ModalView } | null>(null);
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto py-2">
-      {selectedTools.map((toolId, index) => {
+      {selectedTools.map((toolId) => {
         const config = connectorsConfig[toolId] || {
           toolId,
           authMethod: "oauth" as const,
@@ -30,14 +35,7 @@ export function ConnectorGrid({
         const status = statuses[toolId] || "idle";
 
         return (
-          <div
-            key={toolId}
-            className="animate-fadeIn opacity-0"
-            style={{
-              animationDelay: `${index * 50}ms`,
-              animationFillMode: "forwards",
-            }}
-          >
+          <div key={toolId} className="min-h-[210px]">
             <ConnectorCard
               toolId={toolId}
               config={config}
@@ -45,6 +43,10 @@ export function ConnectorGrid({
               onConnect={onConnect}
               onSkip={onSkip}
               onDisconnect={onDisconnect}
+              modalView={modalState?.toolId === toolId ? modalState.view : null}
+              onOpenChoice={() => setModalState({ toolId, view: "choice" })}
+              onOpenApiKey={() => setModalState({ toolId, view: "apikey" })}
+              onCloseModal={() => setModalState(null)}
             />
           </div>
         );

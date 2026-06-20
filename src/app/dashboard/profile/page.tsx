@@ -7,6 +7,9 @@ import CustomSelect from "@/components/ui/CustomSelect";
 import type { DateRangeSelection } from "@/lib/dateRange";
 import { CheckCircleIcon } from "@/components/ui/Icons";
 import { ThemePreferenceSelector } from "@/components/theme/ThemePreferenceSelector";
+import { ImageUploadField } from "@/components/profile/ImageUploadField";
+import { useOnboarding } from "@/context/OnboardingContext";
+import { getInitials } from "@/lib/profile-images";
 
 const TIMEZONE_OPTIONS = [
   { value: "UTC-08:00 (Pacific Time)", label: "UTC-08:00 (Pacific Time)" },
@@ -19,14 +22,26 @@ const TIMEZONE_OPTIONS = [
 
 export default function ProfilePage() {
   const { data: session } = useSession();
+  const {
+    activeWorkspaceId,
+    workspaces,
+    userProfileImage,
+    setUserProfileImage,
+    updateWorkspaceImage,
+  } = useOnboarding();
   const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
 
+  const activeWorkspace = workspaces.find((workspace) => workspace.id === activeWorkspaceId);
+  const displayName = profileName(session?.user?.name, session?.user?.email);
+  const profileInitials = getInitials(displayName);
+  const workspaceInitials = getInitials(activeWorkspace?.name ?? "WS");
+
   const [profile, setProfile] = useState({
     name: session?.user?.name ?? "",
     email: session?.user?.email ?? "",
-    company: "",
+    company: activeWorkspace?.name ?? "",
     timezone: "UTC+05:30 (India Standard Time)",
   });
 
@@ -35,8 +50,9 @@ export default function ProfilePage() {
       ...prev,
       name: session?.user?.name ?? "",
       email: session?.user?.email ?? "",
+      company: activeWorkspace?.name ?? prev.company,
     }));
-  }, [session?.user?.name, session?.user?.email]);
+  }, [session?.user?.name, session?.user?.email, activeWorkspace?.name]);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -54,13 +70,22 @@ export default function ProfilePage() {
     }, 1200);
   };
 
+  const handleProfilePhotoUpload = (dataUrl: string) => {
+    setUserProfileImage(dataUrl);
+    triggerToast("Profile photo updated.");
+  };
+
+  const handleWorkspaceImageUpload = (dataUrl: string) => {
+    if (!activeWorkspaceId) return;
+    updateWorkspaceImage(activeWorkspaceId, dataUrl);
+    triggerToast("Workspace image updated.");
+  };
+
   return (
     <div className="flex-grow flex flex-col overflow-hidden bg-[#040409]">
       <TopBar dateRange={dateRange} onDateRangeChange={setDateRange} />
 
-      {/* Main content scrollable area */}
       <main className="flex-grow overflow-y-auto p-6 space-y-8 scrollbar-thin relative">
-        {/* Floating Toast Notification */}
         {toastMessage && (
           <div className="fixed top-20 right-6 z-50 flex items-center gap-3 bg-[#0d0d1a] border border-emerald-500/30 text-emerald-400 px-4 py-3 rounded-xl shadow-2xl backdrop-blur-md animate-fadeIn transition-all duration-300">
             <CheckCircleIcon className="text-emerald-400" size={16} />
@@ -69,7 +94,6 @@ export default function ProfilePage() {
         )}
 
         <div className="max-w-4xl mx-auto space-y-8">
-          {/* Header Title */}
           <div className="space-y-1">
             <h1 className="text-xl font-bold text-white tracking-tight">User Profile</h1>
             <p className="text-white/40 text-xs">
@@ -77,7 +101,6 @@ export default function ProfilePage() {
             </p>
           </div>
 
-          {/* Profile Form Panel */}
           <div className="bg-[#0d0d1a] border border-white/10 rounded-2xl p-6 shadow-xl">
             <form onSubmit={handleProfileSave} className="space-y-6">
               <div>
@@ -85,18 +108,36 @@ export default function ProfilePage() {
                 <p className="text-white/40 text-[11px]">Manage how your identity appears in reports and invoices.</p>
               </div>
 
-              {/* Avatar Upload Preview */}
-              <div className="flex items-center gap-4 p-4 rounded-xl bg-white/5 border border-white/10">
-                <div className="w-14 h-14 rounded-full border border-white/10 bg-gradient-to-tr from-indigo-500 to-sky-500 flex items-center justify-center text-sm font-bold text-white shadow-lg relative">
-                  AM
-                </div>
-                <div className="space-y-1">
-                  <div className="text-xs font-semibold text-white">Profile Avatar</div>
-                  <div className="text-[10px] text-white/40">Avatar dynamically generated from your display initials.</div>
-                </div>
-              </div>
+              <ImageUploadField
+                label="Profile Photo"
+                description="Upload a photo for your profile. It appears in the sidebar and across your account."
+                imageUrl={userProfileImage}
+                fallbackLabel={profileInitials}
+                disabled={saving}
+                onUpload={handleProfilePhotoUpload}
+                onRemove={() => {
+                  setUserProfileImage(null);
+                  triggerToast("Profile photo removed.");
+                }}
+              />
 
-              {/* Grid fields */}
+              {activeWorkspaceId && (
+                <ImageUploadField
+                  label="Workspace Image"
+                  description="Optional image for your workspace. It appears next to your workspace name in the sidebar."
+                  imageUrl={activeWorkspace?.imageUrl ?? null}
+                  fallbackLabel={workspaceInitials}
+                  optional
+                  disabled={saving}
+                  previewClassName="w-14 h-14 rounded-md"
+                  onUpload={handleWorkspaceImageUpload}
+                  onRemove={() => {
+                    updateWorkspaceImage(activeWorkspaceId, null);
+                    triggerToast("Workspace image removed.");
+                  }}
+                />
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-[10px] font-bold text-white/60 tracking-wider uppercase">Full Name</label>
@@ -158,7 +199,14 @@ export default function ProfilePage() {
                 <ThemePreferenceSelector />
               </div>
 
-              <div className="pt-4 border-t border-white/10 flex justify-end">
+              <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-4">
+                <button
+                  type="button"
+                  onClick={() => signOut({ callbackUrl: "/onboarding?mode=signin" })}
+                  className="profile-sign-out-btn px-4 py-2 rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-400 text-xs font-semibold shadow-[0_4px_14px_rgba(244,63,94,0.18)] hover:bg-rose-500/20 hover:border-rose-500/55 hover:shadow-[0_6px_20px_rgba(244,63,94,0.28)] active:scale-95 transition-all cursor-pointer"
+                >
+                  Sign out
+                </button>
                 <button
                   type="submit"
                   disabled={saving}
@@ -176,29 +224,12 @@ export default function ProfilePage() {
               </div>
             </form>
           </div>
-
-          {/* Sign Out Section */}
-          <div className="bg-[#0d0d1a] border border-rose-500/20 rounded-2xl p-6 shadow-xl">
-            <div className="flex items-start justify-between gap-6">
-              <div className="space-y-1">
-                <h2 className="text-sm font-bold text-white">Sign Out</h2>
-                <p className="text-white/40 text-[11px]">
-                  You are signed in as{" "}
-                  <span className="text-white/60">{session?.user?.email}</span>.
-                  {" "}Signing out will clear your session on this device.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => signOut({ callbackUrl: "/onboarding?mode=signin" })}
-                className="shrink-0 px-4 py-2 rounded-lg border border-rose-500/30 bg-rose-500/10 text-rose-400 text-xs font-semibold hover:bg-rose-500/20 hover:border-rose-500/50 transition-all active:scale-95"
-              >
-                Sign out
-              </button>
-            </div>
-          </div>
         </div>
       </main>
     </div>
   );
+}
+
+function profileName(name?: string | null, email?: string | null) {
+  return name ?? email ?? "Account";
 }

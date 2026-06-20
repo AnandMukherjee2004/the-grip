@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { db } from '../db/index';
 import { workspaces, orgMembers, organizations } from '../db/schema';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, isNull, or } from 'drizzle-orm';
 
 const workspacesRouter = new Hono();
 
@@ -17,16 +17,20 @@ workspacesRouter.get('/by-user', async (c) => {
       .select({
         orgId: orgMembers.orgId,
         workspaceId: workspaces.id,
+        workspaceName: workspaces.name,
       })
       .from(orgMembers)
       .innerJoin(organizations, eq(organizations.id, orgMembers.orgId))
       .innerJoin(workspaces, eq(workspaces.orgId, organizations.id))
       .where(
         and(
-          eq(orgMembers.userId, userId),
+          or(
+            eq(orgMembers.userId, userId),
+            eq(orgMembers.clerkUserId, userId),
+          ),
           isNull(organizations.deletedAt),
-          isNull(workspaces.deletedAt)
-        )
+          isNull(workspaces.deletedAt),
+        ),
       )
       .orderBy(workspaces.createdAt)
       .limit(1);

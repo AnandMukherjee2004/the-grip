@@ -6,6 +6,7 @@ export default auth(function middleware(req) {
   const hasSession = Boolean(session)
   const hasOrgMembership = Boolean(session?.user?.hasOrgMembership)
   const pathname = req.nextUrl.pathname
+  const isOnboardingBack = req.nextUrl.searchParams.get('from') === 'onboarding'
 
   const isDashboard = pathname.startsWith('/dashboard')
   const isOnboardingFlow = ['/onboarding/business', '/onboarding/tools', '/onboarding/connect'].some((p) =>
@@ -21,7 +22,7 @@ export default auth(function middleware(req) {
     return NextResponse.redirect(new URL('/onboarding/business', req.url))
   }
 
-  if (isAuthPage && hasSession) {
+  if (isAuthPage && hasSession && !isOnboardingBack) {
     const redirectPath = hasOrgMembership ? '/dashboard' : '/onboarding/business'
     return NextResponse.redirect(new URL(redirectPath, req.url))
   }

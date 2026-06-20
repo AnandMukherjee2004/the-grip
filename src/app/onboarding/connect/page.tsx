@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useOnboarding } from "@/context/OnboardingContext";
 import { StepProgress } from "@/components/onboarding/StepProgress";
 import { ConnectProgressBar } from "@/components/onboarding/ConnectProgressBar";
@@ -22,7 +23,8 @@ const ONBOARDING_STEPS: OnboardingStep[] = [
 
 export default function OnboardingConnectPage() {
   const router = useRouter();
-  const { selectedTools, connectedTools, setConnectedTools } = useOnboarding();
+  const { update } = useSession();
+  const { selectedTools, connectedTools, setConnectedTools, workspaceId: contextWorkspaceId } = useOnboarding();
   const [localStatuses, setLocalStatuses] = useState<Record<string, ConnectorStatus>>({});
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [modalToolId, setModalToolId] = useState<string | null>(null);
@@ -35,20 +37,28 @@ export default function OnboardingConnectPage() {
 
   // Read workspaceId from localStorage key 'grip_workspace_id' on mount
   useEffect(() => {
-    const savedWorkspaceId = localStorage.getItem("grip_workspace_id");
+    const savedWorkspaceId = contextWorkspaceId || localStorage.getItem("grip_workspace_id");
     setWorkspaceId(savedWorkspaceId);
-  }, []);
+  }, [contextWorkspaceId]);
 
-  // Guard: Redirect if no tools selected
   useEffect(() => {
-    // Check local storage directly in case state hasn't populated yet
-    const saved = localStorage.getItem("grip_selected_tools");
-    const parsed = saved ? JSON.parse(saved) : [];
+    const savedWorkspaceId = contextWorkspaceId || localStorage.getItem("grip_workspace_id");
+    const saved = savedWorkspaceId
+      ? localStorage.getItem(`grip_selected_tools_${savedWorkspaceId}`)
+      : null;
+    let parsed: string[] = [];
+    if (saved) {
+      try {
+        parsed = JSON.parse(saved);
+      } catch {
+        parsed = [];
+      }
+    }
 
     if (selectedTools.length === 0 && parsed.length === 0) {
       router.replace("/onboarding/tools");
     }
-  }, [selectedTools, router]);
+  }, [selectedTools, router, contextWorkspaceId]);
 
   const handleConnect = async (toolId: string) => {
     // Set to connecting state
@@ -150,11 +160,10 @@ export default function OnboardingConnectPage() {
   const totalCount = selectedTools.length;
   const isSubmitDisabled = connectedCount === 0;
 
-  const handleGoToDashboard = () => {
+  const handleGoToDashboard = async () => {
     setIsRedirecting(true);
-    setTimeout(() => {
-      router.push("/dashboard");
-    }, 1000);
+    await update();
+    window.location.href = "/dashboard";
   };
 
   // Prevent flash before redirect guard runs

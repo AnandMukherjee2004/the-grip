@@ -51,10 +51,6 @@ export default function TopBar({ dateRange, onDateRangeChange }: TopBarProps) {
           <AlertsIcon size={14} />
           <span className="notification-indicator" aria-hidden="true" />
         </button>
-
-        <div className="w-8 h-8 rounded-full border border-white/10 bg-gradient-to-tr from-indigo-500 to-sky-500 flex items-center justify-center text-xs font-bold text-white shadow-md cursor-pointer hover:border-white/30 transition-colors">
-          AM
-        </div>
       </div>
     </header>
   );

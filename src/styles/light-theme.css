@@ -1078,6 +1078,24 @@
   border-color: var(--light-border) !important;
 }
 
+[data-theme="light"] .profile-sign-out-btn {
+  color: #be123c !important;
+  background: #ffffff !important;
+  border-color: rgba(244, 63, 94, 0.35) !important;
+  box-shadow:
+    0 4px 14px rgba(15, 23, 42, 0.08),
+    0 2px 6px rgba(244, 63, 94, 0.14) !important;
+}
+
+[data-theme="light"] .profile-sign-out-btn:hover {
+  color: #9f1239 !important;
+  background: #fff1f2 !important;
+  border-color: rgba(244, 63, 94, 0.5) !important;
+  box-shadow:
+    0 6px 20px rgba(15, 23, 42, 0.1),
+    0 3px 10px rgba(244, 63, 94, 0.18) !important;
+}
+
 [data-theme="light"] .text-white\/80,
 [data-theme="light"] .text-white\/85 {
   color: var(--light-text-secondary) !important;
