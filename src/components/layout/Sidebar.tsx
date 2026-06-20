@@ -421,7 +421,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
               <ul className="space-y-1">
                 {[
                   { name: "General", href: "/dashboard/settings?tab=workspace", icon: GeneralIcon },
-                  { name: "Members", href: "/dashboard/settings?tab=team", icon: MembersIcon },
+                  { name: "Members", href: "/dashboard/members", icon: MembersIcon },
                   { name: "Datasources", href: "/dashboard/settings?tab=api", icon: DatasourcesIcon, count: 2 },
                   { name: "Connections", href: "/dashboard/connectors", icon: ConnectionsIcon, count: 2 },
                   { name: "Knowledge", href: "/dashboard/settings?tab=privacy", icon: KnowledgeIcon },
