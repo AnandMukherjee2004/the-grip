@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useOnboarding } from "@/context/OnboardingContext";
 import { getInitials } from "@/lib/profile-images";
@@ -96,6 +96,12 @@ const BillingIcon = ({ className, size = 14 }: { className?: string; size?: numb
   </svg>
 );
 
+const PrivacyIcon = ({ className, size = 14 }: { className?: string; size?: number }) => (
+  <svg className={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </svg>
+);
+
 interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
@@ -105,23 +111,21 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
   const { connectedTools, workspaces, activeWorkspaceId, userProfileImage } = useOnboarding();
   const pathname = usePathname();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session } = useSession();
 
   const [menuMode, setMenuMode] = useState<"main" | "org">("main");
   const [prevRoute, setPrevRoute] = useState<string>("/dashboard");
-  const [activeTab, setActiveTab] = useState<string | null>(null);
 
-  // Sync activeTab from URL on route change
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      setActiveTab(params.get("tab"));
-    }
-  }, [pathname]);
+  const settingsTab = pathname.startsWith("/dashboard/settings")
+    ? searchParams.get("tab") ?? "workspace"
+    : null;
 
-  // Auto-reset to main menu when navigating away from settings (e.g. browser back button)
+  // Show settings submenu when on settings routes; reset when leaving
   useEffect(() => {
-    if (!pathname.startsWith("/dashboard/settings")) {
+    if (pathname.startsWith("/dashboard/settings")) {
+      setMenuMode("org");
+    } else {
       setMenuMode("main");
     }
   }, [pathname]);
@@ -328,13 +332,13 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                     router.push("/dashboard/settings?tab=workspace");
                   }}
                   className={`w-full flex items-center gap-2.5 py-1 rounded-lg text-xs transition-all ${
-                    pathname === "/dashboard/settings"
+                    pathname.startsWith("/dashboard/settings")
                       ? "text-white bg-white/[0.04] border border-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] font-semibold"
                       : "text-white/50 hover:text-white hover:bg-white/[0.02] border border-transparent font-medium"
                   } cursor-pointer focus:outline-none ${isCollapsed ? "justify-center px-0" : "px-2.5"}`}
                   title="Settings"
                 >
-                  <SettingsIcon className={pathname === "/dashboard/settings" ? "text-white/70" : "text-white/40 group-hover:text-white/70"} size={14} />
+                  <SettingsIcon className={pathname.startsWith("/dashboard/settings") ? "text-white/70" : "text-white/40 group-hover:text-white/70"} size={14} />
                   {!isCollapsed && <span>Settings</span>}
                 </button>
               </li>
@@ -372,23 +376,58 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
       ) : (
         <>
           {/* Organization Submenu View */}
-          {/* Back Button */}
-          <div className="h-14 px-4 flex items-center border-b border-white/[0.04] shrink-0">
-            <button
-              type="button"
-              onClick={() => {
-                setMenuMode("main");
-                router.push(prevRoute);
-              }}
-              className="flex items-center gap-2 text-xs font-semibold text-white/50 hover:text-white cursor-pointer focus:outline-none transition-colors"
+          <div className="flex flex-col min-h-0 flex-grow">
+            {/* Workspace header + collapse toggle */}
+            <div
+              className={`h-14 px-4 flex items-center border-b border-white/[0.04] shrink-0 ${isCollapsed ? "justify-center" : "justify-between"
+                }`}
             >
-              <span className="text-[10px] font-bold">&lt;</span>
-              <span>Back</span>
-            </button>
-          </div>
+              {!isCollapsed && (
+                <div className="flex items-center gap-2.5 min-w-0 flex-grow mr-2">
+                  <div className="w-7 h-7 rounded-md border border-white/10 bg-gradient-to-tr from-indigo-500 to-sky-500 flex items-center justify-center text-[10px] font-bold text-white shadow-md shrink-0 overflow-hidden">
+                    {activeWorkspace.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={activeWorkspace.imageUrl} alt={activeWorkspace.name} className="w-full h-full object-cover" />
+                    ) : (
+                      workspaceInitials
+                    )}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-semibold text-xs text-white/90 truncate font-sans leading-tight">
+                      {activeWorkspace.name}
+                    </span>
+                  </div>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={onToggleCollapse}
+                className="text-[10px] text-white/40 hover:text-white transition-colors cursor-pointer w-6 h-6 rounded bg-white/5 border border-white/10 flex items-center justify-center shrink-0"
+                title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+              >
+                {isCollapsed ? "▶" : "◀"}
+              </button>
+            </div>
 
-          {/* Nav Links */}
-          <nav className="flex-grow overflow-y-auto p-4 space-y-5 scrollbar-none">
+            {/* Back button below workspace header */}
+            {!isCollapsed && (
+              <div className="px-4 py-3 border-b border-white/[0.04] shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuMode("main");
+                    router.push(prevRoute);
+                  }}
+                  className="flex items-center gap-2 text-xs font-semibold text-white/50 hover:text-white cursor-pointer focus:outline-none transition-colors"
+                >
+                  <span className="text-[10px] font-bold">&lt;</span>
+                  <span>Back</span>
+                </button>
+              </div>
+            )}
+
+            {/* Nav Links */}
+            <nav className={`flex-grow overflow-y-auto space-y-5 scrollbar-none ${isCollapsed ? "p-2" : "p-4"}`}>
             {/* Personal Section */}
             <div className="space-y-1.5">
               <div className="text-[10px] uppercase tracking-widest text-white/30 font-semibold px-2.5">
@@ -419,16 +458,18 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
               <ul className="space-y-1">
                 {[
                   { name: "General", href: "/dashboard/settings?tab=workspace", icon: GeneralIcon },
-                  { name: "Members", href: "/dashboard/members", icon: MembersIcon },
-                  { name: "Datasources", href: "/dashboard/settings?tab=api", icon: DatasourcesIcon, count: 2 },
-                  { name: "Connections", href: "/dashboard/connectors", icon: ConnectionsIcon, count: 2 },
-                  { name: "Knowledge", href: "/dashboard/settings?tab=privacy", icon: KnowledgeIcon },
+                  { name: "Members", href: "/dashboard/settings?tab=members", icon: MembersIcon },
+                  { name: "API keys", href: "/dashboard/settings?tab=api", icon: DatasourcesIcon, count: 2 },
+                  { name: "Connectors", href: "/dashboard/settings?tab=connectors", icon: ConnectionsIcon, count: connectedTools.length > 0 ? connectedTools.length : undefined },
+                  { name: "Knowledge", href: "/dashboard/settings?tab=knowledge", icon: KnowledgeIcon },
+                  { name: "Privacy", href: "/dashboard/settings?tab=privacy", icon: PrivacyIcon },
                   { name: "Billing", href: "/dashboard/settings?tab=billing", icon: BillingIcon, external: true },
                 ].map((item) => {
                   const tabParam = item.href.includes("tab=") ? item.href.split("tab=")[1] : null;
-                  const isActive = tabParam 
-                    ? (pathname === "/dashboard/settings" && activeTab === tabParam)
-                    : (pathname === item.href);
+                  const isActive =
+                    tabParam !== null
+                      ? pathname.startsWith("/dashboard/settings") && settingsTab === tabParam
+                      : pathname === item.href;
                   const Icon = item.icon;
 
                   return (
@@ -459,24 +500,46 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                 })}
               </ul>
             </div>
-          </nav>
+            </nav>
+          </div>
 
           {/* Bottom Pinned Section for Organization Mode */}
-          <div className="border-t border-white/[0.03] p-4 space-y-4 shrink-0">
-            <div className="space-y-2">
-              <div className="flex justify-between text-[10px] font-semibold text-white/45 leading-none">
-                <span>Pro plan trial</span>
-                <span className="text-white/60">14 days left</span>
+          <div className={`border-t border-white/[0.03] space-y-4 shrink-0 ${isCollapsed ? "p-2" : "p-4"}`}>
+            {!isCollapsed && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-[10px] font-semibold text-white/45 leading-none">
+                  <span>Pro plan trial</span>
+                  <span className="text-white/60">14 days left</span>
+                </div>
+                <div className="w-full h-1 rounded-full bg-white/5 overflow-hidden">
+                  <div className="h-full bg-indigo-500 rounded-full" style={{ width: "30%" }} />
+                </div>
               </div>
-              <div className="w-full h-1 rounded-full bg-white/5 overflow-hidden">
-                <div className="h-full bg-indigo-500 rounded-full" style={{ width: "30%" }} />
+            )}
+            <Link
+              href="/dashboard/profile"
+              className={`flex items-center gap-3 rounded-xl transition-all hover:bg-white/[0.04] p-1.5 cursor-pointer ${pathname === "/dashboard/profile" ? "bg-white/[0.04]" : ""
+                } ${isCollapsed ? "justify-center" : "px-2"}`}
+            >
+              <div className="w-8 h-8 rounded-full border border-white/10 bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-400 shrink-0 overflow-hidden">
+                {userProfileImage ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={userProfileImage} alt={displayName} className="w-full h-full object-cover" />
+                ) : (
+                  initials
+                )}
               </div>
-            </div>
-            <div className="flex items-center pt-2">
-              <div className="w-8 h-8 rounded-full border border-white/10 bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-400">
-                {initials}
-              </div>
-            </div>
+              {!isCollapsed && (
+                <div className="flex flex-col min-w-0">
+                  <span className="text-xs font-semibold text-white/80 truncate leading-tight">
+                    {displayName}
+                  </span>
+                  <span className="text-[9px] text-white/30 truncate">
+                    View profile
+                  </span>
+                </div>
+              )}
+            </Link>
           </div>
         </>
       )}

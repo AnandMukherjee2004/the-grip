@@ -81,13 +81,13 @@ export default function Navbar() {
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center gap-4">
             <Link 
-              href="/onboarding?mode=signin" 
+              href="/sign-in" 
               className={`text-gray-500 hover:text-gray-900 transition-all duration-500 font-medium ${isScrolled ? "text-xs" : "text-sm"}`}
             >
               Sign in
             </Link>
             <Link
-              href="/onboarding"
+              href="/sign-up"
               className={`bg-gray-900 hover:bg-gray-800 !text-white rounded-full transition-all duration-500 font-medium flex items-center justify-center ${
                 isScrolled ? "px-4 h-8 text-xs" : "px-5 h-9 text-sm"
               }`}
@@ -157,14 +157,14 @@ export default function Navbar() {
             style={{ transitionDelay: isMenuOpen ? "300ms" : "0ms" }}
           >
             <Link
-              href="/onboarding?mode=signin"
+              href="/sign-in"
               className="flex-1 rounded-full border border-gray-200 h-14 text-base font-medium flex items-center justify-center text-gray-900 hover:bg-gray-50 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               Sign in
             </Link>
             <Link
-              href="/onboarding"
+              href="/sign-up"
               className="flex-1 bg-gray-900 !text-white rounded-full h-14 text-base font-medium flex items-center justify-center hover:bg-gray-800 transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >

@@ -1,20 +1,38 @@
 "use client";
 
 import { useState, useEffect, Suspense, useRef } from "react";
+import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useOnboarding } from "@/context/OnboardingContext";
 import { getInitials } from "@/lib/profile-images";
 import { readImageFile } from "@/lib/profile-images";
 
+const ConnectorsPage = dynamic(() => import("../connectors/page"), {
+  loading: () => (
+    <div className="py-12 text-center text-sm text-gray-400">Loading connectors...</div>
+  ),
+});
+
 type TabId =
   | "workspace"
+  | "members"
+  | "connectors"
+  | "connections"
   | "team"
   | "billing"
   | "notifications"
-  | "connectors"
   | "privacy"
+  | "knowledge"
   | "api"
   | "danger";
+
+interface Member {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  isYou?: boolean;
+}
 
 interface ApiKeyItem {
   id: string;
@@ -48,7 +66,7 @@ function SettingsPageContent() {
 
   useEffect(() => {
     if (tabParam) {
-      setActiveTab(tabParam as TabId);
+      setActiveTab(tabParam === "connections" ? "connectors" : (tabParam as TabId));
     }
   }, [tabParam]);
 
@@ -68,6 +86,17 @@ function SettingsPageContent() {
   ]);
   const [newKeyName, setNewKeyName] = useState("");
   const [generatedKey, setGeneratedKey] = useState<string | null>(null);
+
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [members, setMembers] = useState<Member[]>([
+    {
+      id: "1",
+      name: "Anand Mukherjee",
+      email: "anandmukherjee2004@gmail.com",
+      role: "Owner",
+      isYou: true,
+    },
+  ]);
 
   useEffect(() => {
     setWorkspaceName(activeWorkspace.name);
@@ -120,6 +149,22 @@ function SettingsPageContent() {
   const handleRevokeApiKey = (id: string, name: string) => {
     setApiKeys(apiKeys.filter((k) => k.id !== id));
     triggerToast(`API key "${name}" revoked.`);
+  };
+
+  const handleSendInvite = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail.trim()) return;
+
+    const newMember: Member = {
+      id: Date.now().toString(),
+      name: inviteEmail.split("@")[0].replace(".", " "),
+      email: inviteEmail,
+      role: "Member",
+    };
+
+    setMembers([...members, newMember]);
+    setInviteEmail("");
+    triggerToast(`Invitation sent to ${inviteEmail}!`);
   };
 
   return (
@@ -500,11 +545,24 @@ function SettingsPageContent() {
             </div>
           )}
 
-          {/* ─── DATA & PRIVACY TAB ─── */}
+          {/* ─── KNOWLEDGE TAB ─── */}
+          {activeTab === "knowledge" && (
+            <div className="space-y-8">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Knowledge</h1>
+                <p className="text-gray-500 text-sm">Manage workspace knowledge and documentation.</p>
+              </div>
+              <div className="bg-white border border-gray-200 rounded-2xl p-12 shadow-sm text-center text-gray-400 text-sm">
+                Nothing here yet.
+              </div>
+            </div>
+          )}
+
+          {/* ─── PRIVACY TAB ─── */}
           {activeTab === "privacy" && (
             <div className="space-y-8">
               <div className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Knowledge & Privacy</h1>
+                <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Privacy</h1>
                 <p className="text-gray-500 text-sm">Configure data retention and compliance settings.</p>
               </div>
 
@@ -547,15 +605,98 @@ function SettingsPageContent() {
             </div>
           )}
 
-          {/* ─── TEAM TAB (fallback) ─── */}
+          {/* ─── MEMBERS TAB ─── */}
+          {activeTab === "members" && (
+            <div className="space-y-8">
+              <div className="space-y-1">
+                <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Members</h1>
+                <p className="text-gray-500 text-sm">Manage your team members.</p>
+              </div>
+
+              <form onSubmit={handleSendInvite} className="space-y-3">
+                <h2 className="text-sm font-semibold text-gray-700">Invite your team</h2>
+                <div className="flex gap-3">
+                  <input
+                    type="email"
+                    required
+                    placeholder="etufte@grip.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    className="flex-grow px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 transition-all shadow-sm"
+                  />
+                  <button
+                    type="submit"
+                    className="px-5 py-2.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-xs font-semibold transition-all shadow-sm cursor-pointer whitespace-nowrap"
+                  >
+                    Send invite
+                  </button>
+                </div>
+              </form>
+
+              <div className="space-y-3">
+                <h2 className="text-sm font-semibold text-gray-700">Manage members</h2>
+                <div className="border border-gray-200 rounded-[20px] p-6 bg-white shadow-sm space-y-4">
+                  {members.map((member) => (
+                    <div key={member.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-bold text-gray-500 shrink-0">
+                          {getInitials(member.name)}
+                        </div>
+                        <div className="space-y-0.5">
+                          <div className="text-sm font-semibold text-gray-800 flex items-center gap-1.5">
+                            {member.name}
+                            {member.isYou && (
+                              <span className="text-xs text-gray-400 font-normal">(You)</span>
+                            )}
+                          </div>
+                          <div className="text-xs text-gray-400 font-medium">{member.email}</div>
+                        </div>
+                      </div>
+                      <select
+                        value={member.role}
+                        onChange={(e) => {
+                          setMembers(
+                            members.map((m) =>
+                              m.id === member.id ? { ...m, role: e.target.value } : m
+                            )
+                          );
+                        }}
+                        className="appearance-none bg-transparent hover:bg-gray-50 text-xs font-semibold text-gray-600 px-3 py-1.5 pr-8 border border-transparent rounded-lg cursor-pointer focus:outline-none transition-colors"
+                        style={{
+                          backgroundImage: `url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236B7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E")`,
+                          backgroundPosition: "right 6px center",
+                          backgroundSize: "16px",
+                          backgroundRepeat: "no-repeat",
+                        }}
+                      >
+                        <option value="Owner">Owner</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Member">Member</option>
+                        <option value="Viewer">Viewer</option>
+                      </select>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ─── CONNECTORS TAB ─── */}
+          {(activeTab === "connectors" || activeTab === "connections") && (
+            <div className="relative -mx-6 -my-10 min-h-[600px]">
+              <ConnectorsPage />
+            </div>
+          )}
+
+          {/* ─── TEAM TAB (legacy redirect) ─── */}
           {activeTab === "team" && (
             <div className="space-y-8">
               <div className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Team & Access</h1>
-                <p className="text-gray-500 text-sm">Manage members and their permission roles.</p>
+                <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Members</h1>
+                <p className="text-gray-500 text-sm">Manage your team members.</p>
               </div>
               <div className="bg-white border border-gray-200 rounded-2xl p-8 shadow-sm text-center text-gray-400 text-sm">
-                Team management has moved to the <strong className="text-gray-700">Members</strong> page in the sidebar.
+                Team settings are now under <strong className="text-gray-700">Members</strong> in the sidebar.
               </div>
             </div>
           )}

@@ -1,12 +1,13 @@
 import type { NextAuthConfig } from 'next-auth'
 
 export const authConfig = {
+  trustHost: true,
   session: {
     strategy: 'jwt',
   },
   pages: {
-    signIn: '/onboarding',
-    error: '/onboarding',
+    signIn: '/sign-in',
+    error: '/sign-in',
   },
   providers: [] as any[],
   callbacks: {

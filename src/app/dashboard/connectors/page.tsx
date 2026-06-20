@@ -596,7 +596,7 @@ export default function ConnectorsPage() {
 
               {/* Title label */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400">Connections</h3>
+                <h3 className="text-sm font-semibold text-gray-400">Connectors</h3>
               </div>
 
               {/* Search bar */}
@@ -656,8 +656,8 @@ export default function ConnectorsPage() {
               {/* Header */}
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
-                  <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Connections</h1>
-                  <p className="text-gray-500 text-sm">Manage your third-party connections.</p>
+                  <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Connectors</h1>
+                  <p className="text-gray-500 text-sm">Manage your third-party connectors.</p>
                 </div>
                 <button
                   type="button"
@@ -667,13 +667,13 @@ export default function ConnectorsPage() {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                   </svg>
-                  Add connection
+                  Add connector
                 </button>
               </div>
 
               {/* Title label */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-400">Manage connections</h3>
+                <h3 className="text-sm font-semibold text-gray-400">Manage connectors</h3>
               </div>
 
               {activeConnectedTools.length > 0 ? (
@@ -710,9 +710,9 @@ export default function ConnectorsPage() {
               ) : (
                 /* ================= VIEW 2: EMPTY STATE ================= */
                 <div className="border border-gray-150 rounded-2xl bg-white shadow-sm p-12 py-20 min-h-[400px] flex flex-col items-center justify-center text-center">
-                  <h3 className="text-base font-semibold text-gray-900">Add your first connection</h3>
+                  <h3 className="text-base font-semibold text-gray-900">Add your first connector</h3>
                   <p className="text-sm text-gray-500 mt-1.5 mb-6 max-w-sm">
-                    Add your first connection to start syncing data to your warehouse.
+                    Add your first connector to start syncing data to your warehouse.
                   </p>
                   <button
                     type="button"
@@ -722,7 +722,7 @@ export default function ConnectorsPage() {
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
-                    Add connection
+                    Add connector
                   </button>
                 </div>
               )}
