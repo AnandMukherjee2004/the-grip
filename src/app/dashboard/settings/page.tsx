@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import TopBar, { DEFAULT_DATE_RANGE } from "@/components/layout/TopBar";
 import CustomSelect from "@/components/ui/CustomSelect";
 import type { DateRangeSelection } from "@/lib/dateRange";
@@ -70,7 +71,7 @@ const RETENTION_OPTIONS = [
   { value: "180", label: "180 Days" },
 ];
 
-export default function SettingsPage() {
+function SettingsPageContent() {
   const { workspaces, activeWorkspaceId, updateWorkspaceName, updateWorkspaceImage } = useOnboarding();
   const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId) || {
     id: "frido",
@@ -80,6 +81,14 @@ export default function SettingsPage() {
 
   const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
   const [activeTab, setActiveTab] = useState<TabId>("workspace");
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab");
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam as TabId);
+    }
+  }, [tabParam]);
 
   // State: Workspace details
   const [workspaceName, setWorkspaceName] = useState(activeWorkspace.name);
@@ -944,5 +953,13 @@ export default function SettingsPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function SettingsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#040409] text-white flex items-center justify-center">Loading settings...</div>}>
+      <SettingsPageContent />
+    </Suspense>
   );
 }

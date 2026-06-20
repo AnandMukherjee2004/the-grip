@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
@@ -18,6 +19,26 @@ import {
   SettingsIcon,
 } from "@/components/ui/Icons";
 
+const OrgIcon = ({ className, size = 14 }: { className?: string; size?: number }) => (
+  <svg
+    className={className}
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+    <line x1="9" y1="3" x2="9" y2="21" />
+    <line x1="15" y1="3" x2="15" y2="21" />
+    <line x1="3" y1="9" x2="21" y2="9" />
+    <line x1="3" y1="15" x2="21" y2="15" />
+  </svg>
+);
+
 interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
@@ -27,6 +48,16 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
   const { connectedTools, workspaces, activeWorkspaceId, userProfileImage } = useOnboarding();
   const pathname = usePathname();
   const { data: session } = useSession();
+
+  const [isOrgExpanded, setIsOrgExpanded] = useState(true);
+  const [activeTab, setActiveTab] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setActiveTab(params.get("tab"));
+    }
+  }, [pathname]);
 
   const failedPaymentsCount = 3;
 
@@ -196,46 +227,66 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
             </ul>
           </div>
 
-          {/* Section: Ops */}
+          {/* Section: Organization */}
           <div>
-            {!isCollapsed && (
-              <div className="text-[10px] uppercase tracking-widest text-white/30 font-semibold px-2.5 mb-1">
-                Ops
-              </div>
+            {!isCollapsed ? (
+              <button
+                type="button"
+                onClick={() => setIsOrgExpanded(!isOrgExpanded)}
+                className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-white/30 hover:text-white/60 font-semibold px-2.5 mb-1 cursor-pointer transition-colors focus:outline-none"
+              >
+                <span>Organization</span>
+                <span className={`text-[10px] text-white/30 font-bold transition-transform duration-200 ${isOrgExpanded ? "rotate-90" : ""}`}>
+                  &gt;
+                </span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => {
+                  onToggleCollapse();
+                  setIsOrgExpanded(true);
+                }}
+                className="w-full flex items-center justify-center p-2 text-white/40 hover:text-white transition-colors cursor-pointer focus:outline-none"
+                title="Organization"
+              >
+                <OrgIcon size={14} />
+              </button>
             )}
-            <ul className="space-y-1">
-              <li>
-                <Link
-                  href="/dashboard/automations"
-                  className={`flex items-center gap-2.5 py-1 rounded-lg text-xs transition-all ${pathname === "/dashboard/automations"
-                      ? "text-white bg-white/[0.04] border border-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] font-semibold"
-                      : "text-white/50 hover:text-white hover:bg-white/[0.02] border border-transparent font-medium"
-                    } ${isCollapsed ? "justify-center px-0" : "px-2.5"}`}
-                  title="Automations"
-                >
-                  <AutomationsIcon className={pathname === "/dashboard/automations" ? "text-white/70" : "text-white/40 group-hover:text-white/70"} size={14} />
-                  {!isCollapsed && <span>Automations</span>}
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/dashboard/connectors"
-                  className={`flex items-center rounded-lg text-xs transition-all ${pathname === "/dashboard/connectors"
-                      ? "text-white bg-white/[0.04] border border-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] font-semibold"
-                      : "text-white/50 hover:text-white hover:bg-white/[0.02] border border-transparent font-medium"
-                    } ${isCollapsed ? "justify-center py-1" : "justify-between px-2.5 py-1"}`}
-                  title="Connectors"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <ConnectorsIcon className={pathname === "/dashboard/connectors" ? "text-white/70" : "text-white/40 group-hover:text-white/70"} size={14} />
-                    {!isCollapsed && <span>Connectors</span>}
-                  </div>
-                  {!isCollapsed && connectedTools.length > 0 && (
-                    <span className="sidebar-count">{connectedTools.length}</span>
-                  )}
-                </Link>
-              </li>
-            </ul>
+
+            {isOrgExpanded && !isCollapsed && (
+              <ul className="space-y-1 mt-1 pl-2 border-l border-white/[0.04] ml-3.5 animate-fadeIn">
+                {[
+                  { name: "General", href: "/dashboard/settings?tab=workspace" },
+                  { name: "Workspaces", href: "/dashboard/settings?tab=workspace" },
+                  { name: "Members", href: "/dashboard/settings?tab=team" },
+                  { name: "Datasources", href: "/dashboard/settings?tab=api" },
+                  { name: "Connections", href: "/dashboard/connectors" },
+                  { name: "Knowledge", href: "/dashboard/settings?tab=privacy" },
+                  { name: "Billing", href: "/dashboard/settings?tab=billing" },
+                ].map((item) => {
+                  const tabParam = item.href.includes("tab=") ? item.href.split("tab=")[1] : null;
+                  const isActive = tabParam 
+                    ? (pathname === "/dashboard/settings" && activeTab === tabParam)
+                    : (pathname === item.href);
+
+                  return (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        className={`flex items-center gap-2.5 py-1 px-2 rounded-lg text-xs transition-all ${
+                          isActive
+                            ? "text-white bg-white/[0.04] border border-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] font-semibold"
+                            : "text-white/50 hover:text-white hover:bg-white/[0.02] border border-transparent font-medium"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
         </nav>
       </div>
