@@ -31,7 +31,7 @@ export default function HeroSection() {
       <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-sky-50/15 rounded-full blur-[110px] pointer-events-none -z-10" />
 
       <div className="max-w-[1440px] mx-auto px-8 lg:px-12 w-full">
-        {/* The Split Hero Layout replicating Mora.com */}
+        {/* The Split Hero Layout replicating Grip.com */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           
           {/* Left Column: Title & Watch Demo */}
@@ -42,7 +42,7 @@ export default function HeroSection() {
               <span className="text-gray-400">finally in </span>one place.
             </h1>
 
-            {/* Watch Demo button replicating Mora's thumbnail styling */}
+            {/* Watch Demo button replicating Grip's thumbnail styling */}
             <button className="group mt-10 inline-flex items-center gap-3 p-1.5 pr-4 rounded-full border border-gray-200/80 hover:border-gray-300 hover:bg-gray-50/50 transition-all text-sm font-medium text-gray-800 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.02)]">
               {/* Fake Video Thumbnail preview */}
               <div className="relative w-12 h-8 rounded-lg overflow-hidden bg-gray-950 flex items-center justify-center shrink-0 shadow-inner">
@@ -76,7 +76,7 @@ export default function HeroSection() {
                 Get started free
               </Link>
 
-              {/* Outline Book Demo CTA with Mora's stacked avatars */}
+              {/* Outline Book Demo CTA with Grip's stacked avatars */}
               <Link
                 href="/onboarding?mode=demo"
                 className="inline-flex items-center justify-center bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-800 font-medium rounded-full h-11 px-5 text-sm transition-all gap-2"

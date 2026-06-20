@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import ActivityFeed from "@/components/dashboard/ActivityFeed";
 import { OnboardingProvider } from "@/context/OnboardingContext";
@@ -12,6 +13,8 @@ export default function DashboardLayout({
 }) {
   const [isFeedCollapsed, setIsFeedCollapsed] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const pathname = usePathname();
+  const showFeed = pathname !== "/dashboard/connectors";
 
   return (
     <OnboardingProvider>
@@ -28,10 +31,12 @@ export default function DashboardLayout({
         </div>
 
         {/* Right column: Live activity feed (fixed, 280px, collapsible) */}
-        <ActivityFeed
-          isCollapsed={isFeedCollapsed}
-          onToggleCollapse={() => setIsFeedCollapsed(!isFeedCollapsed)}
-        />
+        {showFeed && (
+          <ActivityFeed
+            isCollapsed={isFeedCollapsed}
+            onToggleCollapse={() => setIsFeedCollapsed(!isFeedCollapsed)}
+          />
+        )}
       </div>
     </OnboardingProvider>
   );

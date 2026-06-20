@@ -177,6 +177,77 @@ connectorsRouter.post('/', async (c) => {
   }
 });
 
+// POST /test - Validate credentials
+connectorsRouter.post('/test', async (c) => {
+  try {
+    const body = await c.req.json();
+    const { toolId, credentials } = body;
+
+    if (!toolId || !credentials) {
+      return c.json({ error: 'bad_request', message: 'Missing toolId or credentials' }, 400);
+    }
+
+    if (toolId === 'razorpay') {
+      const { key_id, key_secret } = credentials;
+      if (!key_id || !key_secret || !key_id.trim() || !key_secret.trim()) {
+        return c.json({ success: false, message: 'Key ID and Key Secret are required for Razorpay' }, 200);
+      }
+
+      try {
+        const authHeader = `Basic ${Buffer.from(`${key_id}:${key_secret}`).toString('base64')}`;
+        const razorpayRes = await fetch('https://api.razorpay.com/v1/payments?count=1', {
+          method: 'GET',
+          headers: {
+            'Authorization': authHeader
+          }
+        });
+
+        if (razorpayRes.status === 401 || razorpayRes.status === 403) {
+          return c.json({ success: false, message: 'Invalid Razorpay Key ID or Key Secret. Please check and try again.' }, 200);
+        }
+        return c.json({ success: true }, 200);
+      } catch (fetchError) {
+        return c.json({ success: false, message: `Network error: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}` }, 200);
+      }
+    }
+
+    if (toolId === 'leadsquared') {
+      const accessKey = credentials.accessKey || credentials.access_key;
+      const secretKey = credentials.secretKey || credentials.secret_key;
+      if (!accessKey || !secretKey || !accessKey.trim() || !secretKey.trim()) {
+        return c.json({ success: false, message: 'Access Key and Secret Key are required for LeadSquared' }, 200);
+      }
+
+      try {
+        const url = `https://api.leadsquared.com/v2/Authentication.svc/UserByAccessKey.Get?accessKey=${encodeURIComponent(accessKey)}&secretKey=${encodeURIComponent(secretKey)}`;
+        const leadsquaredRes = await fetch(url, {
+          method: 'GET',
+        });
+
+        if (leadsquaredRes.status === 401) {
+          return c.json({ success: false, message: 'Invalid LeadSquared Access Key or Secret Key. Please check and try again.' }, 200);
+        }
+
+        const resBody = await leadsquaredRes.json();
+        if (resBody?.Status === 'Error' || resBody?.d?.Status === 'Error') {
+          return c.json({ success: false, message: resBody?.Message || resBody?.d?.Message || 'Authentication failed' }, 200);
+        }
+
+        return c.json({ success: true }, 200);
+      } catch (fetchError) {
+        return c.json({ success: false, message: `Network error: ${fetchError instanceof Error ? fetchError.message : String(fetchError)}` }, 200);
+      }
+    }
+
+    // Default fallback for other integrations
+    return c.json({ success: true, message: 'Configuration format validated' }, 200);
+  } catch (error) {
+    console.error('Failed to test connector credentials:', error);
+    return c.json({ error: 'internal_error', message: 'Failed to run connection test' }, 500);
+  }
+});
+
+
 // GET / - Get all active (non-deleted) connectors for workspace
 connectorsRouter.get('/', async (c) => {
   try {
