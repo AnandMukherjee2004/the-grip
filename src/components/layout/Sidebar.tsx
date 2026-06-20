@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useOnboarding } from "@/context/OnboardingContext";
 import { getInitials } from "@/lib/profile-images";
@@ -104,16 +104,25 @@ interface SidebarProps {
 export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps) {
   const { connectedTools, workspaces, activeWorkspaceId, userProfileImage } = useOnboarding();
   const pathname = usePathname();
+  const router = useRouter();
   const { data: session } = useSession();
 
-  const [isOrgExpanded, setIsOrgExpanded] = useState(true);
-  const [activeTab, setActiveTab] = useState<string | null>(null);
   const [menuMode, setMenuMode] = useState<"main" | "org">("main");
+  const [prevRoute, setPrevRoute] = useState<string>("/dashboard");
+  const [activeTab, setActiveTab] = useState<string | null>(null);
 
+  // Sync activeTab from URL on route change
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       setActiveTab(params.get("tab"));
+    }
+  }, [pathname]);
+
+  // Auto-reset to main menu when navigating away from settings (e.g. browser back button)
+  useEffect(() => {
+    if (!pathname.startsWith("/dashboard/settings")) {
+      setMenuMode("main");
     }
   }, [pathname]);
 
@@ -310,10 +319,13 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                 <button
                   type="button"
                   onClick={() => {
+                    // Save current route so Back can return here
+                    setPrevRoute(pathname);
                     setMenuMode("org");
                     if (isCollapsed) {
                       onToggleCollapse();
                     }
+                    router.push("/dashboard/settings?tab=workspace");
                   }}
                   className={`w-full flex items-center gap-2.5 py-1 rounded-lg text-xs transition-all ${
                     pathname === "/dashboard/settings"
@@ -364,7 +376,10 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
           <div className="h-14 px-4 flex items-center border-b border-white/[0.04] shrink-0">
             <button
               type="button"
-              onClick={() => setMenuMode("main")}
+              onClick={() => {
+                setMenuMode("main");
+                router.push(prevRoute);
+              }}
               className="flex items-center gap-2 text-xs font-semibold text-white/50 hover:text-white cursor-pointer focus:outline-none transition-colors"
             >
               <span className="text-[10px] font-bold">&lt;</span>
