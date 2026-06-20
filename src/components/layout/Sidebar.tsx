@@ -287,30 +287,6 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                 </ul>
               </div>
 
-              {/* Section: Organization Trigger */}
-              <div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuMode("org");
-                    if (isCollapsed) {
-                      onToggleCollapse(); // Expand sidebar if collapsed
-                    }
-                  }}
-                  className={`w-full flex items-center justify-between text-xs font-semibold py-2 px-2.5 rounded-lg text-white/50 hover:text-white hover:bg-white/[0.02] cursor-pointer transition-all focus:outline-none ${
-                    isCollapsed ? "justify-center px-0" : ""
-                  }`}
-                  title="Organization"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <OrgIcon size={14} className="text-white/40" />
-                    {!isCollapsed && <span>Organization</span>}
-                  </div>
-                  {!isCollapsed && (
-                    <span className="text-[10px] text-white/30 font-bold">&gt;</span>
-                  )}
-                </button>
-              </div>
             </nav>
           </div>
 
@@ -331,17 +307,24 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                 </Link>
               </li>
               <li>
-                <Link
-                  href="/dashboard/settings"
-                  className={`flex items-center gap-2.5 py-1 rounded-lg text-xs transition-all ${pathname === "/dashboard/settings"
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuMode("org");
+                    if (isCollapsed) {
+                      onToggleCollapse();
+                    }
+                  }}
+                  className={`w-full flex items-center gap-2.5 py-1 rounded-lg text-xs transition-all ${
+                    pathname === "/dashboard/settings"
                       ? "text-white bg-white/[0.04] border border-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] font-semibold"
                       : "text-white/50 hover:text-white hover:bg-white/[0.02] border border-transparent font-medium"
-                    } ${isCollapsed ? "justify-center px-0" : "px-2.5"}`}
+                  } cursor-pointer focus:outline-none ${isCollapsed ? "justify-center px-0" : "px-2.5"}`}
                   title="Settings"
                 >
                   <SettingsIcon className={pathname === "/dashboard/settings" ? "text-white/70" : "text-white/40 group-hover:text-white/70"} size={14} />
                   {!isCollapsed && <span>Settings</span>}
-                </Link>
+                </button>
               </li>
             </ul>
 
