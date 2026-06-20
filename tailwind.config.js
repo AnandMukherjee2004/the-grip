@@ -48,9 +48,9 @@ module.exports = {
         "lg-indicator-active": "rgba(255, 255, 255, 0.09)",
       },
       fontFamily: {
-        sans: ["var(--font-geist)"],
-        display: ["var(--font-bricolage)"],
-        mono: ["var(--font-geist-mono)"],
+        sans: ["var(--font-instrument)", "var(--font-geist)", "system-ui", "sans-serif"],
+        display: ["var(--font-instrument-serif)", "var(--font-bricolage)", "Georgia", "serif"],
+        mono: ["var(--font-jetbrains)", "var(--font-geist-mono)", "monospace"],
       },
       transitionTimingFunction: {
         lg: "cubic-bezier(0.22, 1, 0.36, 1)",

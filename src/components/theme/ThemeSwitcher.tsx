@@ -37,7 +37,7 @@ export function ThemeSwitcher() {
     }
   };
 
-  if (!mounted || pathname.startsWith("/dashboard")) {
+  if (!mounted || pathname === "/" || pathname.startsWith("/dashboard")) {
     return null;
   }
 
