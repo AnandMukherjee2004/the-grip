@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense, useRef } from "react";
+import { useState, Suspense, useRef } from "react";
 import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation";
 import { useOnboarding } from "@/context/OnboardingContext";
@@ -62,19 +62,23 @@ function SettingsPageContent() {
 
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<TabId>("workspace");
-
-  useEffect(() => {
-    if (tabParam) {
-      setActiveTab(tabParam === "connections" ? "connectors" : (tabParam as TabId));
-    }
-  }, [tabParam]);
+  const activeTab: TabId = !tabParam
+    ? "workspace"
+    : tabParam === "connections"
+      ? "connectors"
+      : (tabParam as TabId);
 
   // Workspace state
   const [workspaceName, setWorkspaceName] = useState(activeWorkspace.name);
   const [workspaceSlug, setWorkspaceSlug] = useState(
     activeWorkspace.name.toLowerCase().replace(/\s+/g, "-")
   );
+  const syncedWorkspaceIdRef = useRef(activeWorkspaceId);
+  if (syncedWorkspaceIdRef.current !== activeWorkspaceId) {
+    syncedWorkspaceIdRef.current = activeWorkspaceId;
+    setWorkspaceName(activeWorkspace.name);
+    setWorkspaceSlug(activeWorkspace.name.toLowerCase().replace(/\s+/g, "-"));
+  }
   const [saving, setSaving] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [slackConnected, setSlackConnected] = useState(false);
@@ -97,11 +101,13 @@ function SettingsPageContent() {
       isYou: true,
     },
   ]);
-
-  useEffect(() => {
-    setWorkspaceName(activeWorkspace.name);
-    setWorkspaceSlug(activeWorkspace.name.toLowerCase().replace(/\s+/g, "-"));
-  }, [activeWorkspaceId, activeWorkspace.name]);
+  const [notificationPrefs, setNotificationPrefs] = useState({
+    syncFailures: true,
+    paymentFailures: true,
+    dailySummary: false,
+    weeklyReport: true,
+    inAppAlerts: true,
+  });
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -182,7 +188,7 @@ function SettingsPageContent() {
         <div className="max-w-2xl mx-auto px-6 py-10 space-y-10">
 
           {/* ─── GENERAL / WORKSPACE TAB ─── */}
-          {(activeTab === "workspace" || !activeTab) && (
+          {activeTab === "workspace" && (
             <div className="space-y-8">
               {/* Header */}
               <div className="space-y-1">
@@ -515,31 +521,33 @@ function SettingsPageContent() {
                 <p className="text-sm text-gray-500 font-medium">Preferences</p>
                 <div className="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden divide-y divide-gray-100">
                   {[
-                    { key: "syncFailures", title: "Integration sync failures", desc: "Notify when HubSpot, Shopify, or Razorpay drop sync.", default: true },
-                    { key: "paymentFailures", title: "Payment failures", desc: "Send critical transaction drop alerts.", default: true },
-                    { key: "dailySummary", title: "Daily analytics digest", desc: "Email metrics snapshots at the end of each day.", default: false },
-                    { key: "weeklyReport", title: "Weekly report", desc: "Email PDF overview breakdowns every Monday.", default: true },
-                    { key: "inAppAlerts", title: "In-app activity alerts", desc: "Real-time alerts in the top dashboard navigation bar.", default: true },
-                  ].map((pref) => {
-                    const [enabled, setEnabled] = useState(pref.default);
-                    return (
-                      <div key={pref.key} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
-                        <div className="space-y-0.5 pr-4">
-                          <div className="text-sm font-semibold text-gray-900">{pref.title}</div>
-                          <div className="text-xs text-gray-400">{pref.desc}</div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setEnabled(!enabled)}
-                          className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 focus:outline-none cursor-pointer flex items-center shrink-0 ${
-                            enabled ? "bg-gray-900 justify-end" : "bg-gray-200 justify-start"
-                          }`}
-                        >
-                          <span className="w-4 h-4 rounded-full bg-white shadow-sm" />
-                        </button>
+                    { key: "syncFailures" as const, title: "Integration sync failures", desc: "Notify when HubSpot, Shopify, or Razorpay drop sync." },
+                    { key: "paymentFailures" as const, title: "Payment failures", desc: "Send critical transaction drop alerts." },
+                    { key: "dailySummary" as const, title: "Daily analytics digest", desc: "Email metrics snapshots at the end of each day." },
+                    { key: "weeklyReport" as const, title: "Weekly report", desc: "Email PDF overview breakdowns every Monday." },
+                    { key: "inAppAlerts" as const, title: "In-app activity alerts", desc: "Real-time alerts in the top dashboard navigation bar." },
+                  ].map((pref) => (
+                    <div key={pref.key} className="p-4 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                      <div className="space-y-0.5 pr-4">
+                        <div className="text-sm font-semibold text-gray-900">{pref.title}</div>
+                        <div className="text-xs text-gray-400">{pref.desc}</div>
                       </div>
-                    );
-                  })}
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setNotificationPrefs((prev) => ({
+                            ...prev,
+                            [pref.key]: !prev[pref.key],
+                          }))
+                        }
+                        className={`w-9 h-5 rounded-full p-0.5 transition-colors duration-200 focus:outline-none cursor-pointer flex items-center shrink-0 ${
+                          notificationPrefs[pref.key] ? "bg-gray-900 justify-end" : "bg-gray-200 justify-start"
+                        }`}
+                      >
+                        <span className="w-4 h-4 rounded-full bg-white shadow-sm" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
