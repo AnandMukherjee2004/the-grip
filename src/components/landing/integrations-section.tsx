@@ -73,9 +73,8 @@ export function IntegrationsSection() {
           animation-play-state: paused;
         }
       `}} />
-
       <div className="max-w-[1440px] mx-auto px-8 lg:px-12">
-        {/* Header matching Mora aesthetics */}
+        {/* Header matching Grip aesthetics */}
         <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20 space-y-4">
           {/* Pill Badge */}
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-gray-200 bg-gray-50/50 text-[11px] font-medium text-gray-500 shadow-sm select-none">

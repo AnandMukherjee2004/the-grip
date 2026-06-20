@@ -80,6 +80,17 @@ export const CONNECTOR_REGISTRY = {
     ],
     capabilities: { webhooks: true, bidirectional: false },
     category: "communication"
+  },
+  salesforce: {
+    displayName: "Salesforce",
+    label: "Salesforce",
+    authMethod: "oauth2",
+    oauthScopes: [],
+    capabilities: { webhooks: true, bidirectional: false },
+    category: "crm",
+    description: "Sync leads and contacts from Salesforce CRM",
+    logo: "/assets/crm-logos/salesforce.svg",
+    credentialFields: []
   }
 } as const;
 
