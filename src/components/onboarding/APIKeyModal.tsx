@@ -4,6 +4,11 @@ import { useState } from "react";
 import { Tool } from "@/types/onboarding";
 import { getConnector } from "@/lib/connector-registry";
 import { ModalPortal } from "@/components/ui/ModalPortal";
+import {
+  authInputClass,
+  authLabelClass,
+  authPrimaryButtonClass,
+} from "@/components/auth/auth-styles";
 
 interface APIKeyModalProps {
   tool: Tool;
@@ -82,16 +87,11 @@ export function APIKeyModal({
     <ModalPortal>
       <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
         <div
-          className="fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm transition-opacity duration-300"
           onClick={!isLoading ? onClose : undefined}
         />
 
-        <div className="relative w-full max-w-md p-6 rounded-2xl bg-[#090911]/95 border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.8)] backdrop-blur-xl overflow-hidden transition-all duration-300 max-h-[90vh] overflow-y-auto">
-        {/* Glow Effects */}
-        <div className="absolute -top-20 -left-20 w-48 h-48 rounded-full bg-indigo-600/10 blur-[85px] pointer-events-none" />
-        <div className="absolute -bottom-20 -right-20 w-48 h-48 rounded-full bg-purple-600/10 blur-[85px] pointer-events-none" />
-
-        {/* Header */}
+        <div className="relative w-full max-w-md p-6 rounded-2xl bg-white border border-gray-100 shadow-[0_25px_60px_rgba(0,0,0,0.12)] overflow-hidden transition-all duration-300 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center gap-3.5 mb-5">
           {tool.logo ? (
             <img
@@ -100,15 +100,15 @@ export function APIKeyModal({
               className="h-8 w-auto max-w-[100px] object-contain"
             />
           ) : (
-            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-xl">
+            <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 border border-gray-200 text-xl">
               {tool.icon}
             </div>
           )}
           <div>
-            <h3 className="text-base font-bold text-white leading-tight">
+            <h3 className="text-base font-bold text-gray-900 leading-tight">
               Connect {tool.name}
             </h3>
-            <p className="text-white/40 text-[10px] uppercase tracking-wider font-semibold">
+            <p className="text-gray-500 text-[10px] uppercase tracking-wider font-semibold">
               {meta?.authMethod === "oauth2" ? "OAuth Authorization" : "API Credentials Setup"}
             </p>
           </div>
@@ -118,16 +118,16 @@ export function APIKeyModal({
         <form onSubmit={handleSubmit} className="space-y-4">
           {meta?.authMethod === "oauth2" ? (
             <div className="py-4 space-y-4">
-              <p className="text-white/60 text-xs text-center">
+              <p className="text-gray-500 text-xs text-center">
                 This connector uses OAuth 2.0 authentication. Click below to authorize read-only access.
               </p>
-              {error && <p className="text-xs text-rose-400 leading-normal text-center">{error}</p>}
-              <div className="flex gap-3 pt-3 border-t border-white/[0.04]">
+              {error && <p className="text-xs text-red-500 leading-normal text-center">{error}</p>}
+              <div className="flex gap-3 pt-3 border-t border-gray-100">
                 <button
                   type="button"
                   disabled={isLoading}
                   onClick={onClose}
-                  className="flex-1 h-11 rounded-lg border border-white/10 text-white/60 hover:text-white hover:bg-white/5 font-semibold text-xs transition-all active:scale-[0.99]"
+                  className="flex-1 h-11 rounded-full border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-semibold text-xs transition-all"
                 >
                   Cancel
                 </button>
@@ -135,7 +135,7 @@ export function APIKeyModal({
                   type="button"
                   disabled={isLoading}
                   onClick={() => handleOAuth(toolId)}
-                  className="flex-1 h-11 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-xs hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(124,58,237,0.2)]"
+                  className={`flex-1 ${authPrimaryButtonClass}`}
                 >
                   {isLoading ? (
                     <>
@@ -154,28 +154,25 @@ export function APIKeyModal({
           ) : (
             <>
               {meta?.credentialFields?.map((field) => (
-                <div key={field.key} className="space-y-1.5">
-                  <div className="flex justify-between items-center">
-                    <label htmlFor={field.key} className="text-[10px] font-bold text-white/60 uppercase tracking-wider">
-                      {field.label}
-                    </label>
-                  </div>
+                <div key={field.key}>
+                  <label htmlFor={field.key} className={authLabelClass}>
+                    {field.label}
+                  </label>
                   <input
                     id={field.key}
                     type={field.secret ? "password" : "text"}
                     value={values[field.key] || ""}
                     disabled={isLoading}
                     onChange={(e) => setValues(prev => ({ ...prev, [field.key]: e.target.value }))}
-                    className="w-full h-11 px-4 rounded-lg bg-black/40 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-white focus:ring-0 transition-all font-mono"
+                    className={`${authInputClass} font-mono`}
                     placeholder={(field as any).placeholder || `Enter ${field.label}`}
                   />
                 </div>
               ))}
 
-              {error && <p className="text-xs text-rose-400 leading-normal animate-fadeIn">{error}</p>}
+              {error && <p className="text-xs text-red-500 leading-normal">{error}</p>}
 
-              {/* Security Note */}
-              <div className="pt-2 flex items-start gap-2 text-white/40 text-[10px] leading-relaxed">
+              <div className="pt-2 flex items-start gap-2 text-gray-400 text-[10px] leading-relaxed">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5" aria-hidden>
                   <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
                   <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -183,20 +180,19 @@ export function APIKeyModal({
                 <span>Your credentials are encrypted and never stored in plaintext</span>
               </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-3 pt-3 border-t border-white/[0.04]">
+              <div className="flex gap-3 pt-3 border-t border-gray-100">
                 <button
                   type="button"
                   disabled={isLoading}
                   onClick={onClose}
-                  className="flex-1 h-11 rounded-lg border border-white/10 text-white/60 hover:text-white hover:bg-white/5 font-semibold text-xs transition-all active:scale-[0.99]"
+                  className="flex-1 h-11 rounded-full border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-semibold text-xs transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="flex-1 h-11 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-xs hover:opacity-95 active:scale-[0.99] transition-all flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(124,58,237,0.2)] disabled:opacity-50"
+                  className={`flex-1 ${authPrimaryButtonClass}`}
                 >
                   {isLoading ? (
                     <>

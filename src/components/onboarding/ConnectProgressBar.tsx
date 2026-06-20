@@ -15,25 +15,21 @@ export function ConnectProgressBar({
 
   let labelText = `${connectedCount} of ${totalCount} tools connected`;
   if (isNoneConnected) {
-    labelText = "Connect at least 1 tool to continue";
+    labelText = "Connect at least 2 tools to continue";
   } else if (isAllConnected) {
-    labelText = "All tools connected! 🎉";
+    labelText = "All tools connected!";
   }
 
   return (
-    <div className="w-full space-y-2.5 max-w-xl mx-auto select-none">
+    <div className="w-full space-y-2.5 select-none">
       <div className="flex justify-between items-center text-xs">
-        <span className="font-semibold text-white/70">
-          {labelText}
-        </span>
-        <span className="font-mono text-white/50">
-          {Math.round(percentage)}%
-        </span>
+        <span className="font-semibold text-gray-700">{labelText}</span>
+        <span className="font-mono text-gray-500">{Math.round(percentage)}%</span>
       </div>
 
-      <div className="w-full h-2.5 bg-white/5 rounded-full overflow-hidden border border-white/[0.03] p-[1px]">
+      <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden border border-gray-200 p-[1px]">
         <div
-          className="h-full rounded-full bg-[#1D9E75] shadow-[0_0_12px_rgba(29,158,117,0.4)] transition-all duration-500 ease-out"
+          className="h-full rounded-full bg-emerald-500 transition-all duration-500 ease-out"
           style={{ width: `${percentage}%` }}
         />
       </div>

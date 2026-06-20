@@ -16,7 +16,7 @@ export default function EmptyState({
   title,
   description,
   buttonText = "Connect Tool",
-  href = "/onboarding/connect",
+  href = "/dashboard/connectors",
   icon,
 }: EmptyStateProps) {
   const renderedIcon = icon || <PlugIcon size={28} className="text-white/60" />;

@@ -187,7 +187,7 @@ export function PricingSection() {
 
               {/* CTA Button */}
               <a
-                href="/onboarding"
+                href="/sign-up"
                 className={`w-full py-4 flex items-center justify-center gap-2 text-sm font-semibold transition-all group rounded-lg ${plan.popular
                   ? "bg-gray-900 !text-white hover:bg-gray-800"
                   : "border border-gray-200 text-gray-900 hover:border-gray-900 hover:bg-gray-50"

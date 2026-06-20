@@ -202,7 +202,7 @@ export default function ProfilePage() {
               <div className="pt-4 border-t border-white/10 flex items-center justify-between gap-4">
                 <button
                   type="button"
-                  onClick={() => signOut({ callbackUrl: "/onboarding?mode=signin" })}
+                  onClick={() => signOut({ callbackUrl: "/sign-in" })}
                   className="profile-sign-out-btn px-4 py-2 rounded-lg border border-rose-500/40 bg-rose-500/10 text-rose-400 text-xs font-semibold shadow-[0_4px_14px_rgba(244,63,94,0.18)] hover:bg-rose-500/20 hover:border-rose-500/55 hover:shadow-[0_6px_20px_rgba(244,63,94,0.28)] active:scale-95 transition-all cursor-pointer"
                 >
                   Sign out

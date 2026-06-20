@@ -10,6 +10,8 @@ import {
   onboardingLabelClass,
   onboardingSubmitClass,
 } from "@/components/onboarding/OnboardingStepShell";
+import { FieldError } from "@/components/auth/FieldError";
+import { authServerErrorClass } from "@/components/auth/auth-styles";
 import CustomSelect from "@/components/ui/CustomSelect";
 
 import { useOnboarding } from "@/context/OnboardingContext";
@@ -42,11 +44,6 @@ const TEAM_SIZES = [
   "200+",
 ] as const;
 
-function FieldError({ message }: { message?: string }) {
-  if (!message) return null;
-  return <p className="mt-1 text-xs text-rose-400">{message}</p>;
-}
-
 function SelectField({
   id,
   label,
@@ -66,7 +63,7 @@ function SelectField({
 }) {
   const selectOptions = options.map((opt) => ({ value: opt, label: opt }));
   return (
-    <div className="space-y-2">
+    <div>
       <label htmlFor={id} className={onboardingLabelClass}>
         {label}
       </label>
@@ -128,7 +125,7 @@ export default function OnboardingBusinessPage() {
     if (status === "loading") return;
 
     if (!session?.user?.id) {
-      router.push("/onboarding?mode=signin");
+      router.push("/sign-in");
       return;
     }
 
@@ -162,7 +159,7 @@ export default function OnboardingBusinessPage() {
         }
 
         if (response.status === 409) {
-          return false; // conflict, retry with suffix
+          return false;
         }
 
         throw new Error("API responded with an error");
@@ -175,7 +172,7 @@ export default function OnboardingBusinessPage() {
       const success = await callApi(baseSlug);
       if (success) {
         await update();
-        router.push("/onboarding/tools");
+        window.location.href = "/dashboard/connectors";
         return;
       }
 
@@ -184,7 +181,7 @@ export default function OnboardingBusinessPage() {
       const successFallback = await callApi(fallbackSlug);
       if (successFallback) {
         await update();
-        router.push("/onboarding/tools");
+        window.location.href = "/dashboard/connectors";
       } else {
         setGlobalError("Something went wrong, please try again");
         setIsLoading(false);
@@ -205,18 +202,15 @@ export default function OnboardingBusinessPage() {
     >
       <form onSubmit={handleSubmit} className="space-y-5" noValidate>
         {status === "loading" && (
-          <p className="text-xs text-white/40">Setting up your session...</p>
+          <p className="text-xs text-gray-400">Setting up your session...</p>
         )}
         {!sessionReady && status === "unauthenticated" && (
-          <p className="text-xs text-rose-400">Please sign in to continue.</p>
+          <p className="text-xs text-red-500">Please sign in to continue.</p>
         )}
-        {globalError && (
-          <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs font-medium">
-            ⚠️ {globalError}
-          </div>
-        )}
-        <div className="space-y-4 animate-fadeIn">
-          <div className="space-y-2">
+        {globalError && <div className={authServerErrorClass}>{globalError}</div>}
+
+        <div className="space-y-4">
+          <div>
             <label htmlFor="companyName" className={onboardingLabelClass}>
               Company Name
             </label>
@@ -255,7 +249,7 @@ export default function OnboardingBusinessPage() {
             error={errors.teamSize}
           />
 
-          <div className="space-y-2">
+          <div>
             <label htmlFor="website" className={onboardingLabelClass}>
               Company Website
             </label>
@@ -274,22 +268,20 @@ export default function OnboardingBusinessPage() {
           </div>
         </div>
 
-        <div className="flex gap-3 pt-3 border-t border-white/[0.04]">
-          <button
-            type="submit"
-            disabled={isLoading || status === "loading" || !sessionReady}
-            className={`${onboardingSubmitClass} disabled:opacity-50 disabled:pointer-events-none`}
-          >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <span className="w-3.5 h-3.5 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-                Processing...
-              </span>
-            ) : (
-              "Continue →"
-            )}
-          </button>
-        </div>
+        <button
+          type="submit"
+          disabled={isLoading || status === "loading" || !sessionReady}
+          className={onboardingSubmitClass}
+        >
+          {isLoading ? (
+            <>
+              <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+              Processing...
+            </>
+          ) : (
+            "Continue →"
+          )}
+        </button>
       </form>
     </OnboardingStepShell>
   );

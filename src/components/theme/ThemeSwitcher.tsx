@@ -37,7 +37,13 @@ export function ThemeSwitcher() {
     }
   };
 
-  if (!mounted || pathname === "/" || pathname.startsWith("/dashboard")) {
+  const hideOnPaths =
+    pathname === "/" ||
+    pathname.startsWith("/dashboard") ||
+    pathname === "/sign-in" ||
+    pathname === "/sign-up";
+
+  if (!mounted || hideOnPaths) {
     return null;
   }
 

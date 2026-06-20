@@ -70,7 +70,7 @@ export default function HeroSection() {
 
             <div className="flex items-center gap-3.5 mt-8">
               <Link
-                href="/onboarding"
+                href="/sign-up"
                 className="inline-flex items-center justify-center bg-gray-900 hover:bg-gray-800 !text-white font-medium rounded-full h-11 px-5 text-sm transition-all shadow-sm"
               >
                 Get started free
@@ -78,7 +78,7 @@ export default function HeroSection() {
 
               {/* Outline Book Demo CTA with Grip's stacked avatars */}
               <Link
-                href="/onboarding?mode=demo"
+                href="/sign-up"
                 className="inline-flex items-center justify-center bg-white border border-gray-200 hover:border-gray-300 hover:bg-gray-50 text-gray-800 font-medium rounded-full h-11 px-5 text-sm transition-all gap-2"
               >
                 <span>Book a demo</span>
