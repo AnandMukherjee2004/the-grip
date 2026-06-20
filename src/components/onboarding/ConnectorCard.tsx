@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { ConnectorConfig, ConnectorStatus } from "@/types/onboarding";
 import { TOOLS } from "@/lib/tools";
 import { APIKeyModal } from "./APIKeyModal";
@@ -14,6 +13,10 @@ interface ConnectorCardProps {
   onConnect: (toolId: string) => void;
   onSkip: (toolId: string) => void;
   onDisconnect?: (toolId: string) => void;
+  modalView: "choice" | "apikey" | null;
+  onOpenChoice: () => void;
+  onOpenApiKey: () => void;
+  onCloseModal: () => void;
 }
 
 export function ConnectorCard({
@@ -23,11 +26,11 @@ export function ConnectorCard({
   onConnect,
   onSkip,
   onDisconnect,
+  modalView,
+  onOpenChoice,
+  onOpenApiKey,
+  onCloseModal,
 }: ConnectorCardProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isChoiceModalOpen, setIsChoiceModalOpen] = useState(false);
-
-  // Find tool configuration from lib/tools.ts
   const tool = TOOLS.find((t) => t.id === toolId) || {
     id: toolId,
     name: toolId.charAt(0).toUpperCase() + toolId.slice(1).replace("-", " "),
@@ -51,18 +54,13 @@ export function ConnectorCard({
     }
   };
 
-  const handleConnectClick = () => {
-    setIsChoiceModalOpen(true);
-  };
-
   const handleSelectOAuth = () => {
-    setIsChoiceModalOpen(false);
+    onCloseModal();
     onConnect(toolId);
   };
 
   const handleSelectAPIKey = () => {
-    setIsChoiceModalOpen(false);
-    setIsModalOpen(true);
+    onOpenApiKey();
   };
 
   const handleModalSubmit = async (credentials: Record<string, string>) => {
@@ -91,12 +89,10 @@ export function ConnectorCard({
     onConnect(toolId);
   };
 
-  // Outer border and shadow styling based on state
   let cardStyles = "border-white/5 bg-[#0e0e1a]/40 shadow-none";
   if (status === "connected") {
     cardStyles = "border-[#1D9E75] bg-[#0c1514]/40 shadow-[0_0_20px_rgba(29,158,117,0.15)]";
   } else if (status === "connecting") {
-    // Ensure all connecting statuses pulse nicely
     cardStyles = "border-purple-500/50 bg-[#0e0e1a]/40 animate-pulse shadow-[0_0_15px_rgba(168,85,247,0.15)]";
   } else if (status === "error") {
     cardStyles = "border-rose-500/40 bg-[#140b0d]/40 shadow-[0_0_15px_rgba(244,63,94,0.1)]";
@@ -107,9 +103,8 @@ export function ConnectorCard({
   return (
     <>
       <div
-        className={`group relative flex flex-col justify-between p-5 rounded-xl border backdrop-blur-md transition-all duration-300 h-[210px] overflow-hidden select-none ${cardStyles}`}
+        className={`group relative flex flex-col justify-between p-5 rounded-xl border backdrop-blur-md transition-all duration-300 min-h-[210px] overflow-hidden select-none ${cardStyles}`}
       >
-        {/* Top Checkmark / Header Info */}
         <div className="flex justify-between items-start mb-2">
           {tool.logo ? (
             <img
@@ -132,7 +127,6 @@ export function ConnectorCard({
           )}
         </div>
 
-        {/* Info Area */}
         <div className="flex-grow">
           <div className="flex items-center gap-1.5 mb-1">
             <h3 className="text-white font-semibold text-sm tracking-tight">
@@ -154,14 +148,12 @@ export function ConnectorCard({
           </p>
         </div>
 
-        {/* Footer Area with Action State */}
         <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between h-8">
           <span className="text-[8px] font-bold tracking-wider uppercase px-1.5 py-0.5 rounded bg-white/5 text-white/40 border border-white/5">
             {getCategoryLabel(tool.category)}
           </span>
 
           <div className="flex items-center gap-3">
-            {/* IDLE state */}
             {status === "idle" && (
               <>
                 <button
@@ -173,7 +165,7 @@ export function ConnectorCard({
                 </button>
                 <button
                   type="button"
-                  onClick={handleConnectClick}
+                  onClick={onOpenChoice}
                   className="px-3 py-1.5 rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-bold text-[11px] hover:opacity-95 active:scale-[0.98] transition-all shadow-[0_0_12px_rgba(124,58,237,0.25)] flex items-center gap-1 cursor-pointer"
                 >
                   Connect {config.connectTime && <span className="opacity-60 text-[9px] font-normal">({config.connectTime})</span>}
@@ -181,7 +173,6 @@ export function ConnectorCard({
               </>
             )}
 
-            {/* CONNECTING state (displays spinner in card during handshake) */}
             {status === "connecting" && (
               <div className="flex items-center gap-1.5 text-xs text-purple-400 font-semibold">
                 <svg className="animate-spin h-3 w-3 text-purple-400" fill="none" viewBox="0 0 24 24">
@@ -192,7 +183,6 @@ export function ConnectorCard({
               </div>
             )}
 
-            {/* CONNECTED state */}
             {status === "connected" && onDisconnect && (
               <button
                 type="button"
@@ -203,13 +193,12 @@ export function ConnectorCard({
               </button>
             )}
 
-            {/* ERROR state */}
             {status === "error" && (
               <div className="flex items-center gap-2">
                 <span className="text-[9px] text-rose-400 font-medium">Failed</span>
                 <button
                   type="button"
-                  onClick={handleConnectClick}
+                  onClick={onOpenChoice}
                   className="px-2.5 py-1.2 rounded bg-rose-500/10 border border-rose-500/30 text-rose-300 font-bold text-[10px] hover:bg-rose-500/20 transition-all cursor-pointer"
                 >
                   Try Again
@@ -217,11 +206,10 @@ export function ConnectorCard({
               </div>
             )}
 
-            {/* SKIPPED state */}
             {status === "skipped" && (
               <button
                 type="button"
-                onClick={handleConnectClick}
+                onClick={onOpenChoice}
                 className="text-[10px] text-indigo-400 hover:text-indigo-300 transition-colors font-semibold cursor-pointer"
               >
                 Connect now
@@ -230,7 +218,6 @@ export function ConnectorCard({
           </div>
         </div>
 
-        {/* Error message slot */}
         {status === "error" && (
           <div className="absolute inset-x-0 bottom-0 bg-rose-950/80 border-t border-rose-900/50 px-5 py-1 text-center">
             <span className="text-[8px] text-rose-300 font-semibold">
@@ -240,26 +227,24 @@ export function ConnectorCard({
         )}
       </div>
 
-      {/* Auth Selection Modal */}
-      {isChoiceModalOpen && (
+      {modalView === "choice" && (
         <AuthMethodModal
           toolName={tool.name}
           toolLogo={tool.logo}
           toolIcon={tool.icon}
-          isOpen={isChoiceModalOpen}
-          onClose={() => setIsChoiceModalOpen(false)}
+          isOpen
+          onClose={onCloseModal}
           onSelectOAuth={handleSelectOAuth}
           onSelectAPIKey={handleSelectAPIKey}
         />
       )}
 
-      {/* API Key Modal */}
-      {isModalOpen && (
+      {modalView === "apikey" && (
         <APIKeyModal
           tool={tool}
           toolId={toolId}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen
+          onClose={onCloseModal}
           onSubmit={handleModalSubmit}
         />
       )}

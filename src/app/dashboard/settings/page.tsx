@@ -7,6 +7,8 @@ import CustomSelect from "@/components/ui/CustomSelect";
 import type { DateRangeSelection } from "@/lib/dateRange";
 import { InfoIcon, CheckCircleIcon, SettingsIcon } from "@/components/ui/Icons";
 import { useOnboarding } from "@/context/OnboardingContext";
+import { ImageUploadField } from "@/components/profile/ImageUploadField";
+import { getInitials } from "@/lib/profile-images";
 
 type TabId =
   | "workspace"
@@ -69,10 +71,11 @@ const RETENTION_OPTIONS = [
 ];
 
 export default function SettingsPage() {
-  const { workspaces, activeWorkspaceId, updateWorkspaceName } = useOnboarding();
+  const { workspaces, activeWorkspaceId, updateWorkspaceName, updateWorkspaceImage } = useOnboarding();
   const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId) || {
     id: "frido",
     name: "Frido",
+    imageUrl: null,
   };
 
   const [dateRange, setDateRange] = useState<DateRangeSelection>(DEFAULT_DATE_RANGE);
@@ -84,7 +87,6 @@ export default function SettingsPage() {
   const [currency, setCurrency] = useState("INR");
   const [timezone, setTimezone] = useState("IST");
   const [dateFormat, setDateFormat] = useState("DD/MM/YYYY");
-  const [logoFile, setLogoFile] = useState<string | null>(null);
 
   useEffect(() => {
     setWorkspaceName(activeWorkspace.name);
@@ -255,8 +257,9 @@ export default function SettingsPage() {
     }, 1500);
   };
 
-  const handleLogoUploadSim = () => {
-    setLogoFile("https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=80&h=80&fit=crop");
+  const handleLogoUpload = (dataUrl: string) => {
+    if (!activeWorkspaceId) return;
+    updateWorkspaceImage(activeWorkspaceId, dataUrl);
     triggerToast("Workspace logo uploaded successfully!");
   };
 
@@ -328,27 +331,20 @@ export default function SettingsPage() {
                     <p className="text-white/40 text-[11px]">Configure your workspace settings and user experience parameters.</p>
                   </div>
 
-                  {/* Logo upload row */}
-                  <div className="flex items-center gap-6 p-4 rounded-xl bg-white/5 border border-white/10">
-                    <div className="relative w-14 h-14 rounded-full border border-white/10 overflow-hidden bg-[#040409] flex items-center justify-center text-xs font-bold text-indigo-400">
-                      {logoFile ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={logoFile} alt="Logo" className="w-full h-full object-cover" />
-                      ) : (
-                        "GRIP"
-                      )}
-                    </div>
-                    <div className="space-y-1.5">
-                      <div className="text-xs font-semibold text-white">Workspace Logo</div>
-                      <button
-                        type="button"
-                        onClick={handleLogoUploadSim}
-                        className="px-2.5 py-1.5 rounded bg-white/5 border border-white/10 hover:border-white/20 text-[10px] text-white/70 hover:text-white font-semibold transition-all cursor-pointer"
-                      >
-                        Upload Image
-                      </button>
-                    </div>
-                  </div>
+                  <ImageUploadField
+                    label="Workspace Logo"
+                    description="Optional image shown next to your workspace name across the dashboard."
+                    imageUrl={activeWorkspace.imageUrl ?? null}
+                    fallbackLabel={getInitials(activeWorkspace.name)}
+                    optional
+                    previewClassName="w-14 h-14 rounded-full"
+                    onUpload={handleLogoUpload}
+                    onRemove={() => {
+                      if (!activeWorkspaceId) return;
+                      updateWorkspaceImage(activeWorkspaceId, null);
+                      triggerToast("Workspace logo removed.");
+                    }}
+                  />
 
                   {/* Workspace form grid */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

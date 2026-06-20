@@ -2,7 +2,6 @@
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useSearchParams } from "next/navigation";
 import {
   OnboardingStepShell,
@@ -12,6 +11,7 @@ import {
   onboardingSubmitClass,
 } from "@/components/onboarding/OnboardingStepShell";
 import { signUpAction, signInAction } from "@/app/actions/auth";
+import { persistWorkspaceIds } from "@/lib/workspace-session";
 
 type Mode = "signup" | "signin";
 
@@ -80,7 +80,6 @@ function getModeFromSearchParams(searchParams: ReturnType<typeof useSearchParams
 }
 
 function OnboardingPageInner() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>(() => getModeFromSearchParams(searchParams));
   const [showPassword, setShowPassword] = useState(false);
@@ -166,7 +165,7 @@ function OnboardingPageInner() {
       return;
     }
 
-    router.push("/onboarding/business");
+    window.location.href = "/onboarding/business";
   };
 
   const handleSignInSubmit = async (e: React.FormEvent) => {
@@ -187,7 +186,17 @@ function OnboardingPageInner() {
       return;
     }
 
-    router.push(result.redirect ?? "/dashboard");
+    if (result.orgId && result.workspaceId) {
+      persistWorkspaceIds(result.orgId, result.workspaceId);
+      if (result.workspaceName) {
+        localStorage.setItem(
+          "grip_workspaces",
+          JSON.stringify([{ id: result.workspaceId, name: result.workspaceName }]),
+        );
+      }
+    }
+
+    window.location.href = result.redirect ?? "/dashboard";
   };
 
   return (

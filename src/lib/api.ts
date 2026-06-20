@@ -84,11 +84,11 @@ export async function getWorkspace(workspaceId: string): Promise<{ id: string; n
   }
 }
 
-export async function getWorkspaceByUser(userId: string): Promise<{ orgId: string; workspaceId: string } | null> {
+export async function getWorkspaceByUser(userId: string): Promise<{ orgId: string; workspaceId: string; workspaceName?: string } | null> {
   try {
     const res = await fetch(`${API_URL}/api/v1/workspaces/by-user?userId=${userId}`, {
       headers: { Accept: "application/json" },
-      next: { revalidate: 0 },
+      cache: "no-store",
     });
 
     if (!res.ok) {
@@ -97,7 +97,11 @@ export async function getWorkspaceByUser(userId: string): Promise<{ orgId: strin
 
     const data = await res.json();
     if (data && data.orgId && data.workspaceId) {
-      return { orgId: data.orgId, workspaceId: data.workspaceId };
+      return {
+        orgId: data.orgId,
+        workspaceId: data.workspaceId,
+        workspaceName: data.workspaceName,
+      };
     }
 
     return null;

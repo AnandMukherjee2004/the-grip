@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Tool } from "@/types/onboarding";
 import { getConnector } from "@/lib/connector-registry";
+import { ModalPortal } from "@/components/ui/ModalPortal";
 
 interface APIKeyModalProps {
   tool: Tool;
@@ -78,15 +79,14 @@ export function APIKeyModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300" 
-        onClick={!isLoading ? onClose : undefined}
-      />
+    <ModalPortal>
+      <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+        <div
+          className="fixed inset-0 bg-black/70 backdrop-blur-md transition-opacity duration-300"
+          onClick={!isLoading ? onClose : undefined}
+        />
 
-      {/* Modal Content */}
-      <div className="relative w-full max-w-md p-6 rounded-2xl bg-[#090911]/95 border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.8)] backdrop-blur-xl overflow-hidden transition-all duration-300">
+        <div className="relative w-full max-w-md p-6 rounded-2xl bg-[#090911]/95 border border-white/10 shadow-[0_25px_60px_rgba(0,0,0,0.8)] backdrop-blur-xl overflow-hidden transition-all duration-300 max-h-[90vh] overflow-y-auto">
         {/* Glow Effects */}
         <div className="absolute -top-20 -left-20 w-48 h-48 rounded-full bg-indigo-600/10 blur-[85px] pointer-events-none" />
         <div className="absolute -bottom-20 -right-20 w-48 h-48 rounded-full bg-purple-600/10 blur-[85px] pointer-events-none" />
@@ -214,7 +214,8 @@ export function APIKeyModal({
             </>
           )}
         </form>
+        </div>
       </div>
-    </div>
+    </ModalPortal>
   );
 }

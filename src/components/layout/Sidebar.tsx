@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useOnboarding } from "@/context/OnboardingContext";
+import { getInitials } from "@/lib/profile-images";
 import {
   DashboardIcon,
   ReportsIcon,
@@ -23,24 +24,20 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps) {
-  const { connectedTools, workspaces, activeWorkspaceId } = useOnboarding();
+  const { connectedTools, workspaces, activeWorkspaceId, userProfileImage } = useOnboarding();
   const pathname = usePathname();
   const { data: session } = useSession();
 
-  // Mock value for failed payments
   const failedPaymentsCount = 3;
 
   const activeWorkspace = workspaces.find((w) => w.id === activeWorkspaceId) || {
     id: "",
     name: "...",
+    imageUrl: null,
   };
   const displayName = session?.user?.name ?? session?.user?.email ?? "Account";
-  const initials = displayName
-    .split(" ")
-    .map((w) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const initials = getInitials(displayName);
+  const workspaceInitials = getInitials(activeWorkspace.name);
 
   return (
     <aside
@@ -56,8 +53,13 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
         >
           {!isCollapsed && (
             <div className="flex items-center gap-2.5 min-w-0 flex-grow mr-2">
-              <div className="w-7 h-7 rounded-md bg-gradient-to-tr from-indigo-500 to-sky-500 border border-white/10 flex items-center justify-center text-[10px] font-bold text-white shadow-md shrink-0">
-                {activeWorkspace.name.substring(0, 2).toUpperCase()}
+              <div className="w-7 h-7 rounded-md border border-white/10 bg-gradient-to-tr from-indigo-500 to-sky-500 flex items-center justify-center text-[10px] font-bold text-white shadow-md shrink-0 overflow-hidden">
+                {activeWorkspace.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={activeWorkspace.imageUrl} alt={activeWorkspace.name} className="w-full h-full object-cover" />
+                ) : (
+                  workspaceInitials
+                )}
               </div>
               <div className="flex flex-col min-w-0">
                 <span className="font-semibold text-xs text-white/90 truncate font-sans leading-tight">
@@ -277,8 +279,13 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
             className={`flex items-center gap-3 rounded-xl transition-all hover:bg-white/[0.04] p-1.5 cursor-pointer ${pathname === "/dashboard/profile" ? "bg-white/[0.04]" : ""
               } ${isCollapsed ? "justify-center" : "px-2"}`}
           >
-            <div className="w-8 h-8 rounded-full border border-white/10 bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-400 shrink-0">
-              {initials}
+            <div className="w-8 h-8 rounded-full border border-white/10 bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-400 shrink-0 overflow-hidden">
+              {userProfileImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={userProfileImage} alt={displayName} className="w-full h-full object-cover" />
+              ) : (
+                initials
+              )}
             </div>
             {!isCollapsed && (
               <div className="flex flex-col min-w-0">

@@ -7,7 +7,33 @@ import { AuthError } from 'next-auth'
 import { Resend } from 'resend'
 import { signIn } from '@/auth'
 import { db } from '@/db/index'
-import { users, orgMembers, passwordResetTokens } from '@/db/schema'
+import { users, orgMembers, passwordResetTokens, workspaces, organizations } from '@/db/schema'
+
+async function getUserWorkspace(userId: string) {
+  const [row] = await db
+    .select({
+      orgId: orgMembers.orgId,
+      workspaceId: workspaces.id,
+      workspaceName: workspaces.name,
+    })
+    .from(orgMembers)
+    .innerJoin(organizations, eq(organizations.id, orgMembers.orgId))
+    .innerJoin(workspaces, eq(workspaces.orgId, organizations.id))
+    .where(
+      and(
+        or(
+          eq(orgMembers.userId, userId),
+          eq(orgMembers.clerkUserId, userId),
+        ),
+        isNull(organizations.deletedAt),
+        isNull(workspaces.deletedAt),
+      ),
+    )
+    .orderBy(workspaces.createdAt)
+    .limit(1)
+
+  return row ?? null
+}
 
 export async function signUpAction(data: {
   firstName: string
@@ -58,7 +84,13 @@ export async function signUpAction(data: {
 export async function signInAction(data: {
   email: string
   password: string
-}): Promise<{ redirect?: string; error?: string }> {
+}): Promise<{
+  redirect?: string
+  error?: string
+  orgId?: string
+  workspaceId?: string
+  workspaceName?: string
+}> {
   try {
     const result = await signIn('credentials', {
       email: data.email.toLowerCase(),
@@ -78,19 +110,15 @@ export async function signInAction(data: {
 
     if (!userRecord) return { error: 'Account not found.' }
 
-    const [membership] = await db
-      .select({ orgId: orgMembers.orgId })
-      .from(orgMembers)
-      .where(
-        or(
-          eq(orgMembers.userId, userRecord.id),
-          eq(orgMembers.clerkUserId, userRecord.id),
-        ),
-      )
-      .limit(1)
+    const workspace = await getUserWorkspace(userRecord.id)
 
-    if (membership) {
-      return { redirect: '/dashboard' }
+    if (workspace) {
+      return {
+        redirect: '/dashboard',
+        orgId: workspace.orgId,
+        workspaceId: workspace.workspaceId,
+        workspaceName: workspace.workspaceName,
+      }
     }
 
     return { redirect: '/onboarding/business' }
