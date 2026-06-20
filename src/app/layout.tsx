@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Geist, Geist_Mono, Instrument_Sans, Instrument_Serif } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import { ThemeScript } from "@/components/ThemeScript";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
@@ -22,6 +22,17 @@ const bricolage = Bricolage_Grotesque({
   weight: ["200", "300", "400", "500", "600", "700", "800"],
 });
 
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument",
+  subsets: ["latin"],
+});
+
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-instrument-serif",
+  subsets: ["latin"],
+  weight: "400",
+});
+
 export const metadata: Metadata = {
   title: "GRIP — Don't have grip on your System?",
   description:
@@ -38,7 +49,7 @@ export default function RootLayout({
       lang="en"
       data-theme="dark"
       data-theme-preference="dark"
-      className={`${geist.variable} ${geistMono.variable} ${bricolage.variable} h-full antialiased`}
+      className={`${geist.variable} ${geistMono.variable} ${bricolage.variable} ${instrumentSans.variable} ${instrumentSerif.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>
