@@ -22,7 +22,7 @@ const LOGO_MAP: Record<string, string> = {
   salesforce: "/assets/crm-logos/salesforce.svg",
 };
 
-export default function ConnectorsPage() {
+export default function ConnectorsPage({ embedded = false }: { embedded?: boolean }) {
   const {
     connectedTools,
     setConnectedTools,
@@ -251,10 +251,8 @@ export default function ConnectorsPage() {
     connectedTools.includes(tool.toolId)
   );
 
-  return (
-    <div className="flex-grow flex flex-col min-h-screen bg-[#fafafa] font-sans text-gray-900">
-      <main className="flex-grow p-12 lg:p-20 overflow-y-auto scrollbar-thin">
-        <div className="max-w-4xl mx-auto space-y-8">
+  const pageContent = (
+    <div className="space-y-8">
           {viewingToolId ? (
             /* ================= VIEW 5: VIEW / MANAGE ACTIVE CONNECTION ================= */
             <div className="space-y-6 animate-fadeIn">
@@ -731,17 +729,32 @@ export default function ConnectorsPage() {
           )}
 
         </div>
-      </main>
+  );
 
-      {/* Disconnect Confirmation Modal */}
-      {disconnectTool && (
-        <DisconnectModal
-          tool={disconnectTool}
-          isOpen={!!disconnectTool}
-          onClose={() => setDisconnectTool(null)}
-          onConfirm={handleDisconnectConfirm}
-        />
-      )}
+  const disconnectModal = disconnectTool ? (
+    <DisconnectModal
+      tool={disconnectTool}
+      isOpen={!!disconnectTool}
+      onClose={() => setDisconnectTool(null)}
+      onConfirm={handleDisconnectConfirm}
+    />
+  ) : null;
+
+  if (embedded) {
+    return (
+      <>
+        {pageContent}
+        {disconnectModal}
+      </>
+    );
+  }
+
+  return (
+    <div className="flex-grow flex flex-col min-h-screen bg-[#fafafa] font-sans text-gray-900">
+      <main className="flex-grow overflow-y-auto p-12 scrollbar-thin lg:p-20">
+        <div className="mx-auto max-w-4xl">{pageContent}</div>
+      </main>
+      {disconnectModal}
     </div>
   );
 }

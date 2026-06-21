@@ -347,8 +347,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
             {/* User profile */}
             <div className="space-y-1">
               <Link
-                href="/dashboard/profile"
-                className={`flex items-center gap-3 rounded-xl transition-all hover:bg-white/[0.04] p-1.5 cursor-pointer ${pathname === "/dashboard/profile" ? "bg-white/[0.04]" : ""
+                href="/dashboard/settings?tab=account"
+                className={`flex items-center gap-3 rounded-xl transition-all hover:bg-white/[0.04] p-1.5 cursor-pointer ${pathname.startsWith("/dashboard/settings") && settingsTab === "account" ? "bg-white/[0.04]" : ""
                   } ${isCollapsed ? "justify-center" : "px-2"}`}
               >
                 <div className="w-8 h-8 rounded-full border border-white/10 bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-400 shrink-0 overflow-hidden">
@@ -436,14 +436,14 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
               <ul>
                 <li>
                   <Link
-                    href="/dashboard/profile"
+                    href="/dashboard/settings?tab=account"
                     className={`flex items-center gap-2.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all ${
-                      pathname === "/dashboard/profile"
+                      settingsTab === "account"
                         ? "text-white bg-white/[0.04] border border-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] font-semibold"
                         : "text-white/50 hover:text-white hover:bg-white/[0.02] border border-transparent"
                     }`}
                   >
-                    <AccountIcon size={14} className={pathname === "/dashboard/profile" ? "text-white/70" : "text-white/40"} />
+                    <AccountIcon size={14} className={settingsTab === "account" ? "text-white/70" : "text-white/40"} />
                     <span>Account</span>
                   </Link>
                 </li>
@@ -461,6 +461,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                   { name: "Members", href: "/dashboard/settings?tab=members", icon: MembersIcon },
                   { name: "API keys", href: "/dashboard/settings?tab=api", icon: DatasourcesIcon, count: 2 },
                   { name: "Connectors", href: "/dashboard/settings?tab=connectors", icon: ConnectionsIcon, count: connectedTools.length > 0 ? connectedTools.length : undefined },
+                  { name: "Automations", href: "/dashboard/settings?tab=automations", icon: AutomationsIcon },
                   { name: "Knowledge", href: "/dashboard/settings?tab=knowledge", icon: KnowledgeIcon },
                   { name: "Privacy", href: "/dashboard/settings?tab=privacy", icon: PrivacyIcon },
                   { name: "Billing", href: "/dashboard/settings?tab=billing", icon: BillingIcon, external: true },
@@ -517,8 +518,8 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
               </div>
             )}
             <Link
-              href="/dashboard/profile"
-              className={`flex items-center gap-3 rounded-xl transition-all hover:bg-white/[0.04] p-1.5 cursor-pointer ${pathname === "/dashboard/profile" ? "bg-white/[0.04]" : ""
+              href="/dashboard/settings?tab=account"
+              className={`flex items-center gap-3 rounded-xl transition-all hover:bg-white/[0.04] p-1.5 cursor-pointer ${settingsTab === "account" || pathname === "/dashboard/profile" ? "bg-white/[0.04]" : ""
                 } ${isCollapsed ? "justify-center" : "px-2"}`}
             >
               <div className="w-8 h-8 rounded-full border border-white/10 bg-indigo-500/10 flex items-center justify-center text-xs font-bold text-indigo-400 shrink-0 overflow-hidden">
