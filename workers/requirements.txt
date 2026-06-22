@@ -2,3 +2,5 @@ httpx
 psycopg2-binary
 python-dotenv
 cryptography
+fastapi
+uvicorn

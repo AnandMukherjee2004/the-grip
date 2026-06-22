@@ -655,7 +655,7 @@ export default function ConnectorsPage({ embedded = false }: { embedded?: boolea
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Connectors</h1>
-                  <p className="text-gray-500 text-sm">Manage your third-party connectors.</p>
+                  <p className="text-gray-500 text-sm">Manage and monitor your third-party data connectors.</p>
                 </div>
                 <button
                   type="button"

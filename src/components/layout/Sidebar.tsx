@@ -481,11 +481,9 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                   { name: "General", href: "/dashboard/settings?tab=workspace", icon: GeneralIcon },
                   { name: "Members", href: "/dashboard/settings?tab=members", icon: MembersIcon },
                   { name: "Datasources", href: "/dashboard/settings?tab=datasources", icon: DatasourcesIcon },
-                  { name: "API keys", href: "/dashboard/settings?tab=api", icon: DatasourcesIcon, count: 2 },
-                  { name: "Connectors", href: "/dashboard/settings?tab=connectors", icon: ConnectionsIcon, count: connectedTools.length > 0 ? connectedTools.length : undefined },
+                  { name: "Connections", href: "/dashboard/settings?tab=connectors", icon: ConnectionsIcon, count: connectedTools.length > 0 ? connectedTools.length : undefined },
                   { name: "Automations", href: "/dashboard/settings?tab=automations", icon: AutomationsIcon },
                   { name: "Knowledge", href: "/dashboard/settings?tab=knowledge", icon: KnowledgeIcon },
-                  { name: "Privacy", href: "/dashboard/settings?tab=privacy", icon: PrivacyIcon },
                   { name: "Billing", href: "/dashboard/settings?tab=billing", icon: BillingIcon, external: true },
                 ].map((item) => {
                   const tabParam = item.href.includes("tab=") ? item.href.split("tab=")[1] : null;
