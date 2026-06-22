@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   ComposedChart,
   Bar,
@@ -47,6 +47,57 @@ const CustomDot = (props: any) => {
     </g>
   );
 };
+
+function PlatformFeatureCard({
+  children,
+  className = "",
+}: {
+  children: React.ReactNode;
+  className?: string;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [transform, setTransform] = useState(
+    "perspective(1200px) rotateX(0deg) rotateY(0deg) translateX(0px) translateY(0px) scale(1)"
+  );
+
+  const handleMouseMove = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
+    const card = cardRef.current;
+    if (!card) return;
+
+    const rect = card.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const moveX = ((x - centerX) / centerX) * 10;
+    const moveY = ((y - centerY) / centerY) * 10;
+    const rotateY = ((x - centerX) / centerX) * 4;
+    const rotateX = ((centerY - y) / centerY) * 4;
+
+    setTransform(
+      `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateX(${moveX}px) translateY(${moveY}px) scale(1.01)`
+    );
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setTransform(
+      "perspective(1200px) rotateX(0deg) rotateY(0deg) translateX(0px) translateY(0px) scale(1)"
+    );
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={`rounded-2xl border border-gray-200/90 bg-white p-6 md:p-8 lg:p-10 shadow-[0_8px_30px_rgba(15,23,42,0.06)] transition-[transform,box-shadow] duration-300 ease-out will-change-transform hover:shadow-[0_16px_40px_rgba(15,23,42,0.08)] ${className}`}
+      style={{ transform }}
+    >
+      {children}
+    </div>
+  );
+}
 
 export default function PlatformSection() {
   const [mounted, setMounted] = useState(false);
@@ -102,10 +153,10 @@ export default function PlatformSection() {
         </div>
 
         {/* 2-Column Mockup Area */}
-        <div className="grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-gray-150 border-t border-gray-200/80">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
           
           {/* Column 1: Unified Revenue View */}
-          <div className="py-12 md:py-16 md:pr-12 flex flex-col justify-between space-y-12 min-h-[440px]">
+          <PlatformFeatureCard className="flex flex-col justify-between space-y-12 min-h-[440px]">
             {/* Chart Mockup (No x padding, stretches full width) */}
             <div className="w-full flex flex-col relative select-none">
               
@@ -202,10 +253,10 @@ export default function PlatformSection() {
                 Unified revenue view so you see Razorpay payments, Shopify orders, and CRM deals in one chart — not three tabs.
               </p>
             </div>
-          </div>
+          </PlatformFeatureCard>
 
           {/* Column 2: Advanced Customization Controls */}
-          <div className="py-12 md:py-16 md:pl-12 flex flex-col justify-between space-y-12 min-h-[440px]">
+          <PlatformFeatureCard className="flex flex-col justify-between space-y-12 min-h-[440px]">
             {/* Card Widget Mockup */}
             <div className="w-full flex items-center justify-center">
               <div className="w-full max-w-[290px] border border-gray-200/80 rounded-2xl bg-white shadow-sm p-4 text-[11px] space-y-4">
@@ -290,7 +341,7 @@ export default function PlatformSection() {
                 with comprehensive controls to match your brand and tune colors, axes, labels and more.
               </p>
             </div>
-          </div>
+          </PlatformFeatureCard>
 
         </div>
       </div>

@@ -7,6 +7,9 @@ import { useOnboarding } from "@/context/OnboardingContext";
 import { getInitials } from "@/lib/profile-images";
 import { readImageFile } from "@/lib/profile-images";
 
+import { AccountSettingsTab } from "@/components/dashboard/settings/AccountSettingsTab";
+import { AutomationsSettingsTab } from "@/components/dashboard/settings/AutomationsSettingsTab";
+
 const ConnectorsPage = dynamic(() => import("../connectors/page"), {
   loading: () => (
     <div className="py-12 text-center text-sm text-gray-400">Loading connectors...</div>
@@ -14,9 +17,11 @@ const ConnectorsPage = dynamic(() => import("../connectors/page"), {
 });
 
 type TabId =
+  | "account"
   | "workspace"
   | "members"
   | "connectors"
+  | "automations"
   | "connections"
   | "team"
   | "billing"
@@ -186,6 +191,11 @@ function SettingsPageContent() {
       {/* Scrollable main content */}
       <main className="flex-grow overflow-y-auto scrollbar-thin">
         <div className="max-w-2xl mx-auto px-6 py-10 space-y-10">
+
+          {/* ─── ACCOUNT TAB ─── */}
+          {activeTab === "account" && (
+            <AccountSettingsTab onToast={triggerToast} />
+          )}
 
           {/* ─── GENERAL / WORKSPACE TAB ─── */}
           {activeTab === "workspace" && (
@@ -553,6 +563,9 @@ function SettingsPageContent() {
             </div>
           )}
 
+          {/* ─── AUTOMATIONS TAB ─── */}
+          {activeTab === "automations" && <AutomationsSettingsTab />}
+
           {/* ─── KNOWLEDGE TAB ─── */}
           {activeTab === "knowledge" && (
             <div className="space-y-8">
@@ -691,9 +704,7 @@ function SettingsPageContent() {
 
           {/* ─── CONNECTORS TAB ─── */}
           {(activeTab === "connectors" || activeTab === "connections") && (
-            <div className="relative -mx-6 -my-10 min-h-[600px]">
-              <ConnectorsPage />
-            </div>
+            <ConnectorsPage embedded />
           )}
 
           {/* ─── TEAM TAB (legacy redirect) ─── */}

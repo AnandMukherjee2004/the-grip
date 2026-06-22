@@ -7,14 +7,14 @@ const plans = [
     name: "Starter",
     description: "For founders just getting started",
     price: { monthly: 0, annual: 0 },
-    features: [
+    usage: [
       "2 connectors",
       "500 leads synced per month",
       "90-day data history",
       "1 workspace",
-      "Unified orders + leads view",
-      "Community support",
     ],
+    features: ["Unified orders + leads view", "Community support"],
+    featuresLabel: "Key features",
     cta: "Get started free",
     popular: false,
   },
@@ -22,16 +22,19 @@ const plans = [
     name: "Growth",
     description: "For growing Indian SMBs",
     price: { monthly: 1999, annual: 1666 },
-    features: [
+    usage: [
       "6 connectors",
       "Unlimited leads synced",
       "1-year data history",
       "3 workspaces",
+    ],
+    features: [
       "Pipeline tracking + attribution",
       "Meta Ads + Google Ads ROAS",
       "API access",
       "Email support",
     ],
+    featuresLabel: "All Starter features, plus",
     cta: "Start free trial",
     popular: true,
   },
@@ -39,20 +42,55 @@ const plans = [
     name: "Enterprise",
     description: "For teams scaling fast",
     price: { monthly: null, annual: null },
-    features: [
+    usage: [
       "All 14+ connectors",
       "Unlimited workspaces",
       "Unlimited data history",
+    ],
+    features: [
       "Multi-user with roles",
       "Custom pipeline stages",
       "White-label reports",
       "Priority support",
       "SLA guarantee",
     ],
+    featuresLabel: "All Growth features, plus",
     cta: "Talk to us",
     popular: false,
   },
 ];
+
+function CheckIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="w-4 h-4 text-gray-900 mt-0.5 shrink-0"
+    >
+      <polyline points="20 6 9 17 4 12" />
+    </svg>
+  );
+}
+
+function FeatureList({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-3">
+      {items.map((feature) => (
+        <li key={feature} className="flex items-start gap-3">
+          <CheckIcon />
+          <span className="text-sm text-gray-500 font-medium leading-snug">{feature}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 export function PricingSection() {
   const [isAnnual, setIsAnnual] = useState(true);
@@ -81,16 +119,16 @@ export function PricingSection() {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* Header */}
-        <div className="max-w-3xl mb-20">
-          <span className="font-mono text-xs tracking-widest text-gray-500 uppercase block mb-6">
+        <div className="mb-20 max-w-3xl">
+          <p className="mb-6 pl-2 text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">
             Pricing
-          </span>
-          <h2 className="text-5xl md:text-6xl lg:text-7xl tracking-tight text-gray-900 mb-6 font-normal">
+          </p>
+          <h2 className="mb-6 text-5xl font-normal tracking-tight text-gray-900 md:text-6xl lg:text-7xl leading-[1.05]">
             Simple, transparent
             <br />
             <span className="[-webkit-text-stroke:1px_#111111] text-transparent">pricing</span>
           </h2>
-          <p className="text-lg text-gray-500 max-w-xl">
+          <p className="max-w-xl text-lg text-gray-500">
             Start free and scale as you grow. No hidden fees, no surprises.
           </p>
         </div>
@@ -98,8 +136,9 @@ export function PricingSection() {
         {/* Billing Toggle */}
         <div className="flex items-center gap-4 mb-16 select-none">
           <span
-            className={`text-sm font-medium transition-colors ${!isAnnual ? "text-gray-900" : "text-gray-400"
-              }`}
+            className={`text-sm font-medium transition-colors ${
+              !isAnnual ? "text-gray-900" : "text-gray-400"
+            }`}
           >
             Monthly
           </span>
@@ -108,13 +147,15 @@ export function PricingSection() {
             className="relative w-14 h-7 bg-gray-100 rounded-full p-1 transition-colors hover:bg-gray-200/80"
           >
             <div
-              className={`w-5 h-5 bg-gray-900 rounded-full transition-transform duration-300 ${isAnnual ? "translate-x-7" : "translate-x-0"
-                }`}
+              className={`w-5 h-5 bg-gray-900 rounded-full transition-transform duration-300 ${
+                isAnnual ? "translate-x-7" : "translate-x-0"
+              }`}
             />
           </button>
           <span
-            className={`text-sm font-medium transition-colors ${isAnnual ? "text-gray-900" : "text-gray-400"
-              }`}
+            className={`text-sm font-medium transition-colors ${
+              isAnnual ? "text-gray-900" : "text-gray-400"
+            }`}
           >
             Annual
           </span>
@@ -125,47 +166,78 @@ export function PricingSection() {
           )}
         </div>
 
-        {/* Pricing Cards Grid */}
-        <div className="grid md:grid-cols-3 gap-px bg-gray-100 border border-gray-100">
-          {plans.map((plan, idx) => (
-            <div
-              key={plan.name}
-              className={`relative p-8 lg:p-12 bg-white ${plan.popular ? "md:-my-4 md:py-12 lg:py-16 border-2 border-gray-900 z-10 shadow-lg" : ""
+        {/* Pricing Cards — Glide-style separate bordered cards */}
+        <div className="grid md:grid-cols-3 gap-4 lg:gap-5 items-stretch">
+          {plans.map((plan) => {
+            const displayPrice =
+              plan.price.monthly !== null
+                ? isAnnual
+                  ? plan.price.annual
+                  : plan.price.monthly
+                : null;
+            const isFree = displayPrice === 0;
+
+            return (
+              <div
+                key={plan.name}
+                className={`relative flex flex-col h-full rounded-2xl border bg-white p-6 lg:p-8 ${
+                  plan.popular
+                    ? "border-gray-900 shadow-sm"
+                    : "border-gray-200"
                 }`}
-            >
-              {plan.popular && (
-                <span className="absolute -top-3 left-8 px-3 py-1 bg-gray-900 !text-white text-[10px] font-medium font-mono uppercase tracking-widest rounded-sm">
-                  Most Popular
-                </span>
-              )}
-
-              {/* Plan Header */}
-              <div className="mb-8">
-                <span className="font-mono text-xs text-gray-400 font-normal">
-                  {String(idx + 1).padStart(2, "0")}
-                </span>
-                <h3 className="text-3xl text-gray-900 mt-2 font-normal">{plan.name}</h3>
-                <p className="text-sm text-gray-500 mt-2 font-normal leading-relaxed">{plan.description}</p>
-              </div>
-
-              {/* Price */}
-              <div className="mb-8 pb-8 border-b border-gray-100">
-                {plan.price.monthly !== null ? (
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-5xl lg:text-6xl text-gray-900 font-semibold">
-                      ₹{isAnnual ? plan.price.annual : plan.price.monthly}
+              >
+                {plan.popular && (
+                  <>
+                    <div className="pointer-events-none absolute inset-x-0 top-0 h-28 rounded-t-2xl bg-gradient-to-b from-gray-50 to-transparent" />
+                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-gray-900 !text-white text-[10px] font-medium font-mono uppercase tracking-widest rounded-sm whitespace-nowrap z-10">
+                      Most Popular
                     </span>
-                    <span className="text-gray-400 text-sm font-medium">/month</span>
-                  </div>
-                ) : (
-                  <span className="text-4xl text-gray-900 font-semibold">Custom</span>
+                  </>
                 )}
-              </div>
 
-              {/* Features List */}
-              <ul className="space-y-4 mb-10">
-                {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-3">
+                <div className="relative flex flex-col flex-grow">
+                  {/* Plan header */}
+                  <div className="min-h-[5.5rem]">
+                    <h3 className="text-3xl text-gray-900 font-normal">{plan.name}</h3>
+                    <p className="text-sm text-gray-500 mt-2 font-normal leading-relaxed">
+                      {plan.description}
+                    </p>
+                  </div>
+
+                  {/* Price — fixed height keeps CTAs aligned across cards */}
+                  <div className="mt-8 mb-6 min-h-[8.5rem] flex flex-col justify-end">
+                    {displayPrice !== null ? (
+                      isFree ? (
+                        <span className="text-5xl lg:text-6xl text-gray-900 font-semibold leading-none">Free</span>
+                      ) : (
+                        <div>
+                          <p className="text-sm text-gray-500 font-medium mb-1">Starting at</p>
+                          <div className="flex items-baseline gap-2 flex-wrap">
+                            <span className="text-5xl lg:text-6xl text-gray-900 font-semibold leading-none">
+                              ₹{displayPrice}
+                            </span>
+                            <span className="text-gray-400 text-sm font-medium">per month</span>
+                          </div>
+                          <p className={`text-sm text-gray-400 font-medium mt-1 ${isAnnual ? "visible" : "invisible"}`}>
+                            billed yearly
+                          </p>
+                        </div>
+                      )
+                    ) : (
+                      <span className="text-4xl lg:text-5xl text-gray-900 font-semibold leading-none">Custom</span>
+                    )}
+                  </div>
+
+                  {/* CTA — above feature sections, Glide-style */}
+                  <a
+                    href="/sign-up"
+                    className={`mb-8 w-full py-3.5 flex items-center justify-center gap-2 text-sm font-semibold transition-all group rounded-lg ${
+                      plan.popular
+                        ? "bg-gray-900 !text-white hover:bg-gray-800"
+                        : "border border-gray-200 text-gray-900 hover:border-gray-900 hover:bg-gray-50"
+                    }`}
+                  >
+                    {plan.cta}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="16"
@@ -173,51 +245,40 @@ export function PricingSection() {
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
-                      strokeWidth="3"
+                      strokeWidth="2.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
-                      className="w-4 h-4 text-gray-900 mt-0.5 shrink-0"
+                      className="w-4 h-4 transition-transform group-hover:translate-x-1"
                     >
-                      <polyline points="20 6 9 17 4 12"></polyline>
+                      <line x1="5" y1="12" x2="19" y2="12" />
+                      <polyline points="12 5 19 12 12 19" />
                     </svg>
-                    <span className="text-sm text-gray-500 font-medium">{feature}</span>
-                  </li>
-                ))}
-              </ul>
+                  </a>
 
-              {/* CTA Button */}
-              <a
-                href="/sign-up"
-                className={`w-full py-4 flex items-center justify-center gap-2 text-sm font-semibold transition-all group rounded-lg ${plan.popular
-                  ? "bg-gray-900 !text-white hover:bg-gray-800"
-                  : "border border-gray-200 text-gray-900 hover:border-gray-900 hover:bg-gray-50"
-                  }`}
-              >
-                {plan.cta}
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                >
-                  <line x1="5" y1="12" x2="19" y2="12"></line>
-                  <polyline points="12 5 19 12 12 19"></polyline>
-                </svg>
-              </a>
-            </div>
-          ))}
+                  {/* Usage section */}
+                  <div className="space-y-3">
+                    <h4 className="text-sm font-semibold text-gray-900">Usage</h4>
+                    <FeatureList items={plan.usage} />
+                  </div>
+
+                  {/* Key features section */}
+                  <div className="mt-8 space-y-3">
+                    <h4 className="text-sm font-semibold text-gray-900">{plan.featuresLabel}</h4>
+                    <FeatureList items={plan.features} />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
 
         {/* Bottom Note */}
         <p className="mt-12 text-center text-sm text-gray-400 font-medium">
           All plans include automatic updates, HTTPS, and DDoS protection.{" "}
-          <a href="#" className="underline underline-offset-4 text-gray-500 hover:text-gray-900 transition-colors">
+          <a
+            href="#"
+            className="underline underline-offset-4 text-gray-500 hover:text-gray-900 transition-colors"
+          >
             Compare all features
           </a>
         </p>
