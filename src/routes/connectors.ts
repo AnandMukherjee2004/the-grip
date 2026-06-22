@@ -41,7 +41,7 @@ connectorsRouter.post('/', async (c) => {
       }
     }
 
-    let lsqHost: string | null = null;
+    let cleanHostToSave: string | null = null;
     if (toolId === 'leadsquared') {
       const accessKey = credentials.accessKey || credentials.access_key;
       const secretKey = credentials.secretKey || credentials.secret_key;
@@ -49,8 +49,16 @@ connectorsRouter.post('/', async (c) => {
         return c.json({ error: 'bad_request', message: 'Access Key and Secret Key are required for LeadSquared' }, 400);
       }
 
+      const host = credentials.host || credentials.lsq_host;
+      if (!host || !host.trim()) {
+        return c.json({ error: 'bad_request', message: 'Host URL is required for LeadSquared' }, 400);
+      }
+
+      const cleanHost = host.replace(/^https?:\/\//, '').replace(/\/$/, '');
+      cleanHostToSave = cleanHost;
+
       try {
-        const url = `https://api.leadsquared.com/v2/Authentication.svc/UserByAccessKey.Get?accessKey=${encodeURIComponent(accessKey)}&secretKey=${encodeURIComponent(secretKey)}`;
+        const url = `https://${cleanHost}/v2/Authentication.svc/UserByAccessKey.Get?accessKey=${encodeURIComponent(accessKey)}&secretKey=${encodeURIComponent(secretKey)}`;
         const leadsquaredRes = await fetch(url, {
           method: 'GET',
         });
@@ -65,7 +73,11 @@ connectorsRouter.post('/', async (c) => {
             const urls = resBody?.LSQCommonServiceURLs || resBody?.d?.LSQCommonServiceURLs;
             const apiVal = urls?.api;
             if (typeof apiVal === 'string' && apiVal.trim()) {
-              lsqHost = apiVal.trim();
+              const lsqHost = apiVal.trim();
+              const cleanLsqHost = lsqHost.replace(/^https?:\/\//, '').replace(/\/$/, '');
+              if (cleanLsqHost !== cleanHost) {
+                return c.json({ error: 'bad_request', message: `Host does not match your LeadSquared account region. Expected: ${lsqHost}` }, 400);
+              }
             } else {
               console.warn('LSQCommonServiceURLs.api not found in LeadSquared response:', JSON.stringify(resBody));
             }
@@ -100,14 +112,14 @@ connectorsRouter.post('/', async (c) => {
       .limit(1);
 
     let capabilitiesToSave: any = undefined;
-    if (toolId === 'leadsquared' && lsqHost) {
+    if (toolId === 'leadsquared' && cleanHostToSave) {
       const existingCapabilities = existing.length > 0
         ? (existing[0].capabilities || {})
         : (meta.capabilities || {});
 
       capabilitiesToSave = {
         ...(typeof existingCapabilities === 'object' ? existingCapabilities : {}),
-        lsq_host: lsqHost
+        lsq_host: cleanHostToSave
       };
     }
 
@@ -218,8 +230,15 @@ connectorsRouter.post('/test', async (c) => {
         return c.json({ success: false, message: 'Access Key and Secret Key are required for LeadSquared' }, 200);
       }
 
+      const host = credentials.host || credentials.lsq_host;
+      if (!host || !host.trim()) {
+        return c.json({ error: 'bad_request', message: 'Host URL is required for LeadSquared' }, 400);
+      }
+
+      const cleanHost = host.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
       try {
-        const url = `https://api.leadsquared.com/v2/Authentication.svc/UserByAccessKey.Get?accessKey=${encodeURIComponent(accessKey)}&secretKey=${encodeURIComponent(secretKey)}`;
+        const url = `https://${cleanHost}/v2/Authentication.svc/UserByAccessKey.Get?accessKey=${encodeURIComponent(accessKey)}&secretKey=${encodeURIComponent(secretKey)}`;
         const leadsquaredRes = await fetch(url, {
           method: 'GET',
         });
@@ -231,6 +250,16 @@ connectorsRouter.post('/test', async (c) => {
         const resBody = await leadsquaredRes.json();
         if (resBody?.Status === 'Error' || resBody?.d?.Status === 'Error') {
           return c.json({ success: false, message: resBody?.Message || resBody?.d?.Message || 'Authentication failed' }, 200);
+        }
+
+        const urls = resBody?.LSQCommonServiceURLs || resBody?.d?.LSQCommonServiceURLs;
+        const apiVal = urls?.api;
+        if (typeof apiVal === 'string' && apiVal.trim()) {
+          const lsqHost = apiVal.trim();
+          const cleanLsqHost = lsqHost.replace(/^https?:\/\//, '').replace(/\/$/, '');
+          if (cleanLsqHost !== cleanHost) {
+            return c.json({ error: 'bad_request', message: `Host does not match your LeadSquared account region. Expected: ${lsqHost}` }, 400);
+          }
         }
 
         return c.json({ success: true }, 200);
