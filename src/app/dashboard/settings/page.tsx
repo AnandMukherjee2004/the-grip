@@ -29,7 +29,8 @@ type TabId =
   | "privacy"
   | "knowledge"
   | "api"
-  | "danger";
+  | "danger"
+  | "datasources";
 
 interface Member {
   id: string;
@@ -56,6 +57,14 @@ const SlackLogo = () => (
     <path d="M0 34.249a5.381 5.381 0 0 0 5.376 5.386 5.381 5.381 0 0 0 5.376-5.386v-5.387H5.376A5.381 5.381 0 0 0 0 34.249m14.336 0v14.364A5.381 5.381 0 0 0 19.712 54a5.381 5.381 0 0 0 5.376-5.387V34.249a5.381 5.381 0 0 0-5.376-5.387 5.381 5.381 0 0 0-5.376 5.387" fill="#E01E5A"/>
   </svg>
 );
+
+const DATASOURCE_TYPES = [
+  { id: "postgresql", name: "PostgreSQL", description: "Open-source relational database.", logo: <img src="/assets/datasource-logos/postgresql.svg" alt="PostgreSQL" className="w-8 h-8 object-contain shrink-0" /> },
+  { id: "mysql", name: "MySQL", description: "Popular open-source relational database.", logo: <img src="/assets/datasource-logos/mysql.svg" alt="MySQL" className="w-8 h-8 object-contain shrink-0" /> },
+  { id: "bigquery", name: "BigQuery", description: "Google's serverless, highly scalable data warehouse.", logo: <img src="/assets/datasource-logos/bigquery.svg" alt="BigQuery" className="w-8 h-8 object-contain shrink-0" /> },
+  { id: "clickhouse", name: "ClickHouse", description: "Column-oriented database for real-time analytics.", logo: <img src="/assets/datasource-logos/clickhouse.svg" alt="ClickHouse" className="w-8 h-8 object-contain shrink-0" /> },
+  { id: "redshift", name: "Redshift", description: "Fast, simple, cost-effective data warehousing.", logo: <img src="/assets/datasource-logos/redshift.svg" alt="Redshift" className="w-8 h-8 object-contain shrink-0" /> }
+];
 
 function SettingsPageContent() {
   const { workspaces, activeWorkspaceId, updateWorkspaceName, updateWorkspaceImage } = useOnboarding();
@@ -113,6 +122,14 @@ function SettingsPageContent() {
     weeklyReport: true,
     inAppAlerts: true,
   });
+
+  // Datasources state
+  const [datasources, setDatasources] = useState<Array<{ id: string; name: string; type: string }>>([]);
+  const [isAddingDatasource, setIsAddingDatasource] = useState(false);
+  const [selectedDatasourceType, setSelectedDatasourceType] = useState<string | null>(null);
+  const [datasourceName, setDatasourceName] = useState("");
+  const [datasourceSearch, setDatasourceSearch] = useState("");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const triggerToast = (msg: string) => {
     setToastMessage(msg);
@@ -577,6 +594,255 @@ function SettingsPageContent() {
                 Nothing here yet.
               </div>
             </div>
+          )}
+
+          {/* ─── DATASOURCES TAB ─── */}
+          {activeTab === "datasources" && (
+            isAddingDatasource ? (
+              <div className="space-y-6 animate-fadeIn">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Add datasource</h1>
+                    <p className="text-gray-500 text-sm">Connect a new data source to start querying your data.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsAddingDatasource(false);
+                      setSelectedDatasourceType(null);
+                      setDatasourceName("");
+                      setDatasourceSearch("");
+                      setIsDropdownOpen(false);
+                    }}
+                    className="text-sm font-semibold text-gray-500 hover:text-gray-900 transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span className="text-xs">&lt;</span> Back
+                  </button>
+                </div>
+
+                {/* Form Card */}
+                <div className="border border-gray-200 rounded-[20px] bg-white shadow-sm p-6 lg:p-8 space-y-8 relative">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                    
+                    {/* Left Column: Datasource type */}
+                    <div className="space-y-2 relative">
+                      <label className="text-sm font-medium text-gray-700">Datasource type</label>
+                      
+                      {/* Select Dropdown Button */}
+                      <button
+                        type="button"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        className="w-full flex items-center justify-between px-3.5 h-10 bg-white border border-gray-200 rounded-lg text-sm text-gray-700 hover:border-gray-300 transition-colors text-left focus:outline-none"
+                      >
+                        {selectedDatasourceType ? (
+                          <div className="flex items-center gap-2">
+                            {DATASOURCE_TYPES.find(d => d.id === selectedDatasourceType)?.logo}
+                            <span className="font-medium text-gray-900">
+                              {DATASOURCE_TYPES.find(d => d.id === selectedDatasourceType)?.name}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="text-gray-400">Select type</span>
+                        )}
+                        <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                        </svg>
+                      </button>
+
+                      {/* Dropdown Menu */}
+                      {isDropdownOpen && (
+                        <div className="absolute top-full left-0 w-full mt-1.5 bg-white border border-gray-200 rounded-xl shadow-lg z-50 p-2 space-y-2 max-h-[300px] overflow-y-auto">
+                          {/* Search bar inside dropdown */}
+                          <div className="relative p-1">
+                            <svg className="absolute left-3 top-3.5 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.637 10.637z" />
+                            </svg>
+                            <input
+                              type="text"
+                              placeholder="Search datasources..."
+                              value={datasourceSearch}
+                              onChange={(e) => setDatasourceSearch(e.target.value)}
+                              onClick={(e) => e.stopPropagation()}
+                              className="w-full pl-8 pr-3 h-8 bg-gray-50 border border-gray-150 rounded-lg text-xs placeholder-gray-400 text-gray-900 focus:outline-none focus:bg-white focus:border-gray-300 transition-all"
+                            />
+                          </div>
+
+                          {/* Options List */}
+                          <div className="space-y-0.5">
+                            {DATASOURCE_TYPES.filter(d => 
+                              d.name.toLowerCase().includes(datasourceSearch.toLowerCase())
+                            ).map((db) => (
+                              <button
+                                key={db.id}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedDatasourceType(db.id);
+                                  setIsDropdownOpen(false);
+                                  if (!datasourceName) {
+                                    setDatasourceName(db.name);
+                                  }
+                                }}
+                                className="flex items-center gap-3 w-full p-2.5 rounded-lg hover:bg-gray-50 text-left transition-colors cursor-pointer"
+                              >
+                                {db.logo}
+                                <div className="space-y-0.5 min-w-0">
+                                  <div className="text-xs font-semibold text-gray-800">{db.name}</div>
+                                  <div className="text-[10px] text-gray-400 truncate">{db.description}</div>
+                                </div>
+                              </button>
+                            ))}
+                            {DATASOURCE_TYPES.filter(d => 
+                              d.name.toLowerCase().includes(datasourceSearch.toLowerCase())
+                            ).length === 0 && (
+                              <div className="py-6 text-center text-xs text-gray-400">No datasources found</div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Right Column: Datasource name */}
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-gray-700">Datasource name</label>
+                      <input
+                        type="text"
+                        placeholder="Frido DB"
+                        value={datasourceName}
+                        onChange={(e) => setDatasourceName(e.target.value)}
+                        className="w-full h-10 px-3.5 rounded-lg text-sm bg-white border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-400 transition-all"
+                      />
+                      <p className="text-xs text-gray-400">Name your datasource in Mora.</p>
+                    </div>
+
+                  </div>
+
+                  {/* Form Footer Action Row */}
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-100">
+                    <button
+                      type="button"
+                      disabled={!selectedDatasourceType || !datasourceName.trim()}
+                      onClick={() => {
+                        triggerToast("Connection test successful!");
+                      }}
+                      className="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-xl text-xs font-semibold text-gray-500 hover:text-gray-700 disabled:opacity-50 disabled:hover:bg-white transition-colors cursor-pointer"
+                    >
+                      Test connection
+                    </button>
+                    <div className="flex gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsAddingDatasource(false);
+                          setSelectedDatasourceType(null);
+                          setDatasourceName("");
+                        }}
+                        className="px-4 py-2 hover:bg-gray-50 rounded-xl text-xs font-semibold text-gray-600 transition-colors cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!selectedDatasourceType || !datasourceName.trim()}
+                        onClick={() => {
+                          if (!selectedDatasourceType) return;
+                          const newDb = {
+                            id: Date.now().toString(),
+                            name: datasourceName,
+                            type: selectedDatasourceType
+                          };
+                          setDatasources([...datasources, newDb]);
+                          setIsAddingDatasource(false);
+                          setSelectedDatasourceType(null);
+                          setDatasourceName("");
+                          triggerToast("Datasource added successfully!");
+                        }}
+                        className="px-4 py-2 bg-gray-900 hover:bg-gray-800 disabled:bg-gray-400 text-white rounded-xl text-xs font-semibold shadow-sm transition-all active:scale-95 cursor-pointer disabled:pointer-events-none"
+                      >
+                        Add datasource
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Let us know footer link */}
+                <div className="text-center pt-6 text-xs text-gray-400 font-medium">
+                  Need something specific? <a href="#" className="underline hover:text-gray-600 transition-colors">Let us know</a>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-8 animate-fadeIn">
+                {/* Header */}
+                <div className="flex items-center justify-between">
+                  <div className="space-y-1">
+                    <h1 className="text-2xl font-semibold tracking-tight text-gray-900">Datasources</h1>
+                    <p className="text-gray-500 text-sm">Configure and manage your data sources.</p>
+                  </div>
+                  <div className="flex gap-2.5">
+                    <button
+                      type="button"
+                      className="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-xl text-xs font-semibold text-gray-700 bg-white flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                    >
+                      <span className="text-gray-400">✦</span>
+                      Create managed warehouse
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddingDatasource(true)}
+                      className="px-4 py-2 border border-gray-200 hover:bg-gray-50 rounded-xl text-xs font-semibold text-gray-700 bg-white flex items-center gap-1.5 shadow-sm transition-colors cursor-pointer"
+                    >
+                      <span className="text-gray-400">+</span>
+                      Add datasource
+                    </button>
+                  </div>
+                </div>
+
+                {/* Main area */}
+                <div className="space-y-3">
+                  <p className="text-sm text-gray-500 font-medium">Manage datasources</p>
+                  {datasources.length > 0 ? (
+                    <div className="bg-white border border-gray-200 rounded-[20px] shadow-sm overflow-hidden divide-y divide-gray-150">
+                      {datasources.map((db) => (
+                        <div key={db.id} className="p-5 flex items-center justify-between hover:bg-gray-50/50 transition-colors">
+                          <div className="flex items-center gap-4">
+                            {DATASOURCE_TYPES.find(d => d.id === db.type)?.logo}
+                            <div className="space-y-0.5">
+                              <div className="text-sm font-semibold text-gray-900">{db.name}</div>
+                              <div className="text-xs text-gray-400 capitalize">{db.type} Database</div>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setDatasources(datasources.filter((d) => d.id !== db.id));
+                              triggerToast(`Datasource "${db.name}" deleted.`);
+                            }}
+                            className="text-xs text-red-500 hover:text-red-700 font-semibold transition-colors cursor-pointer"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border border-gray-200 rounded-[20px] bg-white shadow-sm p-12 py-20 min-h-[400px] flex flex-col items-center justify-center text-center">
+                      <h3 className="text-base font-semibold text-gray-900">No datasource configured</h3>
+                      <p className="text-sm text-gray-500 mt-1.5 mb-6 max-w-sm">
+                        Add a datasource to start querying your data.
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => setIsAddingDatasource(true)}
+                        className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-xl text-sm font-semibold transition-all shadow-md cursor-pointer flex items-center gap-1.5"
+                      >
+                        <span className="text-white">+</span>
+                        Add datasource
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )
           )}
 
           {/* ─── PRIVACY TAB ─── */}
