@@ -410,7 +410,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
             </div>
 
             {/* Back button below workspace header */}
-            {!isCollapsed && (
+            {!isCollapsed ? (
               <div className="px-4 py-3 border-b border-white/[0.04] shrink-0">
                 <button
                   type="button"
@@ -424,27 +424,46 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                   <span>Back</span>
                 </button>
               </div>
+            ) : (
+              <div className="px-2 py-2 border-b border-white/[0.04] shrink-0 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuMode("main");
+                    router.push(prevRoute);
+                  }}
+                  className="w-9 h-9 flex items-center justify-center rounded-lg text-white/50 hover:text-white hover:bg-white/[0.04] transition-colors cursor-pointer focus:outline-none"
+                  title="Back"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <polyline points="15 18 9 12 15 6" />
+                  </svg>
+                </button>
+              </div>
             )}
 
             {/* Nav Links */}
             <nav className={`flex-grow overflow-y-auto space-y-5 scrollbar-none ${isCollapsed ? "p-2" : "p-4"}`}>
             {/* Personal Section */}
             <div className="space-y-1.5">
-              <div className="text-[10px] uppercase tracking-widest text-white/30 font-semibold px-2.5">
-                Personal
-              </div>
+              {!isCollapsed && (
+                <div className="text-[10px] uppercase tracking-widest text-white/30 font-semibold px-2.5">
+                  Personal
+                </div>
+              )}
               <ul>
                 <li>
                   <Link
                     href="/dashboard/settings?tab=account"
-                    className={`flex items-center gap-2.5 py-1.5 px-2.5 rounded-lg text-xs font-medium transition-all ${
+                    title="Account"
+                    className={`flex items-center gap-2.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                       settingsTab === "account"
                         ? "text-white bg-white/[0.04] border border-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] font-semibold"
                         : "text-white/50 hover:text-white hover:bg-white/[0.02] border border-transparent"
-                    }`}
+                    } ${isCollapsed ? "justify-center px-0 py-2" : "px-2.5"}`}
                   >
                     <AccountIcon size={14} className={settingsTab === "account" ? "text-white/70" : "text-white/40"} />
-                    <span>Account</span>
+                    {!isCollapsed && <span>Account</span>}
                   </Link>
                 </li>
               </ul>
@@ -452,9 +471,11 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
 
             {/* Organization Section */}
             <div className="space-y-1.5">
-              <div className="text-[10px] uppercase tracking-widest text-white/30 font-semibold px-2.5">
-                Organization
-              </div>
+              {!isCollapsed && (
+                <div className="text-[10px] uppercase tracking-widest text-white/30 font-semibold px-2.5">
+                  Organization
+                </div>
+              )}
               <ul className="space-y-1">
                 {[
                   { name: "General", href: "/dashboard/settings?tab=workspace", icon: GeneralIcon },
@@ -476,24 +497,27 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }: SidebarProps)
                     <li key={item.name}>
                       <Link
                         href={item.href}
-                        className={`flex items-center justify-between py-1.5 px-2.5 rounded-lg text-xs transition-all ${
+                        title={item.name}
+                        className={`flex items-center rounded-lg text-xs transition-all ${
                           isActive
                             ? "text-white bg-white/[0.04] border border-white/[0.02] shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] font-semibold"
                             : "text-white/50 hover:text-white hover:bg-white/[0.02] border border-transparent font-medium"
-                        }`}
+                        } ${isCollapsed ? "justify-center px-0 py-2" : "justify-between py-1.5 px-2.5"}`}
                       >
-                        <div className="flex items-center gap-2.5">
+                        <div className={`flex items-center gap-2.5 ${isCollapsed ? "justify-center" : ""}`}>
                           <Icon size={14} className={isActive ? "text-white/70" : "text-white/40"} />
-                          <span>{item.name}</span>
+                          {!isCollapsed && <span>{item.name}</span>}
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          {item.count !== undefined && (
-                            <span className="sidebar-count">{item.count}</span>
-                          )}
-                          {item.external && (
-                            <span className="text-[10px] text-white/30">↗</span>
-                          )}
-                        </div>
+                        {!isCollapsed && (
+                          <div className="flex items-center gap-1.5">
+                            {item.count !== undefined && (
+                              <span className="sidebar-count">{item.count}</span>
+                            )}
+                            {item.external && (
+                              <span className="text-[10px] text-white/30">↗</span>
+                            )}
+                          </div>
+                        )}
                       </Link>
                     </li>
                   );
