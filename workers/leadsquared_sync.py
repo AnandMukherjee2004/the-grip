@@ -6,6 +6,7 @@ import httpx
 import psycopg2
 from dotenv import load_dotenv
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from datetime import datetime, timedelta
 
 # Load environment variables
 load_dotenv()
@@ -48,42 +49,31 @@ def parse_lead_property_list(lead: dict) -> dict:
             
     return flat
 
-def main():
-    if len(sys.argv) < 2:
-        print("Usage: python leadsquared_sync.py <connectorId>")
-        sys.exit(1)
-        
-    connector_id = sys.argv[1]
-    
-    # 1. Fetch credentials and configuration from database
-    db_url = os.getenv("DATABASE_URL")
+def run_sync(connector_id: str, workspace_id: str, db_conn, pipeline_run_id: str = None) -> dict:
+    """
+    Runs the LeadSquared sync logic and returns records_synced and records_failed.
+    """
     encryption_key = os.getenv("CREDENTIALS_ENCRYPTION_KEY")
-    
-    if not db_url:
-        print("Error: DATABASE_URL environment variable is missing")
-        sys.exit(1)
     if not encryption_key:
-        print("Error: CREDENTIALS_ENCRYPTION_KEY environment variable is missing")
-        sys.exit(1)
+        raise ValueError("CREDENTIALS_ENCRYPTION_KEY environment variable is missing")
         
-    try:
-        conn = psycopg2.connect(db_url)
-        cur = conn.cursor()
-    except Exception as e:
-        print(f"Error connecting to database: {e}")
-        sys.exit(1)
-        
+    cur = db_conn.cursor()
+    
     try:
         cur.execute(
-            "SELECT workspace_id, credentials_enc_b64, capabilities FROM connectors WHERE id = %s",
+            "SELECT credentials_enc_b64, capabilities, last_synced_at FROM connectors WHERE id = %s",
             (connector_id,)
         )
         row = cur.fetchone()
         if not row:
-            print(f"Error: Connector {connector_id} not found.")
-            sys.exit(1)
+            raise ValueError(f"Connector {connector_id} not found.")
             
-        workspace_id, credentials_enc_b64, capabilities = row
+        credentials_enc_b64, capabilities, last_synced_at = row
+        
+        if last_synced_at is not None:
+            lookup_value = last_synced_at.strftime("%Y-%m-%d %H:%M:%S")
+        else:
+            lookup_value = (datetime.now() - timedelta(days=100)).strftime("%Y-%m-%d %H:%M:%S")
         
         # Parse capabilities JSON
         if isinstance(capabilities, str):
@@ -93,22 +83,15 @@ def main():
             
         lsq_host = capabilities.get("lsq_host")
         if not lsq_host:
-            print(f"Error: No lsq_host mapped in capabilities for connector {connector_id}.")
-            sys.exit(1)
+            raise ValueError(f"No lsq_host mapped in capabilities for connector {connector_id}.")
             
         # 2. Decrypt credentials
-        try:
-            credentials = decrypt_credentials(credentials_enc_b64, encryption_key)
-        except Exception as e:
-            print(f"Error decrypting credentials: {e}")
-            sys.exit(1)
-            
+        credentials = decrypt_credentials(credentials_enc_b64, encryption_key)
         access_key = credentials.get("accessKey") or credentials.get("access_key")
         secret_key = credentials.get("secretKey") or credentials.get("secret_key")
         
         if not access_key or not secret_key:
-            print("Error: Decrypted credentials do not contain accessKey or secretKey.")
-            sys.exit(1)
+            raise ValueError("Decrypted credentials do not contain accessKey or secretKey.")
             
         # 3. Paginate LeadSquared Leads
         # Clean host (strip scheme if present)
@@ -117,17 +100,17 @@ def main():
         
         page_index = 1
         page_size = 50
-        total_fetched = 0
         inserted_count = 0
         updated_count = 0
+        records_failed = 0
         
-        print(f"Starting sync from LeadSquared via {host}...")
+        print(f"Starting sync from LeadSquared via {host} with CreatedOn > {lookup_value}...")
         
         while True:
             payload = {
                 "Parameter": {
                     "LookupName": "CreatedOn",
-                    "LookupValue": "1970-01-01 00:00:00",
+                    "LookupValue": lookup_value,
                     "SqlOperator": ">"
                 },
                 "Columns": {
@@ -148,23 +131,18 @@ def main():
                 "secretKey": secret_key
             }
             
-            try:
-                resp = httpx.post(url, params=params, json=payload, timeout=60.0)
-                if resp.status_code != 200:
-                    print(f"Error: LeadSquared API returned {resp.status_code}: {resp.text}")
-                    sys.exit(1)
-                    
-                data = resp.json()
-            except Exception as e:
-                print(f"Error calling LeadSquared API: {e}")
-                sys.exit(1)
+            resp = httpx.post(url, params=params, json=payload, timeout=60.0)
+            if resp.status_code != 200:
+                raise ValueError(f"LeadSquared API returned {resp.status_code}: {resp.text}")
                 
+            data = resp.json()
             if isinstance(data, list):
                 leads = data
             elif isinstance(data, dict):
                 leads = data.get("Leads", data.get("RecordList", []))
             else:
                 leads = []
+                
             if not leads:
                 break
                 
@@ -226,6 +204,7 @@ def main():
                 """
                 
                 try:
+                    cur.execute("SAVEPOINT lead_upsert")
                     cur.execute(upsert_query, (
                         workspace_id,
                         connector_id,
@@ -241,26 +220,60 @@ def main():
                         inserted_count += 1
                     else:
                         updated_count += 1
+                    cur.execute("RELEASE SAVEPOINT lead_upsert")
                 except Exception as e:
                     print(f"Error upserting lead {external_id}: {e}")
-                    conn.rollback()
-                    sys.exit(1)
+                    try:
+                        cur.execute("ROLLBACK TO SAVEPOINT lead_upsert")
+                    except Exception:
+                        pass
+                    records_failed += 1
                     
-            conn.commit()
-            total_fetched += len(leads)
+            db_conn.commit()
             print(f"Processed page {page_index} ({len(leads)} leads)...")
-            
-            break
-                
             page_index += 1
             
-        print("\n--- Sync Summary ---")
-        print(f"Leads fetched:  {total_fetched}")
-        print(f"Leads inserted: {inserted_count}")
-        print(f"Leads updated:  {updated_count}")
-        
+        return {
+            "records_synced": inserted_count + updated_count,
+            "records_failed": records_failed
+        }
     finally:
         cur.close()
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: python leadsquared_sync.py <connectorId>")
+        sys.exit(1)
+        
+    connector_id = sys.argv[1]
+    
+    # 1. Fetch credentials and configuration from database
+    db_url = os.getenv("DATABASE_URL")
+    
+    if not db_url:
+        print("Error: DATABASE_URL environment variable is missing")
+        sys.exit(1)
+        
+    try:
+        conn = psycopg2.connect(db_url)
+    except Exception as e:
+        print(f"Error connecting to database: {e}")
+        sys.exit(1)
+        
+    try:
+        # Get workspace_id
+        cur = conn.cursor()
+        cur.execute("SELECT workspace_id FROM connectors WHERE id = %s", (connector_id,))
+        row = cur.fetchone()
+        if not row:
+            print(f"Error: Connector {connector_id} not found.")
+            sys.exit(1)
+        workspace_id = row[0]
+        cur.close()
+
+        res = run_sync(connector_id, workspace_id, conn)
+        print(f"Sync finished: {res}")
+    finally:
         conn.close()
 
 if __name__ == "__main__":
