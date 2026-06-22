@@ -1,10 +1,13 @@
 import os
+import sys
 import psycopg2
 import traceback
 from fastapi import FastAPI, Header, HTTPException, BackgroundTasks, status
 from pydantic import BaseModel
 from dotenv import load_dotenv
 from leadsquared_sync import run_sync
+
+sys.stdout.reconfigure(line_buffering=True)
 
 # Load environment variables
 load_dotenv()

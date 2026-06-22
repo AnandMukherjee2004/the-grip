@@ -1,12 +1,15 @@
 import sys
 import os
 import json
+import sys
 import base64
 import httpx
 import psycopg2
 from dotenv import load_dotenv
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from datetime import datetime, timedelta
+
+sys.stdout.reconfigure(line_buffering=True)
 
 # Load environment variables
 load_dotenv()
