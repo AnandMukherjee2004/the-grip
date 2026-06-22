@@ -76,7 +76,7 @@ def run_sync(connector_id: str, workspace_id: str, db_conn, pipeline_run_id: str
         if last_synced_at is not None:
             lookup_value = last_synced_at.strftime("%Y-%m-%d %H:%M:%S")
         else:
-            lookup_value = (datetime.now() - timedelta(days=30)).strftime("%Y-%m-%d %H:%M:%S")
+            lookup_value = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
         
         # Parse capabilities JSON
         if isinstance(capabilities, str):
