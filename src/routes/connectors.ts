@@ -230,7 +230,7 @@ connectorsRouter.post('/test', async (c) => {
         return c.json({ success: false, message: 'Access Key and Secret Key are required for LeadSquared' }, 200);
       }
 
-      const host = credentials.host || credentials.lsq_host;
+      const host = credentials.host_url || credentials.host || credentials.lsq_host;
       if (!host || !host.trim()) {
         return c.json({ error: 'bad_request', message: 'Host URL is required for LeadSquared' }, 400);
       }
