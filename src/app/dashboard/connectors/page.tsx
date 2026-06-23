@@ -253,9 +253,8 @@ export default function ConnectorsPage({ embedded = false }: { embedded?: boolea
       const connector = data.connectors.find((c: any) => c.toolId === viewingToolId);
       if (!connector) throw new Error("Connector not found");
 
-      const syncRes = await fetch(`${API_URL}/api/v1/sync/${connector.id}`, {
+      const syncRes = await fetch(`/api/sync/${connector.id}`, {
         method: "POST",
-        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
