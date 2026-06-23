@@ -117,7 +117,7 @@ def run_sync(connector_id: str, workspace_id: str, db_conn, pipeline_run_id: str
                     "SqlOperator": ">"
                 },
                 "Columns": {
-                    "Include_CSV": "ProspectID,FirstName,LastName,EmailAddress,Phone,TotalSales,mx_TotalSales,LeadStatus,Status,CreatedOn"
+                    "Include_CSV": "ProspectID,FirstName,LastName,EmailAddress,Phone,TotalSales,mx_TotalSales,ProspectStage,CreatedOn"
                 },
                 "Sorting": {
                     "ColumnName": "CreatedOn",
@@ -176,7 +176,7 @@ def run_sync(connector_id: str, workspace_id: str, db_conn, pipeline_run_id: str
                             pass
                             
                 # Stage Raw mapping
-                stage_raw = lead.get("LeadStatus") or lead.get("Status") or lead.get("StatusCode") or None
+                stage_raw = lead.get("ProspectStage") or None
                 
                 # Upsert into unified_leads
                 upsert_query = """
