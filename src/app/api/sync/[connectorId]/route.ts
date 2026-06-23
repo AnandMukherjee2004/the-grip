@@ -6,6 +6,7 @@ export async function POST(
   { params }: { params: Promise<{ connectorId: string }> }
 ) {
   const session = await auth();
+  console.log("Session debug:", JSON.stringify(session));
   if (!session || !session.user || !session.user.id) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
