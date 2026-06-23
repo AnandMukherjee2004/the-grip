@@ -4,6 +4,7 @@ import connectorsRouter from './connectors';
 import workspacesRouter from './workspaces';
 import pipelineRunsRouter from './pipeline-runs';
 import syncRouter from './sync';
+import leadsRouter from './leads';
 
 const apiRouter = new Hono();
 
@@ -22,4 +23,8 @@ apiRouter.route('/api/v1/pipeline-runs', pipelineRunsRouter);
 // Mount sync router under /api/v1/sync -> will map to /api/v1/sync/:connectorId
 apiRouter.route('/api/v1/sync', syncRouter);
 
+// Mount leads router under /api/v1/leads
+apiRouter.route('/api/v1/leads', leadsRouter);
+
 export default apiRouter;
+
