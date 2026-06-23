@@ -12,31 +12,40 @@ syncRoute.post('/:connectorId', async (c) => {
   try {
     const connectorId = c.req.param('connectorId');
 
-    // 1. Authenticate user session from request cookies
-    const sessionToken = getCookie(c, '__Secure-next-auth.session-token') || getCookie(c, 'next-auth.session-token');
-    if (!sessionToken) {
-      return c.json({ error: 'unauthorized', message: 'Unauthorized: No active session' }, 401);
-    }
+    let userId: string;
 
-    let decoded;
-    try {
-      decoded = await decode({
-        token: sessionToken,
-        secret: process.env.AUTH_SECRET!,
-        salt: getCookie(c, '__Secure-next-auth.session-token')
-          ? '__Secure-next-auth.session-token'
-          : 'next-auth.session-token',
-      });
-    } catch (e) {
-      console.error('Failed to decode next-auth session token:', e);
-      return c.json({ error: 'unauthorized', message: 'Unauthorized: Invalid session token' }, 401);
-    }
+    const xUserId = c.req.header('x-user-id');
+    const xInternalSecret = c.req.header('x-internal-secret');
 
-    if (!decoded || !(decoded as any).id) {
-      return c.json({ error: 'unauthorized', message: 'Unauthorized: User ID not found in session' }, 401);
-    }
+    if (xUserId && xInternalSecret && xInternalSecret === process.env.INTERNAL_SECRET) {
+      userId = xUserId;
+    } else {
+      // 1. Authenticate user session from request cookies
+      const sessionToken = getCookie(c, '__Secure-next-auth.session-token') || getCookie(c, 'next-auth.session-token');
+      if (!sessionToken) {
+        return c.json({ error: 'unauthorized', message: 'Unauthorized: No active session' }, 401);
+      }
 
-    const userId = (decoded as any).id as string;
+      let decoded;
+      try {
+        decoded = await decode({
+          token: sessionToken,
+          secret: process.env.AUTH_SECRET!,
+          salt: getCookie(c, '__Secure-next-auth.session-token')
+            ? '__Secure-next-auth.session-token'
+            : 'next-auth.session-token',
+        });
+      } catch (e) {
+        console.error('Failed to decode next-auth session token:', e);
+        return c.json({ error: 'unauthorized', message: 'Unauthorized: Invalid session token' }, 401);
+      }
+
+      if (!decoded || !(decoded as any).id) {
+        return c.json({ error: 'unauthorized', message: 'Unauthorized: User ID not found in session' }, 401);
+      }
+
+      userId = (decoded as any).id as string;
+    }
 
     // 2. Query database for the connector
     const [connector] = await db
