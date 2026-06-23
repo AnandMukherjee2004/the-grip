@@ -7,7 +7,9 @@ import httpx
 import psycopg2
 from dotenv import load_dotenv
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
+
+IST = timezone(timedelta(hours=5, minutes=30))
 
 sys.stdout.reconfigure(line_buffering=True)
 
@@ -74,9 +76,9 @@ def run_sync(connector_id: str, workspace_id: str, db_conn, pipeline_run_id: str
         credentials_enc_b64, capabilities, last_synced_at = row
         
         if last_synced_at is not None:
-            lookup_value = last_synced_at.strftime("%Y-%m-%d %H:%M:%S")
+            lookup_value = (last_synced_at.replace(tzinfo=timezone.utc) - timedelta(minutes=5)).astimezone(IST).strftime("%Y-%m-%d %H:%M:%S")
         else:
-            lookup_value = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d %H:%M:%S")
+            lookup_value = (datetime.now(timezone.utc) - timedelta(days=1)).astimezone(IST).strftime("%Y-%m-%d %H:%M:%S")
         
         # Parse capabilities JSON
         if isinstance(capabilities, str):
@@ -178,6 +180,10 @@ def run_sync(connector_id: str, workspace_id: str, db_conn, pipeline_run_id: str
                 # Stage Raw mapping
                 stage_raw = lead.get("ProspectStage") or None
                 
+                # Sourced At parsing
+                sourced_at_str = lead.get("CreatedOn")
+                sourced_at = datetime.strptime(sourced_at_str, "%Y-%m-%d %H:%M:%S.%f").replace(tzinfo=IST).astimezone(timezone.utc) if sourced_at_str else None
+                
                 # Upsert into unified_leads
                 upsert_query = """
                 INSERT INTO unified_leads (
@@ -190,10 +196,11 @@ def run_sync(connector_id: str, workspace_id: str, db_conn, pipeline_run_id: str
                     phone,
                     deal_value_inr,
                     stage_raw,
+                    sourced_at,
                     created_at,
                     updated_at
                 ) VALUES (
-                    %s, %s, 'leadsquared', %s, %s, %s, %s, %s, %s, NOW(), NOW()
+                    %s, %s, 'leadsquared', %s, %s, %s, %s, %s, %s, %s, NOW(), NOW()
                 )
                 ON CONFLICT (workspace_id, source_tool, external_id) DO UPDATE SET
                     connector_id = EXCLUDED.connector_id,
@@ -202,6 +209,7 @@ def run_sync(connector_id: str, workspace_id: str, db_conn, pipeline_run_id: str
                     phone = EXCLUDED.phone,
                     deal_value_inr = EXCLUDED.deal_value_inr,
                     stage_raw = EXCLUDED.stage_raw,
+                    sourced_at = EXCLUDED.sourced_at,
                     updated_at = NOW()
                 RETURNING (xmax = 0) AS inserted;
                 """
@@ -216,7 +224,8 @@ def run_sync(connector_id: str, workspace_id: str, db_conn, pipeline_run_id: str
                         email,
                         phone,
                         deal_value_inr,
-                        stage_raw
+                        stage_raw,
+                        sourced_at
                     ))
                     inserted = cur.fetchone()[0]
                     if inserted:
