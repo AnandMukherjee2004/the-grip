@@ -3,14 +3,14 @@ import { auth } from "@/auth";
 
 export async function POST(
   req: Request,
-  { params }: { params: { connectorId: string } }
+  { params }: { params: Promise<{ connectorId: string }> }
 ) {
   const session = await auth();
   if (!session || !session.user || !session.user.id) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
-  const { connectorId } = params;
+  const { connectorId } = await params;
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
   const internalSecret = process.env.INTERNAL_SECRET || "";
 
