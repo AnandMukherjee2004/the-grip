@@ -222,6 +222,7 @@ export const unifiedLeads = pgTable('unified_leads', {
   stageId: uuid('stage_id').references(() => pipelineStages.id, { onDelete: 'set null' }),
   stageRaw: varchar('stage_raw', { length: 100 }),   // original CRM label
   stageUpdatedAt: timestamp('stage_updated_at'),           // for funnel velocity
+  sourcedAt: timestamp('sourced_at'), // original creation time in the source CRM
   // Source identity
   sourceTool: varchar('source_tool', { length: 100 }).notNull(),
   externalId: varchar('external_id', { length: 255 }).notNull(),
