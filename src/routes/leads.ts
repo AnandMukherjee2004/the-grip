@@ -106,18 +106,14 @@ leadsRouter.get('/stats', async (c) => {
     
     const totalLeads = Number(totalResult?.count || 0);
 
-    // 2. New This Month (createdAt >= start of current month)
-    const startOfMonth = new Date();
-    startOfMonth.setDate(1);
-    startOfMonth.setHours(0, 0, 0, 0);
-
+    // 2. New This Month (sourced_at in current month, UTC)
     const [newResult] = await db
       .select({ count: sql<number>`count(*)` })
       .from(unifiedLeads)
       .where(
         and(
           eq(unifiedLeads.workspaceId, workspaceId),
-          gte(unifiedLeads.createdAt, startOfMonth)
+          sql`sourced_at >= date_trunc('month', now() AT TIME ZONE 'UTC') AND sourced_at < date_trunc('month', now() AT TIME ZONE 'UTC') + interval '1 month'`
         )
       );
 
