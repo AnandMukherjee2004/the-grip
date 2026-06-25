@@ -124,7 +124,7 @@ export default function PlatformSection() {
       ref={sectionRef}
       className="bg-white pt-24 pb-12 border-t border-gray-150 font-sans relative overflow-hidden opacity-0 translate-y-8 transition-all duration-1000 ease-out"
     >
-      <div className="max-w-[1440px] mx-auto px-8 lg:px-12 w-full space-y-16">
+      <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12 w-full space-y-16">
         
         {/* Header Section */}
         <div className="flex flex-col items-center text-center space-y-4">

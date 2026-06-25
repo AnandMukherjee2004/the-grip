@@ -30,7 +30,7 @@ export default function HeroSection() {
       <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-indigo-50/20 rounded-full blur-[130px] pointer-events-none -z-10" />
       <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-sky-50/15 rounded-full blur-[110px] pointer-events-none -z-10" />
 
-      <div className="max-w-[1440px] mx-auto px-8 lg:px-12 w-full">
+      <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12 w-full">
         {/* The Split Hero Layout replicating Grip.com */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-start">
           

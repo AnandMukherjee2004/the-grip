@@ -45,8 +45,8 @@ export default function Navbar() {
       <nav 
         className={`mx-auto transition-all duration-500 ${
           isScrolled || isMenuOpen
-            ? "bg-white/80 backdrop-blur-xl border border-gray-150 rounded-2xl shadow-lg max-w-[1200px]"
-            : "bg-transparent max-w-[1400px]"
+            ? "bg-white/80 backdrop-blur-xl border border-gray-150 rounded-2xl shadow-lg max-w-7xl"
+            : "bg-transparent max-w-7xl"
         }`}
       >
         <div 

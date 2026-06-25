@@ -1,11 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Image from "next/image";
-import { CirclePlay, LayoutDashboard } from "lucide-react";
 import { ContainerScroll } from "@/components/ui/container-scroll-animation";
-
-type Tab = "demo" | "dashboard";
 
 const LIVE_ACTIVITIES = [
   {
@@ -69,34 +66,6 @@ function ShowcaseFrame({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ShowcaseDemoContent() {
-  return (
-    <ShowcaseFrame>
-      <div className="relative flex h-full min-h-[22rem] items-center justify-center bg-slate-950">
-        <Image
-          src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1400&q=80"
-          alt="Analytics dashboard preview"
-          fill
-          className="object-cover object-center opacity-30"
-          draggable={false}
-          priority
-        />
-        <div className="relative z-10 flex flex-col items-center justify-center space-y-4 p-8 text-center">
-          <div className="group flex h-16 w-16 cursor-pointer items-center justify-center rounded-full border border-white/20 bg-white/10 shadow-2xl backdrop-blur-md transition-all duration-300 hover:bg-white/20">
-            <CirclePlay className="h-8 w-8 text-white transition-transform group-hover:scale-110" />
-          </div>
-          <span className="text-sm font-semibold tracking-wide text-white/90">
-            Watch GRIP Platform Demo
-          </span>
-          <span className="max-w-xs text-xs leading-relaxed text-white/40">
-            Learn how GRIP maps, cleanses, and synchronizes your SMB revenue
-            metrics in under 5 minutes.
-          </span>
-        </div>
-      </div>
-    </ShowcaseFrame>
-  );
-}
 
 function ShowcaseDashboardContent() {
   return (
@@ -377,7 +346,6 @@ function ShowcaseDashboardContent() {
 }
 
 export default function InteractiveShowcase() {
-  const [activeTab, setActiveTab] = useState<Tab>("demo");
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
@@ -395,73 +363,28 @@ export default function InteractiveShowcase() {
     return () => observer.disconnect();
   }, []);
 
-  const titleComponent =
-    activeTab === "demo" ? (
-      <>
-        <p className="text-sm font-medium uppercase tracking-widest text-gray-400">
-          Platform demo
-        </p>
-        <h2 className="mt-2 text-3xl font-semibold text-black md:text-5xl">
-          See GRIP in action
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-base text-gray-500">
-          Watch how GRIP maps, cleanses, and synchronizes your SMB revenue
-          metrics in under 5 minutes.
-        </p>
-      </>
-    ) : (
-      <>
-        <p className="text-sm font-medium uppercase tracking-widest text-gray-400">
-          Analytics dashboard
-        </p>
-        <h2 className="mt-2 text-3xl font-semibold text-black md:text-5xl">
-          Your revenue, unified
-        </h2>
-        <p className="mx-auto mt-4 max-w-xl text-base text-gray-500">
-          Deep-dive analytics across Razorpay, Stripe, Shopify, and every
-          connector in one live workspace.
-        </p>
-      </>
-    );
+  const titleComponent = (
+    <>
+      <p className="text-sm font-medium uppercase tracking-widest text-gray-400">
+        Analytics dashboard
+      </p>
+      <h2 className="mt-2 text-3xl font-semibold text-black md:text-5xl">
+        Your revenue, unified
+      </h2>
+      <p className="mx-auto mt-4 max-w-xl text-base text-gray-500">
+        Deep-dive analytics across Razorpay, Stripe, Shopify, and every
+        connector in one live workspace.
+      </p>
+    </>
+  );
 
   return (
     <section
       ref={sectionRef}
       className="relative overflow-hidden bg-white pb-12 font-sans opacity-0 translate-y-8 transition-all duration-1000 ease-out"
     >
-      <div className="mx-auto w-full max-w-[1440px] px-8 lg:px-12">
-        <div className="grid grid-cols-2 border-b border-t border-gray-200/80">
-          <button
-            onClick={() => setActiveTab("demo")}
-            className={`flex items-center justify-center gap-3 border-b-2 border-r-2 border-gray-300 py-5 text-sm font-semibold transition-all ${
-              activeTab === "demo"
-                ? "border-black bg-gray-50/30 text-black"
-                : "border-transparent text-gray-400 hover:text-gray-900"
-            }`}
-          >
-            <CirclePlay className="h-4 w-4" />
-            Watch Demo
-          </button>
-          <button
-            onClick={() => setActiveTab("dashboard")}
-            className={`flex items-center justify-center gap-3 border-b-2 py-5 text-sm font-semibold transition-all ${
-              activeTab === "dashboard"
-                ? "border-black bg-gray-50/30 text-black"
-                : "border-transparent text-gray-400 hover:text-gray-900"
-            }`}
-          >
-            <LayoutDashboard className="h-4 w-4" />
-            Dashboard
-          </button>
-        </div>
-      </div>
-
-      <ContainerScroll key={activeTab} titleComponent={titleComponent}>
-        {activeTab === "demo" ? (
-          <ShowcaseDemoContent />
-        ) : (
-          <ShowcaseDashboardContent />
-        )}
+      <ContainerScroll titleComponent={titleComponent}>
+        <ShowcaseDashboardContent />
       </ContainerScroll>
     </section>
   );

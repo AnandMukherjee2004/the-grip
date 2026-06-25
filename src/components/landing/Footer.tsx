@@ -125,7 +125,7 @@ export function Footer() {
           <AnimatedWave />
         </div>
 
-        <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12 py-16 lg:py-24">
+        <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 lg:px-12 py-16 lg:py-24">
           <div className="grid grid-cols-2 md:grid-cols-6 gap-12 lg:gap-8">
             {/* Brand Column */}
             <div className="col-span-2">
@@ -195,7 +195,7 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar Segment */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-12">
+      <div className="relative z-10 max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
         <div className="py-8 border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-gray-500 font-medium">
             &copy; 2026 GRIP. All rights reserved.
