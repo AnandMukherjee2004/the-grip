@@ -117,7 +117,7 @@ export function PricingSection() {
       id="pricing"
       className="relative pt-16 pb-32 lg:pt-20 lg:pb-40 border-t border-gray-100 bg-white font-sans opacity-0 translate-y-8 transition-all duration-1000 ease-out"
     >
-      <div className="max-w-7xl mx-auto px-6 lg:px-12">
+      <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
         {/* Header */}
         <div className="mb-20 max-w-3xl">
           <p className="mb-6 pl-2 text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">

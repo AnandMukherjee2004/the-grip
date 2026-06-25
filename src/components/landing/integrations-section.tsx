@@ -3,20 +3,20 @@
 import React, { useEffect, useRef } from "react";
 
 const integrations = [
-  { name: "Razorpay", category: "Payments" },
-  { name: "Shopify", category: "E-commerce" },
-  { name: "LeadSquared", category: "CRM" },
-  { name: "Meta Ads", category: "Advertising" },
-  { name: "Google Ads", category: "Advertising" },
-  { name: "LimeChat", category: "Communication" },
-  { name: "WhatsApp Business", category: "Communication" },
-  { name: "Cashfree", category: "Payments" },
-  { name: "WooCommerce", category: "E-commerce" },
-  { name: "Zoho CRM", category: "CRM" },
-  { name: "HubSpot", category: "CRM" },
-  { name: "Salesforce", category: "CRM" },
-  { name: "Freshsales", category: "CRM" },
-  { name: "Stripe", category: "Payments" },
+  { name: "Razorpay", category: "Payments", logo: "/assets/crm-logos/razorpay.svg" },
+  { name: "Shopify", category: "E-commerce", logo: "/assets/crm-logos/shopify.svg" },
+  { name: "LeadSquared", category: "CRM", logo: "/assets/crm-logos/leadsquared.png" },
+  { name: "Meta Ads", category: "Advertising", logo: "/assets/crm-logos/meta-ads.png" },
+  { name: "Google Ads", category: "Advertising", logo: "/assets/crm-logos/google-ads.png" },
+  { name: "LimeChat", category: "Communication", logo: "/assets/crm-logos/limechat.jpeg" },
+  { name: "WhatsApp Business", category: "Communication", logo: "/assets/crm-logos/whatsapp.svg" },
+  { name: "Cashfree", category: "Payments", logo: "/assets/crm-logos/Cashfree.svg" },
+  { name: "WooCommerce", category: "E-commerce", logo: "/assets/crm-logos/WooCommerce_Logo.svg" },
+  { name: "Zoho CRM", category: "CRM", logo: "/assets/crm-logos/zoho_logo_icon_169675.svg" },
+  { name: "HubSpot", category: "CRM", logo: "/assets/crm-logos/hubspot.svg" },
+  { name: "Salesforce", category: "CRM", logo: "/assets/crm-logos/salesforce.svg" },
+  { name: "Freshsales", category: "CRM", logo: "/assets/crm-logos/freshsales.svg" },
+  { name: "Stripe", category: "Payments", logo: "/assets/crm-logos/stripe.svg" },
 ];
 
 export function IntegrationsSection() {
@@ -73,7 +73,7 @@ export function IntegrationsSection() {
           animation-play-state: paused;
         }
       `}} />
-      <div className="max-w-[1440px] mx-auto px-8 lg:px-12">
+      <div className="max-w-7xl mx-auto px-6 md:px-8 lg:px-12">
         {/* Header matching Grip aesthetics */}
         <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20 space-y-4">
           {/* Pill Badge */}
@@ -105,12 +105,18 @@ export function IntegrationsSection() {
                 {integrations.map((integration, idx) => (
                   <div
                     key={`${integration.name}-${setIndex}-${idx}`}
-                    className="shrink-0 px-8 py-5 border border-gray-150 hover:border-gray-300 hover:bg-gray-50/50 transition-all duration-300 group rounded-md bg-white min-w-[190px]"
+                    className="shrink-0 px-6 py-4 border border-gray-150 hover:border-gray-300 hover:bg-gray-50/50 transition-all duration-300 group rounded-md bg-white min-w-[220px] flex items-center gap-4"
                   >
-                    <div className="text-base font-medium text-gray-900 group-hover:translate-x-1 transition-transform">
-                      {integration.name}
+                    <div className="w-8 h-8 rounded border border-gray-100 flex items-center justify-center p-1 bg-white shrink-0 shadow-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={integration.logo} alt={integration.name} className="w-full h-full object-contain" />
                     </div>
-                    <div className="text-xs text-gray-400 font-medium mt-1">{integration.category}</div>
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900 group-hover:translate-x-0.5 transition-transform">
+                        {integration.name}
+                      </div>
+                      <div className="text-[11px] text-gray-400 font-medium">{integration.category}</div>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -126,12 +132,18 @@ export function IntegrationsSection() {
                 {[...integrations].reverse().map((integration, idx) => (
                   <div
                     key={`${integration.name}-reverse-${setIndex}-${idx}`}
-                    className="shrink-0 px-8 py-5 border border-gray-150 hover:border-gray-300 hover:bg-gray-50/50 transition-all duration-300 group rounded-md bg-white min-w-[190px]"
+                    className="shrink-0 px-6 py-4 border border-gray-150 hover:border-gray-300 hover:bg-gray-50/50 transition-all duration-300 group rounded-md bg-white min-w-[220px] flex items-center gap-4"
                   >
-                    <div className="text-base font-medium text-gray-900 group-hover:translate-x-1 transition-transform">
-                      {integration.name}
+                    <div className="w-8 h-8 rounded border border-gray-100 flex items-center justify-center p-1 bg-white shrink-0 shadow-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={integration.logo} alt={integration.name} className="w-full h-full object-contain" />
                     </div>
-                    <div className="text-xs text-gray-400 font-medium mt-1">{integration.category}</div>
+                    <div>
+                      <div className="text-sm font-semibold text-gray-900 group-hover:translate-x-0.5 transition-transform">
+                        {integration.name}
+                      </div>
+                      <div className="text-[11px] text-gray-400 font-medium">{integration.category}</div>
+                    </div>
                   </div>
                 ))}
               </div>
